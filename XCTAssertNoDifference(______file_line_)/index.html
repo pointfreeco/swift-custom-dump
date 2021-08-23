@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CustomDump - XCTAssertNoDifference(_:_:_:file:line:)</title>
+    <link rel="stylesheet" type="text/css" href="/swift-custom-dump/all.css" media="all" />
+</head>
+<body>
+    <header>
+        <a href="/swift-custom-dump/">
+            <strong>
+                CustomDump
+            </strong>
+            <span>Documentation</span>
+        </a>
+    </header>
+
+    <!--
+    <form class="search">
+        <input type="search" placeholder="Search" />
+    </form>
+    -->
+
+    <nav>
+        <div class="wrapper">
+            <h2>On This Page</h2>
+            <ol/>
+        </div>
+    </nav>
+
+    <main>
+        <article>
+            <h1>
+<small>Function</small>
+<span class="name">XCTAssert​NoDifference(_:​_:​_:​file:​line:​)</span>
+</h1>
+
+<div class="declaration">
+<pre class="highlight"><code><html><body><span class="attribute">@</span><span class="attribute">available</span>(<span class="keyword">iOS</span> <span class="number literal">13</span>, <span class="keyword">macOS</span> <span class="number literal">10.15</span>, <span class="keyword">tvOS</span> <span class="number literal">13</span>, <span class="keyword">watchOS</span> <span class="number literal">6</span>, *)
+<span class="keyword">public</span> <span class="keyword">func</span> <span class="function">XCTAssertNoDifference</span>&lt;<span class="variable">T</span>&gt;(
+  <span class="keyword">_</span> <span class="variable">expression1</span>: <span class="attribute">@</span><span class="attribute">autoclosure</span> () <span class="keyword">throws</span> -&gt; <span class="type">T</span>,
+  <span class="keyword">_</span> <span class="variable">expression2</span>: <span class="attribute">@</span><span class="attribute">autoclosure</span> () <span class="keyword">throws</span> -&gt; <span class="type">T</span>,
+  <span class="keyword">_</span> <span class="variable">message</span>: <span class="attribute">@</span><span class="attribute">autoclosure</span> () -&gt; <span class="type">String</span> = <span class="string literal">"</span><span class="string literal"/><span class="string literal">"</span>,
+  <span class="variable">file</span>: <span class="type">StaticString</span> = <span class="keyword">#filePath</span>,
+  <span class="variable">line</span>: <span class="type">UInt</span> = <span class="keyword">#line</span>
+) <span class="keyword">where</span> <span class="type">T</span>: <span class="type">Equatable</span>  </body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Asserts that two values have no difference.</p>
+
+</div>
+<div class="discussion">
+    <p>Similar to <code>XCTAssertEqual</code>, but that function uses either <code>TextOutputStreamable</code>,
+<code>CustomStringConvertible</code> or <code>CustomDebugStringConvertible</code> in order to display a failure
+message:</p>
+
+<html><body><pre class="highlight"><code><span class="variable">XCTAssertEqual</span>(<span class="variable">user1</span>, <span class="variable">user2</span>)
+</code></pre></body></html>
+<html><body><pre><code class="language-text">XCTAssertEqual failed: ("User(id: 42, name: "Blob")") is not equal to ("User(id: 42, name: "Blob, Esq.")")
+</code></pre>
+ </body></html>
+<p><code>XCTAssertNoDifference</code> uses the output of <code>diff(_:_:format:)</code> to display a failure message,
+which helps highlight the differences between the given values:</p>
+
+<html><body><pre class="highlight"><code><span class="variable">XCTAssertNoDifference</span>(<span class="variable">user1</span>, <span class="variable">user2</span>)
+</code></pre></body></html>
+<html><body><pre><code class="language-text">XCTAssertNoDifference failed: …
+
+    User(
+      id: 42,
+  -   name: "Blob"
+  +   name: "Blob, Esq."
+    )
+
+(First: -, Second: +)
+</code></pre>
+ </body></html>
+</div>
+<h4>Parameters</h4>
+
+<table class="parameters">
+  <thead hidden>
+  <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr>
+    <th>expression1</th>
+    <td><code class="type">@autoclosure () throws -&gt; T</code></td>
+    <td><p>An expression of type <code>T</code>, where <code>T</code> is <code>Equatable</code>.</p>
+</td>
+</tr>
+<tr>
+    <th>expression2</th>
+    <td><code class="type">@autoclosure () throws -&gt; T</code></td>
+    <td><p>A second expression of type <code>T</code>, where <code>T</code> is <code>Equatable</code>.</p>
+</td>
+</tr>
+<tr>
+    <th>message</th>
+    <td><code class="type">@autoclosure () -&gt; String</code></td>
+    <td><p>An optional description of a failure.</p>
+</td>
+</tr>
+<tr>
+    <th>file</th>
+    <td><code class="type">Static​String</code></td>
+    <td><p>The file where the failure occurs. The default is the filename of the test case where you call this function.</p>
+</td>
+</tr>
+<tr>
+    <th>line</th>
+    <td><code class="type">UInt</code></td>
+    <td><p>The line number where the failure occurs. The default is the line number where you call this function.</p>
+</td>
+</tr>
+  </tbody>
+</table>
+        </article>
+    </main>
+
+    <footer>
+        <p>
+    Generated on <time datetime="2021-08-23T01:46:43+0000">August 23, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
+</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CustomDump - CustomDump</title>
+    <link rel="stylesheet" type="text/css" href="/swift-custom-dump/all.css" media="all" />
+</head>
+<body>
+    <header>
+        <a href="/swift-custom-dump/">
+            <strong>
+                CustomDump
+            </strong>
+            <span>Documentation</span>
+        </a>
+    </header>
+
+    <!--
+    <form class="search">
+        <input type="search" placeholder="Search" />
+    </form>
+    -->
+
+    <nav>
+        <div class="wrapper">
+            <h2>On This Page</h2>
+            <ol><li><a href="#structures">Structures</a></li><li><a href="#protocols">Protocols</a></li><li><a href="#functions">Functions</a></li><li><a href="#extensions">Extensions</a></li></ol>
+        </div>
+    </nav>
+
+    <main>
+        <article>
+                <section id="structures">
+        <h2>Structures</h2>
+        <dl>
+            <dt class="structure">
+    <a href="/swift-custom-dump/DiffFormat" title="structure - DiffFormat">
+        Diff​Format
+    </a>
+</dt>
+<dd>
+    <p>Describes how to format a difference between two values when using <code>diff(_:_:format:)</code>.</p>
+
+</dd>
+        </dl>
+    </section>
+    <section id="protocols">
+        <h2>Protocols</h2>
+        <dl>
+            <dt class="protocol">
+    <a href="/swift-custom-dump/CustomDumpReflectable" title="protocol - CustomDumpReflectable">
+        Custom​Dump​Reflectable
+    </a>
+</dt>
+<dd>
+    <p>A type that explicitly supplies its own mirror for <code>customDump(_:to:name:indent:maxDepth:)</code>
+and <code>diff(_:_:format:)</code>.</p>
+
+</dd>
+<dt class="protocol">
+    <a href="/swift-custom-dump/CustomDumpRepresentable" title="protocol - CustomDumpRepresentable">
+        Custom​Dump​Representable
+    </a>
+</dt>
+<dd>
+    <p>A type that can be converted to a value for the purpose of dumping.</p>
+
+</dd>
+<dt class="protocol">
+    <a href="/swift-custom-dump/CustomDumpStringConvertible" title="protocol - CustomDumpStringConvertible">
+        Custom​Dump​String​Convertible
+    </a>
+</dt>
+<dd>
+    <p>A type with a customized textual representation for <code>customDump(_:to:name:indent:maxDepth:)</code>
+and <code>diff(_:_:format:)</code>.</p>
+
+</dd>
+        </dl>
+    </section>
+    <section id="functions">
+        <h2>Functions</h2>
+        <dl>
+            <dt class="function">
+    <a href="/swift-custom-dump/diff(____format_)" title="function - diff(_:_:format:)">
+        diff(_:​_:​format:​)
+    </a>
+</dt>
+<dd>
+    <p>Detects differences between two given values by comparing their mirrors and optionally returns
+a formatted string describing it.</p>
+
+</dd>
+<dt class="function">
+    <a href="/swift-custom-dump/customDump(__name_indent_maxDepth_)" title="function - customDump(_:name:indent:maxDepth:)">
+        custom​Dump(_:​name:​indent:​max​Depth:​)
+    </a>
+</dt>
+<dd>
+    <p>Dumps the given value's contents using its mirror to standard output.</p>
+
+</dd>
+<dt class="function">
+    <a href="/swift-custom-dump/customDump(__to_name_indent_maxDepth_)" title="function - customDump(_:to:name:indent:maxDepth:)">
+        custom​Dump(_:​to:​name:​indent:​max​Depth:​)
+    </a>
+</dt>
+<dd>
+    <p>Dumps the given value's contents using its mirror to the specified output stream.</p>
+
+</dd>
+<dt class="function">
+    <a href="/swift-custom-dump/XCTAssertNoDifference(______file_line_)" title="function - XCTAssertNoDifference(_:_:_:file:line:)">
+        XCTAssert​NoDifference(_:​_:​_:​file:​line:​)
+    </a>
+</dt>
+<dd>
+    <p>Asserts that two values have no difference.</p>
+
+</dd>
+        </dl>
+    </section>
+<section id="extensions">
+    <h2>Extensions</h2>
+    <dl>
+    <dt class="extension">
+    <a href="/swift-custom-dump/Calendar">Calendar</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/Character">Character</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/Data">Data</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/Date">Date</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/Locale">Locale</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/NSAttributedString">NSAttributedString</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/NSCalendar">NSCalendar</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/NSData">NSData</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/NSDate">NSDate</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/NSError">NSError</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/NSExceptionName">NSExceptionName</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/NSIndexPath">NSIndexPath</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/NSIndexSet">NSIndexSet</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/NSLocale">NSLocale</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/NSMeasurement">NSMeasurement</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/NSNotification">NSNotification</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/NSOrderedSet">NSOrderedSet</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/NSPredicate">NSPredicate</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/NSRange">NSRange</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/NSString">NSString</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/NSTimeZone">NSTimeZone</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/NSURL">NSURL</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/NSURLComponents">NSURLComponents</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/NSURLQueryItem">NSURLQueryItem</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/NSURLRequest">NSURLRequest</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/NSUUID">NSUUID</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/NSValue">NSValue</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/ObjectIdentifier">ObjectIdentifier</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/StaticString">StaticString</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/TimeZone">TimeZone</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/URL">URL</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/URLRequest_NetworkServiceType">URLRequest.NetworkServiceType</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/UUID">UUID</a>
+</dt>
+<dd></dd>
+<dt class="extension">
+    <a href="/swift-custom-dump/UnicodeScalar">UnicodeScalar</a>
+</dt>
+<dd></dd>
+    </dl>
+<section>
+        </article>
+    </main>
+
+    <footer>
+        <p>
+    Generated on <time datetime="2021-08-23T01:46:43+0000">August 23, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
+</p>
+    </footer>
+</body>
+</html>

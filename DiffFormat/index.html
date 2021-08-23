@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CustomDump - DiffFormat</title>
+    <link rel="stylesheet" type="text/css" href="/swift-custom-dump/all.css" media="all" />
+</head>
+<body>
+    <header>
+        <a href="/swift-custom-dump/">
+            <strong>
+                CustomDump
+            </strong>
+            <span>Documentation</span>
+        </a>
+    </header>
+
+    <!--
+    <form class="search">
+        <input type="search" placeholder="Search" />
+    </form>
+    -->
+
+    <nav>
+        <div class="wrapper">
+            <h2>On This Page</h2>
+            <ol><li><a href="#initializers">Initializers</a><ul><li class="initializer"><a href="#diffformat.init(first:second:both:)">init(first:​second:​both:​)</a></li></ul></li><li><a href="#properties">Properties</a><ul><li class="variable"><a href="#diffformat.first">first</a></li><li class="variable"><a href="#diffformat.second">second</a></li><li class="variable"><a href="#diffformat.both">both</a></li><li class="variable"><a href="#diffformat.`default`">`default`</a></li><li class="variable"><a href="#diffformat.proportional">proportional</a></li></ul></li></ol>
+        </div>
+    </nav>
+
+    <main>
+        <article>
+            <h1>
+    <small>Structure</small>
+    <code class="name">Diff​Format</code>
+</h1>
+
+<div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">struct</span> <span class="type">DiffFormat</span>  </body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Describes how to format a difference between two values when using <code>diff(_:_:format:)</code>.</p>
+
+</div>
+<div class="discussion">
+    <p>Typically one simply wants to use &quot;-&quot; to denote removals, &quot;+&quot; to denote additions, and &quot; &quot; for
+spacing. However, in some contexts, such as in <code>XCTest</code> failures, messages are displayed in a
+non-monospaced font. In those times the simple &quot;-&quot; and &quot; &quot; characters do not properly line up
+visually, and so you need to use different characters that visually look similar to &quot;-&quot; and &quot; &quot;
+but have the proper widths.</p>
+
+<p>This type comes with two pre-configured formats that you will probably want to use for most
+situations: <code>DiffFormat/default</code> and <code>DiffFormat/proportional</code>.</p>
+
+</div>
+
+    <section id="initializers">
+        <h2>Initializers</h2>
+
+        <div role="article" class="initializer" id="diffformat.init(first:second:both:)">
+    <h3>
+        <code><a href="#diffformat.init(first:second:both:)">init(first:​second:​both:​)</a></code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">init</span>(
+    <span class="variable">first</span>: <span class="type">String</span>,
+    <span class="variable">second</span>: <span class="type">String</span>,
+    <span class="variable">both</span>: <span class="type">String</span>
+  )  </body></html></code></pre>
+</div>
+</div>
+    </section>
+    <section id="properties">
+        <h2>Properties</h2>
+
+        <div role="article" class="variable" id="diffformat.first">
+    <h3>
+        <code><a href="#diffformat.first">first</a></code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">first</span>: <span class="type">String</span></body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>A string prepended to lines that only appear in the string representation of the first value,
+e.g. a &quot;removal.&quot;</p>
+
+</div>
+</div>
+<div role="article" class="variable" id="diffformat.second">
+    <h3>
+        <code><a href="#diffformat.second">second</a></code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">second</span>: <span class="type">String</span></body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>A string prepended to lines that only appear in the string representation of the second value,
+e.g. an &quot;insertion.&quot;</p>
+
+</div>
+</div>
+<div role="article" class="variable" id="diffformat.both">
+    <h3>
+        <code><a href="#diffformat.both">both</a></code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">both</span>: <span class="type">String</span></body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>A string prepended to lines that appear in the string representation of both values, e.g.
+something &quot;unchanged.&quot;</p>
+
+</div>
+</div>
+<div role="article" class="variable" id="diffformat.`default`">
+    <h3>
+        <code><a href="#diffformat.`default`">`default`</a></code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">let</span> <span class="variable">`default`</span>  </body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>The default format for <code>diff(_:_:format:)</code> output, appropriate for where monospaced fonts
+are used, e.g. console output.</p>
+
+</div>
+<div class="discussion">
+    <p>Uses ascii characters for removals (hyphen &quot;-&quot;), insertions (plus &quot;+&quot;), and unchanged (space
+&quot; &quot;).</p>
+
+</div>
+</div>
+<div role="article" class="variable" id="diffformat.proportional">
+    <h3>
+        <code><a href="#diffformat.proportional">proportional</a></code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">let</span> <span class="variable">proportional</span>  </body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>A diff format appropriate for where proportional (non-monospaced) fonts are used, e.g. Xcode's
+failure overlays.</p>
+
+</div>
+<div class="discussion">
+    <p>Uses ascii plus (&quot;+&quot;) for insertions, unicode minus sign (&quot;−&quot;) for removals, and unicode
+figure space (&quot; &quot;) for unchanged. These three characters are more likely to render with equal
+widths in proportional fonts.</p>
+
+</div>
+</div>
+    </section>
+
+
+
+        </article>
+    </main>
+
+    <footer>
+        <p>
+    Generated on <time datetime="2021-08-23T01:46:43+0000">August 23, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
+</p>
+    </footer>
+</body>
+</html>

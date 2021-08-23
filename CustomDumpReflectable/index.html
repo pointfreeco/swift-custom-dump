@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CustomDump - CustomDumpReflectable</title>
+    <link rel="stylesheet" type="text/css" href="/swift-custom-dump/all.css" media="all" />
+</head>
+<body>
+    <header>
+        <a href="/swift-custom-dump/">
+            <strong>
+                CustomDump
+            </strong>
+            <span>Documentation</span>
+        </a>
+    </header>
+
+    <!--
+    <form class="search">
+        <input type="search" placeholder="Search" />
+    </form>
+    -->
+
+    <nav>
+        <div class="wrapper">
+            <h2>On This Page</h2>
+            <ol><li><a href="#requirements">Requirements</a><ul><li class="variable"><a href="#customdumpreflectable.customdumpmirror">custom​Dump​Mirror</a></li></ul></li></ol>
+        </div>
+    </nav>
+
+    <main>
+        <article>
+            <h1>
+    <small>Protocol</small>
+    <code class="name">Custom​Dump​Reflectable</code>
+</h1>
+
+<div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">protocol</span> <span class="type">CustomDumpReflectable</span>  </body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>A type that explicitly supplies its own mirror for <code>customDump(_:to:name:indent:maxDepth:)</code>
+and <code>diff(_:_:format:)</code>.</p>
+
+</div>
+<div class="discussion">
+    <p>Types that want to customize their dump output can conform to this protocol, especially those
+with a complex or nested internal structure. Providing a custom mirror allows you to reorder,
+transform, or omit fields on a base structure, or even change the representation of the base
+structure itself.</p>
+
+<p>For unstructured data types, or data types that are represented by single values, see the
+<code>CustomDumpStringConvertible</code> protocol.</p>
+
+<h2>Customizing the dump of a structure's fields</h2>
+
+<p>For example, let's say you have a struct representing login state, which holds a secure token in
+memory that should never be written to your logs. You can omit the token from <code>customDump</code> by
+providing a mirror that omits this field:</p>
+
+<html><body><pre class="highlight"><code><span class="keyword">struct</span> <span class="type">LoginState</span>: <span class="type">CustomDumpReflectable</span> {
+  <span class="keyword">var</span> <span class="variable">email</span> = <span class="string literal">"</span><span class="string literal"/><span class="string literal">"</span>
+  <span class="keyword">var</span> <span class="variable">password</span> = <span class="string literal">"</span><span class="string literal"/><span class="string literal">"</span>
+  <span class="keyword">var</span> <span class="variable">token</span>: <span class="type">String</span>
+
+  <span class="keyword">var</span> <span class="variable">customDumpMirror</span>: <span class="type">Mirror</span> {
+    .<span class="variable">init</span>(
+      <span class="keyword">self</span>,
+      <span class="variable">children</span>: [
+        <span class="string literal">"</span><span class="string literal">email</span><span class="string literal">"</span>: <span class="keyword">self</span>.<span class="variable">email</span>,
+        <span class="string literal">"</span><span class="string literal">password</span><span class="string literal">"</span>: <span class="keyword">self</span>.<span class="variable">password</span>
+        <span class="comment">// omit token from logs</span>
+      ],
+      <span class="variable">displayStyle</span>: .<span class="variable">struct</span>
+    )
+  }
+}
+
+<span class="variable">customDump</span>(
+  <span class="variable">LoginState</span>(
+    <span class="variable">email</span>: <span class="string literal">"</span><span class="string literal">blob@pointfree.co</span><span class="string literal">"</span>,
+    <span class="variable">password</span>: <span class="string literal">"</span><span class="string literal">bl0bisawesome!</span><span class="string literal">"</span>,
+    <span class="variable">token</span>: <span class="string literal">"</span><span class="string literal">secret</span><span class="string literal">"</span>
+  )
+)
+</code></pre></body></html>
+<html><body><pre><code class="language-text">LoginState(
+  email: "blob@pointfree.co",
+  password: "bl0bisawesome!"
+)
+</code></pre>
+ </body></html>
+<p>There! No token data is being written to the dump. However, the dump still contains the user's
+password, which is sensitive. Rather than omit it entirely, we could redact this information
+using a <code>Redacted</code> wrapper type that redacts its contents from custom dumps via the
+<code>CustomDumpStringConvertible</code> protocol:</p>
+
+<html><body><pre class="highlight"><code><span class="keyword">struct</span> <span class="type">Redacted</span>&lt;<span class="variable">RawValue</span>&gt;: <a href="/swift-custom-dump/CustomDumpStringConvertible"><span class="type">CustomDumpStringConvertible</span></a> {
+  <span class="keyword">let</span> <span class="variable">rawValue</span>: <span class="type">RawValue</span>
+
+  <span class="keyword">var</span> <span class="variable">customDumpDescription</span>: <span class="type">String</span> {
+    <span class="string literal">"</span><span class="string literal">&lt;redacted&gt;</span><span class="string literal">"</span>
+  }
+}
+
+<span class="keyword">struct</span> <span class="type">LoginState</span>: <span class="type">CustomDumpReflectable</span> {
+  ...
+  <span class="keyword">var</span> <span class="variable">customDumpMirror</span>: <span class="type">Mirror</span> {
+    .<span class="variable">init</span>(
+      <span class="keyword">self</span>,
+      <span class="variable">children</span>: [
+        <span class="string literal">"</span><span class="string literal">email</span><span class="string literal">"</span>: <span class="keyword">self</span>.<span class="variable">email</span>,
+        <span class="comment">// redact password!</span>
+        <span class="string literal">"</span><span class="string literal">password</span><span class="string literal">"</span>: <span class="type">Redacted</span>(<span class="variable">rawValue</span>: <span class="keyword">self</span>.<span class="variable">password</span>)
+        <span class="comment">// omit token from logs</span>
+      ],
+      <span class="variable">displayStyle</span>: .<span class="variable">struct</span>
+    )
+  }
+}
+
+<span class="variable">customDump</span>(
+  <span class="variable">LoginState</span>(
+    <span class="variable">email</span>: <span class="string literal">"</span><span class="string literal">blob@pointfree.co</span><span class="string literal">"</span>,
+    <span class="variable">password</span>: <span class="string literal">"</span><span class="string literal">bl0bisawesome!</span><span class="string literal">"</span>,
+    <span class="variable">token</span>: <span class="string literal">"</span><span class="string literal">secret</span><span class="string literal">"</span>
+  )
+)
+</code></pre></body></html>
+<html><body><pre><code class="language-text">LoginState(
+  email: "blob@pointfree.co",
+  password: &lt;redacted&gt;
+)
+</code></pre>
+ </body></html>
+<p>Now the dump retains the fact that a password field exists, but it prevents the underlying value
+from being logged.</p>
+
+<h2>Overriding a structure's dump representation</h2>
+
+<p>Massaging the data inside a structure is just one way to use a custom mirror. A mirror can also
+let you completely transform the <em>way</em> a structure is dumped.</p>
+
+<p>For example, a wrapper type can be flattened to dump the wrapped value by providing the wrapped
+value's mirror:</p>
+
+<html><body><pre class="highlight"><code><span class="keyword">struct</span> <span class="type">Todos</span>: <span class="type">CustomDumpReflectable</span> {
+  <span class="keyword">var</span> <span class="variable">rawValue</span>: [<span class="type">Todo</span>] = []
+
+  <span class="keyword">var</span> <span class="variable">customDumpMirror</span>: <span class="type">Mirror</span> {
+    .<span class="variable">init</span>(<span class="variable">reflecting</span>: <span class="keyword">self</span>.<span class="variable">rawValue</span>)
+  }
+}
+
+<span class="variable">customDump</span>(<span class="variable">Todos</span>())
+</code></pre></body></html>
+<html><body><pre><code class="language-text">[]
+</code></pre>
+ </body></html>
+</div>
+
+
+
+
+    <section id="requirements">
+        <h2>Requirements</h2>
+
+        <div role="article" class="variable" id="customdumpreflectable.customdumpmirror">
+    <h3>
+        <code>custom​Dump​Mirror</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">var</span> <span class="variable">customDumpMirror</span>: <span class="type">Mirror</span>  </body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>The custom dump mirror for this instance.</p>
+
+</div>
+</div>
+    </section>
+        </article>
+    </main>
+
+    <footer>
+        <p>
+    Generated on <time datetime="2021-08-23T01:46:43+0000">August 23, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
+</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CustomDump - CustomDumpRepresentable</title>
+    <link rel="stylesheet" type="text/css" href="/swift-custom-dump/all.css" media="all" />
+</head>
+<body>
+    <header>
+        <a href="/swift-custom-dump/">
+            <strong>
+                CustomDump
+            </strong>
+            <span>Documentation</span>
+        </a>
+    </header>
+
+    <!--
+    <form class="search">
+        <input type="search" placeholder="Search" />
+    </form>
+    -->
+
+    <nav>
+        <div class="wrapper">
+            <h2>On This Page</h2>
+            <ol><li><a href="#requirements">Requirements</a><ul><li class="variable"><a href="#customdumprepresentable.customdumpvalue">custom​Dump​Value</a></li></ul></li></ol>
+        </div>
+    </nav>
+
+    <main>
+        <article>
+            <h1>
+    <small>Protocol</small>
+    <code class="name">Custom​Dump​Representable</code>
+</h1>
+
+<div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">protocol</span> <span class="type">CustomDumpRepresentable</span>  </body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>A type that can be converted to a value for the purpose of dumping.</p>
+
+</div>
+<div class="discussion">
+    <p>The <code>CustomDumpRepresentable</code> protocol allows you to return <em>any</em> value for the purpose of
+dumping. This can be used to flatten the dump representation of wrapper types. For example, a
+type-safe identifier may want to dump its raw value directly:</p>
+
+<html><body><pre class="highlight"><code><span class="keyword">struct</span> <span class="type">ID</span>: <span class="type">RawRepresentable</span> {
+  <span class="keyword">var</span> <span class="variable">rawValue</span>: <span class="type">String</span>
+}
+
+<span class="keyword">extension</span> <span class="type">ID</span>: <span class="type">CustomDumpRepresentable</span> {
+  <span class="keyword">var</span> <span class="variable">customDumpValue</span>: <span class="keyword">Any</span> {
+    <span class="keyword">self</span>.<span class="variable">rawValue</span>
+  }
+}
+
+<span class="variable">customDump</span>(<span class="variable">ID</span>(<span class="variable">rawValue</span>: <span class="string literal">"</span><span class="string literal">deadbeef</span><span class="string literal">"</span>)
+</code></pre></body></html>
+<html><body><pre><code class="language-text">"deadbeef"
+</code></pre>
+ </body></html>
+</div>
+
+
+
+
+    <section id="requirements">
+        <h2>Requirements</h2>
+
+        <div role="article" class="variable" id="customdumprepresentable.customdumpvalue">
+    <h3>
+        <code>custom​Dump​Value</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">var</span> <span class="variable">customDumpValue</span>: <span class="keyword">Any</span>  </body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>The custom dump value for this instance.</p>
+
+</div>
+</div>
+    </section>
+        </article>
+    </main>
+
+    <footer>
+        <p>
+    Generated on <time datetime="2021-08-23T01:46:43+0000">August 23, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
+</p>
+    </footer>
+</body>
+</html>

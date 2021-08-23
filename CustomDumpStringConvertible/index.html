@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CustomDump - CustomDumpStringConvertible</title>
+    <link rel="stylesheet" type="text/css" href="/swift-custom-dump/all.css" media="all" />
+</head>
+<body>
+    <header>
+        <a href="/swift-custom-dump/">
+            <strong>
+                CustomDump
+            </strong>
+            <span>Documentation</span>
+        </a>
+    </header>
+
+    <!--
+    <form class="search">
+        <input type="search" placeholder="Search" />
+    </form>
+    -->
+
+    <nav>
+        <div class="wrapper">
+            <h2>On This Page</h2>
+            <ol><li><a href="#requirements">Requirements</a><ul><li class="variable"><a href="#customdumpstringconvertible.customdumpdescription">custom​Dump​Description</a></li></ul></li></ol>
+        </div>
+    </nav>
+
+    <main>
+        <article>
+            <h1>
+    <small>Protocol</small>
+    <code class="name">Custom​Dump​String​Convertible</code>
+</h1>
+
+<div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">public</span> <span class="keyword">protocol</span> <span class="type">CustomDumpStringConvertible</span>  </body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>A type with a customized textual representation for <code>customDump(_:to:name:indent:maxDepth:)</code>
+and <code>diff(_:_:format:)</code>.</p>
+
+</div>
+<div class="discussion">
+    <p>Types that want to customize their dump output can conform to this protocol. It is most
+appropriate for types that have a simple, un-nested internal representation, and typically its
+output fits on a single line, for example dates, UUIDs, URLs, etc.</p>
+
+<p>For data types with more structure, for example those with nesting and multiple fields, see the
+<code>CustomDumpReflectable</code> protocol.</p>
+
+<p>The library conforms a bunch of Foundation types to this protocol to simplify their dump output:</p>
+
+<html><body><pre class="highlight"><code><span class="keyword">extension</span> <span class="type">URL</span>: <span class="type">CustomDumpStringConvertible</span> {
+  <span class="keyword">public</span> <span class="keyword">var</span> <span class="variable">customDumpDescription</span>: <span class="type">String</span> {
+    <span class="string literal">"</span><span class="string literal">URL(</span>\<span class="string literal">(</span><span class="keyword">self</span>.<span class="variable">absoluteString</span><span class="string literal">)</span><span class="string literal">)</span><span class="string literal">"</span>
+  }
+}
+
+<span class="variable">customDump</span>(<span class="variable">URL</span>(<span class="variable">string</span>: <span class="string literal">"</span><span class="string literal">https://www.pointfree.co/</span><span class="string literal">"</span>)!)
+</code></pre></body></html>
+<html><body><pre><code class="language-text">URL(https://www.pointfree.co/)
+</code></pre>
+ </body></html>
+<p>Custom Dump also uses this protocol internally to provide more useful output for enums imported
+from Objective-C:</p>
+
+<html><body><pre class="highlight"><code><span class="keyword">import</span> <span class="variable">UserNotifications</span>
+
+<span class="variable">print</span>(<span class="string literal">"</span><span class="string literal">dump:</span><span class="string literal">"</span>)
+<span class="variable">dump</span>(<span class="variable">UNNotificationSetting</span>.<span class="variable">disabled</span>)
+<span class="variable">print</span>(<span class="string literal">"</span><span class="string literal">customDump:</span><span class="string literal">"</span>)
+<span class="variable">customDump</span>(<span class="variable">UNNotificationSetting</span>.<span class="variable">disabled</span>)
+</code></pre></body></html>
+<html><body><pre><code class="language-text">dump:
+- __C.UNNotificationSetting
+customDump:
+UNNotificationSettings.disabled
+</code></pre>
+ </body></html>
+<p>Any time you want to override the dump representation with some other string, you can use this
+protocol.</p>
+
+<p>For example, you could introduce a wrapper type that &quot;redacts&quot; a portion of a dump:</p>
+
+<html><body><pre class="highlight"><code><span class="keyword">struct</span> <span class="type">Redacted</span>&lt;<span class="variable">RawValue</span>&gt;: <span class="type">CustomDumpStringConvertible</span> {
+  <span class="keyword">let</span> <span class="variable">rawValue</span>: <span class="type">RawValue</span>
+
+  <span class="keyword">var</span> <span class="variable">customDumpDescription</span>: <span class="type">String</span> {
+    <span class="string literal">"</span><span class="string literal">&lt;redacted&gt;</span><span class="string literal">"</span>
+  }
+}
+
+<span class="variable">customDump</span>(<span class="variable">Redacted</span>(<span class="variable">rawValue</span>: <span class="string literal">"</span><span class="string literal">my super secret password</span><span class="string literal">"</span>))
+</code></pre></body></html>
+<html><body><pre><code class="language-text">&lt;redacted&gt;
+</code></pre>
+ </body></html>
+</div>
+
+
+
+
+    <section id="requirements">
+        <h2>Requirements</h2>
+
+        <div role="article" class="variable" id="customdumpstringconvertible.customdumpdescription">
+    <h3>
+        <code>custom​Dump​Description</code>
+    </h3>
+    <div class="declaration">
+<pre class="highlight"><code><html><body><span class="keyword">var</span> <span class="variable">customDumpDescription</span>: <span class="type">String</span>  </body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>The custom dump description for this instance.</p>
+
+</div>
+</div>
+    </section>
+        </article>
+    </main>
+
+    <footer>
+        <p>
+    Generated on <time datetime="2021-08-23T01:46:43+0000">August 23, 2021</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
+</p>
+    </footer>
+</body>
+</html>
