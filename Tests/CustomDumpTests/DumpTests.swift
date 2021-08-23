@@ -766,12 +766,24 @@ final class DumpTests: XCTestCase {
       NestedDate(date: Date(timeIntervalSince1970: 0)),
       to: &dump
     )
-    XCTAssertNoDifference(
-      dump,
-      """
-      NestedDate(date: Date(1970-01-01T00:00:00.000Z))
-      """
-    )
+    #if compiler(>=5.4)
+      XCTAssertNoDifference(
+        dump,
+        """
+        NestedDate(date: Date(1970-01-01T00:00:00.000Z))
+        """
+      )
+    #else
+      XCTAssertNoDifference(
+        dump,
+        """
+        NestedDate(
+          date: Date(1970-01-01T00:00:00.000Z)
+        )
+        """
+      )
+    #endif
+
 
     dump = ""
     customDump(
