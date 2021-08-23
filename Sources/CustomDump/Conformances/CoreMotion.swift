@@ -34,7 +34,9 @@
         }
       }
     }
+  #endif
 
+  #if compiler(>=5.5)
     @available(iOS, unavailable)
     @available(macOS, unavailable)
     @available(tvOS, unavailable)
