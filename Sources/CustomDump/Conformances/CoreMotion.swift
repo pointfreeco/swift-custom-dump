@@ -34,28 +34,30 @@
         }
       }
     }
+  #endif
 
-//    @available(iOS, unavailable)
-//    @available(macOS, unavailable)
-//    @available(tvOS, unavailable)
-//    @available(watchOS 7.2, *)
-//    extension CMFallDetectionEvent.UserResolution: CustomDumpStringConvertible {
-//      public var customDumpDescription: String {
-//        switch self {
-//        case .confirmed:
-//          return "CMFallDetectionEvent.UserResolution.confirmed"
-//        case .dismissed:
-//          return "CMFallDetectionEvent.UserResolution.dismissed"
-//        case .rejected:
-//          return "CMFallDetectionEvent.UserResolution.rejected"
-//        case .unresponsive:
-//          return "CMFallDetectionEvent.UserResolution.unresponsive"
-//        @unknown default:
-//          return
-//            "CMFallDetectionEvent.UserResolution.(@unknown default, rawValue: \(self.rawValue))"
-//        }
-//      }
-//    }
+  #if compiler(>=5.5)
+    @available(iOS, unavailable)
+    @available(macOS, unavailable)
+    @available(tvOS, unavailable)
+    @available(watchOS 7.2, *)
+    extension CMFallDetectionEvent.UserResolution: CustomDumpStringConvertible {
+      public var customDumpDescription: String {
+        switch self {
+        case .confirmed:
+          return "CMFallDetectionEvent.UserResolution.confirmed"
+        case .dismissed:
+          return "CMFallDetectionEvent.UserResolution.dismissed"
+        case .rejected:
+          return "CMFallDetectionEvent.UserResolution.rejected"
+        case .unresponsive:
+          return "CMFallDetectionEvent.UserResolution.unresponsive"
+        @unknown default:
+          return
+            "CMFallDetectionEvent.UserResolution.(@unknown default, rawValue: \(self.rawValue))"
+        }
+      }
+    }
   #endif
 
   extension CMMotionActivityConfidence: CustomDumpStringConvertible {

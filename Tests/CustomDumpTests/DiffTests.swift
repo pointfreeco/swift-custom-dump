@@ -469,16 +469,18 @@ final class DiffTests: XCTestCase {
   }
 
   func testNestedCustomMirror() {
-    XCTAssertNoDifference(
-      diff(
-        NestedDate(date: Date(timeIntervalSince1970: 0)),
-        NestedDate(date: Date(timeIntervalSince1970: 1))
-      ),
-      """
-      - NestedDate(date: Date(1970-01-01T00:00:00.000Z))
-      + NestedDate(date: Date(1970-01-01T00:00:01.000Z))
-      """
-    )
+    #if compiler(>=5.4)
+      XCTAssertNoDifference(
+        diff(
+          NestedDate(date: Date(timeIntervalSince1970: 0)),
+          NestedDate(date: Date(timeIntervalSince1970: 1))
+        ),
+        """
+        - NestedDate(date: Date(1970-01-01T00:00:00.000Z))
+        + NestedDate(date: Date(1970-01-01T00:00:01.000Z))
+        """
+      )
+    #endif
   }
 
   func testMultilineString() {
