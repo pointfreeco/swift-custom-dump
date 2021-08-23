@@ -2,23 +2,25 @@
   import GameKit
 
   #if !os(watchOS)
-    @available(iOS 14, macOS 11, macCatalyst 14, tvOS 14, *)
-    extension GKAccessPoint.Location: CustomDumpStringConvertible {
-      public var customDumpDescription: String {
-        switch self {
-        case .bottomLeading:
-          return "GKAccessPoint.Location.bottomLeading"
-        case .bottomTrailing:
-          return "GKAccessPoint.Location.bottomTrailing"
-        case .topLeading:
-          return "GKAccessPoint.Location.topLeading"
-        case .topTrailing:
-          return "GKAccessPoint.Location.topTrailing"
-        @unknown default:
-          return "GKAccessPoint.Location.(@unknown default, rawValue: \(self.rawValue))"
+    #if compiler(>=5.5)
+      @available(iOS 14, macOS 11, macCatalyst 14, tvOS 14, *)
+      extension GKAccessPoint.Location: CustomDumpStringConvertible {
+        public var customDumpDescription: String {
+          switch self {
+          case .bottomLeading:
+            return "GKAccessPoint.Location.bottomLeading"
+          case .bottomTrailing:
+            return "GKAccessPoint.Location.bottomTrailing"
+          case .topLeading:
+            return "GKAccessPoint.Location.topLeading"
+          case .topTrailing:
+            return "GKAccessPoint.Location.topTrailing"
+          @unknown default:
+            return "GKAccessPoint.Location.(@unknown default, rawValue: \(self.rawValue))"
+          }
         }
       }
-    }
+    #endif
 
     @available(iOS 5, macCatalyst 13, macOS 10.8, tvOS 9, *)
     extension GKPlayer.PhotoSize: CustomDumpStringConvertible {
