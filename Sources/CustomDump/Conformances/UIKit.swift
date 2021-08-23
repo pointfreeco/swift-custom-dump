@@ -25,4 +25,23 @@
       }
     }
   #endif
+
+  @available(macOS 10.15, iOS 11, tvOS 11, watchOS 6, *)
+  extension UIScrollView.ContentInsetAdjustmentBehavior: CustomDumpStringConvertible {
+    public var customDumpDescription: String {
+      switch self {
+      case .always:
+        return "UIScrollView.ContentInsetAdjustmentBehavior.always"
+      case .automatic:
+        return "UIScrollView.ContentInsetAdjustmentBehavior.automatic"
+      case .never:
+        return "UIScrollView.ContentInsetAdjustmentBehavior.never"
+      case .scrollableAxes:
+        return "UIScrollView.ContentInsetAdjustmentBehavior.scrollableAxes"
+      @unknown default:
+        return "UIScrollView.ContentInsetAdjustmentBehavior.(@unknown default, rawValue: \(self.rawValue))"
+      }
+    }
+  }
+}
 #endif
