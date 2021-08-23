@@ -1,7 +1,7 @@
 #if canImport(GameKit)
   import GameKit
 
-  #if compiler(>=5.5)
+  #if !os(watchOS)
     @available(iOS 14, macOS 11, macCatalyst 14, tvOS 14, *)
     extension GKAccessPoint.Location: CustomDumpStringConvertible {
       public var customDumpDescription: String {
@@ -19,11 +19,8 @@
         }
       }
     }
-  #endif
 
-  #if !os(watchOS)
     @available(iOS 5, macCatalyst 13, macOS 10.8, tvOS 9, *)
-    @available(watchOS, unavailable)
     extension GKPlayer.PhotoSize: CustomDumpStringConvertible {
       public var customDumpDescription: String {
         switch self {
