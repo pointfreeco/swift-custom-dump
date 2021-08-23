@@ -480,19 +480,6 @@ final class DiffTests: XCTestCase {
         + NestedDate(date: Date(1970-01-01T00:00:01.000Z))
         """
       )
-    #else
-      XCTAssertNoDifference(
-        diff(
-          NestedDate(date: Date(timeIntervalSince1970: 0)),
-          NestedDate(date: Date(timeIntervalSince1970: 1))
-        ),
-        """
-          NestedDate(
-        -   date: Date(1970-01-01T00:00:00.000Z)
-        +   date: Date(1970-01-01T00:00:01.000Z)
-          )
-        """
-      )
     #endif
   }
 
