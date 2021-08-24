@@ -60,5 +60,30 @@
         }
       }
     }
+    
+    @available(iOS 2, macCatalyst 13, tvOS 9, *)
+    @available(watchOS, unavailable)
+    extension UIControl.State: CustomDumpStringConvertible {
+      public var customDumpDescription: String {
+        switch self {
+        case .normal:
+          return "UIControl.State.normal"
+        case .highlighted:
+          return "UIControl.State.highlighted"
+        case .disabled:
+          return "UIControl.State.disabled"
+        case .selected:
+          return "UIControl.State.selected"
+        case .focused:
+          return "UIControl.State.focused"
+        case .application:
+          return "UIControl.State.application"
+        case .reserved:
+          return "UIControl.State.reserved"
+        default:
+          return "UIControl.State.(default, rawValue: \(self.rawValue))"
+        }
+      }
+    }
   #endif
 #endif
