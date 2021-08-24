@@ -43,5 +43,22 @@
         }
       }
     }
+
+    @available(iOS 12, macCatalyst 13, tvOS 10, *)
+    @available(watchOS, unavailable)
+    extension UIUserInterfaceStyle: CustomDumpStringConvertible {
+      public var customDumpDescription: String {
+        switch self {
+        case .dark:
+          return "UIUserInterfaceStyle.dark"
+        case .light:
+          return "UIUserInterfaceStyle.light"
+        case .unspecified:
+          return "UIUserInterfaceStyle.unspecified"
+        @unknown default:
+          return "UIUserInterfaceStyle.(@unknown default, rawValue: \(self.rawValue))"
+        }
+      }
+    }
   #endif
 #endif
