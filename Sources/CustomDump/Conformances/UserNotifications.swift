@@ -14,8 +14,72 @@
       case .none:
         return "UNAlertStyle.none"
       @unknown default:
-        return "UNAlertStyle.(@unknown default)"
+        return "UNAlertStyle.(@unknown default, rawValue: \(self.rawValue))"
       }
+    }
+  }
+
+  @available(iOS 10, macOS 10.14, tvOS 10, watchOS 3, *)
+  extension UNAuthorizationOptions: CustomDumpReflectable {
+    public var customDumpMirror: Mirror {
+      struct Option: CaseIterable, CustomDumpStringConvertible {
+        static var allCases: [Option] = [
+          .init(rawValue: 1 << 2), // .alert
+          .init(rawValue: 1 << 7), // .announcement
+          .init(rawValue: 1 << 0), // .badge
+          .init(rawValue: 1 << 3), // .carPlay
+          .init(rawValue: 1 << 4), // .criticalAlert
+          .init(rawValue: 1 << 5), // .providesAppNotificationSettings
+          .init(rawValue: 1 << 6), // .provisional
+          .init(rawValue: 1 << 1), // .sound
+          .init(rawValue: 1 << 8), // .timeSensitive
+        ]
+
+        var rawValue: UInt
+
+        var customDumpDescription: String {
+          switch self.rawValue {
+          case 1 << 2:
+            return "UNAuthorizationOptions.alert"
+          case 1 << 7:
+            return "UNAuthorizationOptions.announcement"
+          case 1 << 0:
+            return "UNAuthorizationOptions.badge"
+          case 1 << 3:
+            return "UNAuthorizationOptions.carPlay"
+          case 1 << 4:
+            return "UNAuthorizationOptions.criticalAlert"
+          case 1 << 5:
+            return "UNAuthorizationOptions.providesAppNotificationSettings"
+          case 1 << 6:
+            return "UNAuthorizationOptions.provisional"
+          case 1 << 1:
+            return "UNAuthorizationOptions.sound"
+          case 1 << 8:
+            return "UNAuthorizationOptions.timeSensitive"
+          default:
+            return "UNAuthorizationOptions(rawValue: \(self.rawValue))"
+          }
+        }
+      }
+
+      var options = self
+      var children: [Option] = []
+      for option in Option.allCases {
+        if options.contains(.init(rawValue: option.rawValue)) {
+          children.append(option)
+          options.subtract(.init(rawValue: option.rawValue))
+        }
+      }
+      if !options.isEmpty {
+        children.append(Option(rawValue: options.rawValue))
+      }
+
+      return .init(
+        self,
+        unlabeledChildren: children,
+        displayStyle: .set
+      )
     }
   }
 
@@ -34,7 +98,7 @@
       case .provisional:
         return "UNAuthorizationStatus.provisional"
       @unknown default:
-        return "UNAuthorizationStatus.(@unknown default)"
+        return "UNAuthorizationStatus.(@unknown default, rawValue: \(self.rawValue))"
       }
     }
   }
@@ -53,11 +117,63 @@
         case .timeSensitive:
           return "UNNotificationInterruptionLevel.timeSensitive"
         @unknown default:
-          return "UNNotificationInterruptionLevel.(@unknown default)"
+          return "UNNotificationInterruptionLevel.(@unknown default, rawValue: \(self.rawValue))"
         }
       }
     }
   #endif
+
+  @available(iOS 10, macOS 10.14, tvOS 10, watchOS 3, *)
+  extension UNNotificationPresentationOptions: CustomDumpReflectable {
+    public var customDumpMirror: Mirror {
+      struct Option: CaseIterable, CustomDumpStringConvertible {
+        static var allCases: [Option] = [
+          .init(rawValue: 1 << 2), // .alert
+          .init(rawValue: 1 << 0), // .badge
+          .init(rawValue: 1 << 4), // .banner
+          .init(rawValue: 1 << 3), // .list
+          .init(rawValue: 1 << 1), // .sound
+        ]
+
+        var rawValue: UInt
+
+        var customDumpDescription: String {
+          switch self.rawValue {
+          case 1 << 2:
+            return "UNNotificationPresentationOptions.alert"
+          case 1 << 0:
+            return "UNNotificationPresentationOptions.badge"
+          case 1 << 4:
+            return "UNNotificationPresentationOptions.banner"
+          case 1 << 3:
+            return "UNNotificationPresentationOptions.list"
+          case 1 << 1:
+            return "UNNotificationPresentationOptions.sound"
+          default:
+            return "UNNotificationPresentationOptions(rawValue: \(self.rawValue))"
+          }
+        }
+      }
+
+      var options = self
+      var children: [Option] = []
+      for option in Option.allCases {
+        if options.contains(.init(rawValue: option.rawValue)) {
+          children.append(option)
+          options.subtract(.init(rawValue: option.rawValue))
+        }
+      }
+      if !options.isEmpty {
+        children.append(Option(rawValue: options.rawValue))
+      }
+
+      return .init(
+        self,
+        unlabeledChildren: children,
+        displayStyle: .set
+      )
+    }
+  }
 
   @available(iOS 10, macOS 10.14, tvOS 10, watchOS 3, *)
   extension UNNotificationSetting: CustomDumpStringConvertible {
@@ -70,7 +186,7 @@
       case .notSupported:
         return "UNNotificationSetting.notSupported"
       @unknown default:
-        return "UNNotificationSetting.(@unknown default)"
+        return "UNNotificationSetting.(@unknown default, rawValue: \(self.rawValue))"
       }
     }
   }
@@ -88,71 +204,8 @@
       case .whenAuthenticated:
         return "UNShowPreviewsSetting.whenAuthenticated"
       @unknown default:
-        return "UNShowPreviewsSetting.(@unknown default)"
+        return "UNShowPreviewsSetting.(@unknown default, rawValue: \(self.rawValue))"
       }
     }
   }
-
-@available(iOS 10, macOS 10.14, tvOS 10, watchOS 3, *)
-extension UNAuthorizationOptions: CustomDumpStringConvertible {
-  private static let allStatics: [String: Self] = [
-    "alert": .alert,
-    "announcement": .announcement,
-    "badge": .badge,
-    "carPlay": .carPlay,
-    "criticalAlert": .criticalAlert,
-    "providesAppNotificationSettings": .providesAppNotificationSettings,
-    "provisional": .provisional,
-    "sound": .sound
-  ]
-
-  public var customDumpDescription: String {
-
-    enum Options: CaseIterable {
-      case alert
-      case announcement
-      case badge
-      case carPlay
-      case criticalAlert
-      case providesAppNotificationSettings
-      case provisional
-      case sound
-
-      init(option: UNAuthorizationOptions) {
-        
-      }
-    }
-
-    var options = self
-    var components: [String] = []
-
-    for (key, `static`) in Self.allStatics {
-      if self.contains(`static`) {
-        components.append("UNAuthorizationOptions." + key)
-        options.subtract(`static`)
-      } else {
-      }
-    }
-
-    if !options.isEmpty {
-      components.append("UNAuthorizationOptions(rawValue: \(options.rawValue))")
-    }
-
-    return "[\n" + components
-      .map { "  " + $0 }
-      .joined(separator: ",\n")
-    + "]"
-
-//    var children: [Any] = []
-//    for (key, `static`) in Self.allStatics where self.contains(`static`) {
-//      children.append("." + key)
-//    }
-//
-//    return .init(
-//      self,
-//      unlabeledChildren: children,
-//      displayStyle: .set
-//    )
-  }
-}
 #endif
