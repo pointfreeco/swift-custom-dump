@@ -39,7 +39,8 @@
         case .scrollableAxes:
           return "UIScrollView.ContentInsetAdjustmentBehavior.scrollableAxes"
         @unknown default:
-          return "UIScrollView.ContentInsetAdjustmentBehavior.(@unknown default, rawValue: \(self.rawValue))"
+          return
+            "UIScrollView.ContentInsetAdjustmentBehavior.(@unknown default, rawValue: \(self.rawValue))"
         }
       }
     }

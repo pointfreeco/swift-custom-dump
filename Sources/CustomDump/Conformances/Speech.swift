@@ -14,7 +14,8 @@
       case .restricted:
         return "SFSpeechRecognizerAuthorizationStatus.restricted"
       @unknown default:
-        return "SFSpeechRecognizerAuthorizationStatus.(@unknown default, rawValue: \(self.rawValue))"
+        return
+          "SFSpeechRecognizerAuthorizationStatus.(@unknown default, rawValue: \(self.rawValue))"
       }
     }
   }

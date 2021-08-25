@@ -709,7 +709,8 @@
 
       // This memory layout of Int by 2 is the size of a heap object which object
       // points to. Tail members appear immediately afterwards.
-      let base = unsafeBitCast(object, to: UnsafeMutableRawPointer.self) + MemoryLayout<Int>.size * 2
+      let base =
+        unsafeBitCast(object, to: UnsafeMutableRawPointer.self) + MemoryLayout<Int>.size * 2
 
       // The first word is the kvc string pointer. Set it to 0 (nil).
       base.storeBytes(of: 0, as: Int.self)

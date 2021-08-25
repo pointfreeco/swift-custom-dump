@@ -7,7 +7,7 @@
       switch self {
       case .purchasing:
         return "SKPaymentTransactionState.purchasing"
-      case .purchased: 
+      case .purchased:
         return "SKPaymentTransactionState.purchased"
       case .failed:
         return "SKPaymentTransactionState.failed"

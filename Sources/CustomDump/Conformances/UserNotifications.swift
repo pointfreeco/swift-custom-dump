@@ -30,8 +30,8 @@
           case .alert:
             return "UNAuthorizationOptions.alert"
           #if os(iOS) || os(watchOS)
-          case .announcement:
-            return "UNAuthorizationOptions.announcement"
+            case .announcement:
+              return "UNAuthorizationOptions.announcement"
           #endif
           case .badge:
             return "UNAuthorizationOptions.badge"
@@ -54,7 +54,7 @@
       var options = self
       var children: [Option] = []
       var allCases: [UNAuthorizationOptions] = [
-        .alert,
+        .alert
       ]
       #if os(iOS) || os(watchOS)
         allCases.append(.announcement)

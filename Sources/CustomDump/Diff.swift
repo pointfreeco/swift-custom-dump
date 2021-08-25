@@ -484,15 +484,19 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
       {
         let lhsMirror = Mirror(
           customDumpReflecting:
-            lhs.isEmpty ? [] : lhs
-            .split(separator: "\n", omittingEmptySubsequences: false)
-            .map(Line.init(rawValue:))
+            lhs.isEmpty
+            ? []
+            : lhs
+              .split(separator: "\n", omittingEmptySubsequences: false)
+              .map(Line.init(rawValue:))
         )
         let rhsMirror = Mirror(
           customDumpReflecting:
-            rhs.isEmpty ? [] : rhs
-            .split(separator: "\n", omittingEmptySubsequences: false)
-            .map(Line.init(rawValue:))
+            rhs.isEmpty
+            ? []
+            : rhs
+              .split(separator: "\n", omittingEmptySubsequences: false)
+              .map(Line.init(rawValue:))
         )
         let hashes = String(repeating: "#", count: max(lhs.hashCount, rhs.hashCount))
         diffChildren(
