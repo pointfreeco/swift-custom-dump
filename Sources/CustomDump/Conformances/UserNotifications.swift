@@ -22,41 +22,29 @@
   @available(iOS 10, macOS 10.14, tvOS 10, watchOS 3, *)
   extension UNAuthorizationOptions: CustomDumpReflectable {
     public var customDumpMirror: Mirror {
-      struct Option: CaseIterable, CustomDumpStringConvertible {
-        static var allCases: [Option] = [
-          .init(rawValue: 1 << 2), // .alert
-          .init(rawValue: 1 << 7), // .announcement
-          .init(rawValue: 1 << 0), // .badge
-          .init(rawValue: 1 << 3), // .carPlay
-          .init(rawValue: 1 << 4), // .criticalAlert
-          .init(rawValue: 1 << 5), // .providesAppNotificationSettings
-          .init(rawValue: 1 << 6), // .provisional
-          .init(rawValue: 1 << 1), // .sound
-          .init(rawValue: 1 << 8), // .timeSensitive
-        ]
-
-        var rawValue: UInt
+      struct Option: CustomDumpStringConvertible {
+        var rawValue: UNAuthorizationOptions
 
         var customDumpDescription: String {
           switch self.rawValue {
-          case 1 << 2:
+          case .alert:
             return "UNAuthorizationOptions.alert"
-          case 1 << 7:
+          #if os(iOS) || os(watchOS)
+          case .announcement:
             return "UNAuthorizationOptions.announcement"
-          case 1 << 0:
+          #endif
+          case .badge:
             return "UNAuthorizationOptions.badge"
-          case 1 << 3:
+          case .carPlay:
             return "UNAuthorizationOptions.carPlay"
-          case 1 << 4:
+          case .criticalAlert:
             return "UNAuthorizationOptions.criticalAlert"
-          case 1 << 5:
+          case .providesAppNotificationSettings:
             return "UNAuthorizationOptions.providesAppNotificationSettings"
-          case 1 << 6:
+          case .provisional:
             return "UNAuthorizationOptions.provisional"
-          case 1 << 1:
+          case .sound:
             return "UNAuthorizationOptions.sound"
-          case 1 << 8:
-            return "UNAuthorizationOptions.timeSensitive"
           default:
             return "UNAuthorizationOptions(rawValue: \(self.rawValue))"
           }
@@ -65,14 +53,28 @@
 
       var options = self
       var children: [Option] = []
-      for option in Option.allCases {
-        if options.contains(.init(rawValue: option.rawValue)) {
-          children.append(option)
-          options.subtract(.init(rawValue: option.rawValue))
+      var allCases: [UNAuthorizationOptions] = [
+        .alert,
+      ]
+      #if os(iOS) || os(watchOS)
+        allCases.append(.announcement)
+      #endif
+      allCases.append(contentsOf: [
+        .badge,
+        .carPlay,
+        .criticalAlert,
+        .providesAppNotificationSettings,
+        .provisional,
+        .sound,
+      ])
+      for option in allCases {
+        if options.contains(option) {
+          children.append(.init(rawValue: option))
+          options.subtract(option)
         }
       }
       if !options.isEmpty {
-        children.append(Option(rawValue: options.rawValue))
+        children.append(.init(rawValue: options))
       }
 
       return .init(
@@ -126,30 +128,20 @@
   @available(iOS 10, macOS 10.14, tvOS 10, watchOS 3, *)
   extension UNNotificationPresentationOptions: CustomDumpReflectable {
     public var customDumpMirror: Mirror {
-      struct Option: CaseIterable, CustomDumpStringConvertible {
-        static var allCases: [Option] = [
-          .init(rawValue: 1 << 2), // .alert
-          .init(rawValue: 1 << 0), // .badge
-          .init(rawValue: 1 << 4), // .banner
-          .init(rawValue: 1 << 3), // .list
-          .init(rawValue: 1 << 1), // .sound
-        ]
-
-        var rawValue: UInt
-
+      struct Option: CustomDumpStringConvertible {
+        var rawValue: UNNotificationPresentationOptions
         var customDumpDescription: String {
-          switch self.rawValue {
-          case 1 << 2:
+          if self.rawValue == .alert {
             return "UNNotificationPresentationOptions.alert"
-          case 1 << 0:
+          } else if self.rawValue == .badge {
             return "UNNotificationPresentationOptions.badge"
-          case 1 << 4:
+          } else if #available(iOS 14, macOS 11, tvOS 14, watchOS 7, *), self.rawValue == .banner {
             return "UNNotificationPresentationOptions.banner"
-          case 1 << 3:
+          } else if #available(iOS 14, macOS 11, tvOS 14, watchOS 7, *), self.rawValue == .list {
             return "UNNotificationPresentationOptions.list"
-          case 1 << 1:
+          } else if self.rawValue == .sound {
             return "UNNotificationPresentationOptions.sound"
-          default:
+          } else {
             return "UNNotificationPresentationOptions(rawValue: \(self.rawValue))"
           }
         }
@@ -157,14 +149,22 @@
 
       var options = self
       var children: [Option] = []
-      for option in Option.allCases {
-        if options.contains(.init(rawValue: option.rawValue)) {
-          children.append(option)
-          options.subtract(.init(rawValue: option.rawValue))
+      var allCases: [UNNotificationPresentationOptions] = [
+        .alert,
+        .badge,
+      ]
+      if #available(iOS 14, macOS 11, tvOS 14, watchOS 7, *) {
+        allCases.append(contentsOf: [.banner, .list])
+      }
+      allCases.append(.sound)
+      for option in allCases {
+        if options.contains(option) {
+          children.append(.init(rawValue: option))
+          options.subtract(option)
         }
       }
       if !options.isEmpty {
-        children.append(Option(rawValue: options.rawValue))
+        children.append(.init(rawValue: options))
       }
 
       return .init(

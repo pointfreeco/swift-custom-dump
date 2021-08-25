@@ -65,34 +65,24 @@
     @available(watchOS, unavailable)
     extension UIControl.State: CustomDumpReflectable {
       public var customDumpMirror: Mirror {
-        struct Option: CaseIterable, CustomDumpStringConvertible {
-          static var allCases: [Option] = [
-            .init(rawValue: 0x00FF0000), // .application
-            .init(rawValue: 1 << 1), // .disabled
-            .init(rawValue: 1 << 3), // .focused
-            .init(rawValue: 1 << 0), // .highlighted
-            .init(rawValue: 0), // .normal
-            .init(rawValue: 0xFF000000), // .reserved
-            .init(rawValue: 1 << 2), // .selected
-          ]
-
-          var rawValue: UInt
+        struct Option: CustomDumpStringConvertible {
+          var rawValue: UIControl.State
 
           var customDumpDescription: String {
             switch self.rawValue {
-            case 0x00FF0000:
+            case .application:
               return "UIControl.State.application"
-            case 1 << 1:
+            case .disabled:
               return "UIControl.State.disabled"
-            case 1 << 3:
+            case .focused:
               return "UIControl.State.focused"
-            case 1 << 0:
+            case .highlighted:
               return "UIControl.State.highlighted"
-            case 0:
+            case .normal:
               return "UIControl.State.normal"
-            case 0xFF000000:
+            case .reserved:
               return "UIControl.State.reserved"
-            case 1 << 2:
+            case .selected:
               return "UIControl.State.selected"
             default:
               return "UIControl.State(rawValue: \(self.rawValue))"
@@ -102,14 +92,23 @@
 
         var options = self
         var children: [Option] = []
-        for option in Option.allCases {
-          if options.contains(.init(rawValue: option.rawValue)) {
-            children.append(option)
-            options.subtract(.init(rawValue: option.rawValue))
+        let allCases: [UIControl.State] = [
+          .application,
+          .disabled,
+          .focused,
+          .highlighted,
+          .normal,
+          .reserved,
+          .selected,
+        ]
+        for option in allCases {
+          if options.contains(option) {
+            children.append(.init(rawValue: option))
+            options.subtract(option)
           }
         }
         if !options.isEmpty {
-          children.append(Option(rawValue: options.rawValue))
+          children.append(.init(rawValue: options))
         }
 
         return .init(
