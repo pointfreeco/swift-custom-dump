@@ -14,7 +14,7 @@
       case .overlay:
         return "UNNotificationContentExtensionMediaPlayPauseButtonType.overlay"
       @unknown default:
-        return "UNNotificationContentExtensionMediaPlayPauseButtonType.(@unknown default)"
+        return "UNNotificationContentExtensionMediaPlayPauseButtonType.(@unknown default, rawValue: \(self.rawValue))"
       }
     }
   }
@@ -32,7 +32,7 @@
       case .doNotDismiss:
         return "UNNotificationContentExtensionResponseOption.doNotDismiss"
       @unknown default:
-        return "UNNotificationContentExtensionResponseOption.(@unknown default)"
+        return "UNNotificationContentExtensionResponseOption.(@unknown default, rawValue: \(self.rawValue))"
       }
     }
   }

@@ -5,11 +5,28 @@
 
   final class UIKitTests: XCTestCase {
     func testUIControlState() {
-      var output: String = ""
-      customDump(UIControl.State.selected, to: &output)
+      var dump = ""
+      customDump([.selected, .highlighted] as UIControl.State, to: &dump)
       XCTAssertEqual(
-        output,
-        "UIControl.State.selected"
+        dump,
+        """
+        Set([
+          UIControl.State.highlighted,
+          UIControl.State.normal,
+          UIControl.State.selected
+        ])
+        """
+      )
+
+      dump = ""
+      customDump(UIControl.State.normal, to: &dump)
+      XCTAssertEqual(
+        dump,
+        """
+        Set([
+          UIControl.State.normal
+        ])
+        """
       )
     }
   }

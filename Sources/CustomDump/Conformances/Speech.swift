@@ -14,7 +14,7 @@
       case .restricted:
         return "SFSpeechRecognizerAuthorizationStatus.restricted"
       @unknown default:
-        return "SFSpeechRecognizerAuthorizationStatus.(@unknown default)"
+        return "SFSpeechRecognizerAuthorizationStatus.(@unknown default, rawValue: \(self.rawValue))"
       }
     }
   }
@@ -32,7 +32,7 @@
       case .unspecified:
         return "SFSpeechRecognitionTaskHint.unspecified"
       @unknown default:
-        return "SFSpeechRecognitionTaskHint.(@unknown default)"
+        return "SFSpeechRecognitionTaskHint.(@unknown default, rawValue: \(self.rawValue))"
       }
     }
   }
@@ -52,7 +52,7 @@
       case .starting:
         return "SFSpeechRecognitionTaskState.starting"
       @unknown default:
-        return "SFSpeechRecognitionTaskState.(@unknown default)"
+        return "SFSpeechRecognitionTaskState.(@unknown default, rawValue: \(self.rawValue))"
       }
     }
   }
