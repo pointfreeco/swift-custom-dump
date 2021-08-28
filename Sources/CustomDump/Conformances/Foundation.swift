@@ -54,6 +54,12 @@ extension Date: CustomDumpStringConvertible {
   }()
 }
 
+extension Decimal: CustomDumpStringConvertible {
+  public var customDumpDescription: String {
+    self.description
+  }
+}
+
 extension Locale: CustomDumpStringConvertible {
   public var customDumpDescription: String {
     "Locale(\(self.identifier))"

@@ -777,6 +777,18 @@ final class DumpTests: XCTestCase {
 
     dump = ""
     customDump(
+      Decimal(string: "1.23"),
+      to: &dump
+    )
+    XCTAssertNoDifference(
+      dump,
+      """
+      1.23
+      """
+    )
+
+    dump = ""
+    customDump(
       [1, 2, 3] as NSArray,
       to: &dump
     )
