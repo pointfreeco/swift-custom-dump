@@ -209,7 +209,7 @@ extension NSUserActivity: CustomDumpReflectable {
             children: [
                 "activityType": activityType,
                 "title": title as Any,
-                "userInfo": userInfo.debugDescription,
+                "userInfo": userInfo as Any,
                 "requiredUserInfoKeys": requiredUserInfoKeys as Any,
                 "needsSave": needsSave,
                 "webpageURL": webpageURL as Any,
