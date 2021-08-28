@@ -200,6 +200,37 @@ extension NSTimeZone: CustomDumpRepresentable {
   }
 }
 
+// NB: `NSUserActivity` in unavailable on Linux
+#if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
+extension NSUserActivity: CustomDumpReflectable {
+    public var customDumpMirror: Mirror {
+        .init(
+            self,
+            children: [
+                "activityType": activityType,
+                "title": title as Any,
+                "userInfo": userInfo.debugDescription,
+                "requiredUserInfoKeys": requiredUserInfoKeys as Any,
+                "needsSave": needsSave,
+                "webpageURL": webpageURL?.debugDescription as Any,
+                "referrerURL": referrerURL?.debugDescription as Any,
+                "expirationDate": expirationDate as Any
+                "keywords": keywords,
+                "supportsContinuationStreams": supportsContinuationStreams,
+                "delegate": delegate as Any,
+                "targetContentIdentifier": targetContentIdentifier as Any,
+                "isEligibleForHandoff": isEligibleForHandoff,
+                "isEligibleForSearch": isEligibleForSearch,
+                "isEligibleForPublicIndexing": isEligibleForPublicIndexing,
+                "isEligibleForPrediction": isEligibleForPrediction,
+                "persistentIdentifier": persistentIdentifier?.debugDescription as Any)
+            ],
+            displayStyle: .class
+        )
+    }
+}
+#endif
+
 extension NSURL: CustomDumpRepresentable {
   public var customDumpValue: Any {
     self as URL
