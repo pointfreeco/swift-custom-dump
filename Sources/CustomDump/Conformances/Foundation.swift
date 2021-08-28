@@ -201,7 +201,7 @@ extension NSTimeZone: CustomDumpRepresentable {
 }
 
 // NB: `NSUserActivity` in unavailable on Linux
-#if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
+#if os(iOS)
 extension NSUserActivity: CustomDumpReflectable {
     public var customDumpMirror: Mirror {
         .init(
@@ -212,9 +212,9 @@ extension NSUserActivity: CustomDumpReflectable {
                 "userInfo": userInfo.debugDescription,
                 "requiredUserInfoKeys": requiredUserInfoKeys as Any,
                 "needsSave": needsSave,
-                "webpageURL": webpageURL?.debugDescription as Any,
-                "referrerURL": referrerURL?.debugDescription as Any,
-                "expirationDate": expirationDate as Any
+                "webpageURL": webpageURL as Any,
+                "referrerURL": referrerURL as Any,
+                "expirationDate": expirationDate as Any,
                 "keywords": keywords,
                 "supportsContinuationStreams": supportsContinuationStreams,
                 "delegate": delegate as Any,
@@ -222,8 +222,8 @@ extension NSUserActivity: CustomDumpReflectable {
                 "isEligibleForHandoff": isEligibleForHandoff,
                 "isEligibleForSearch": isEligibleForSearch,
                 "isEligibleForPublicIndexing": isEligibleForPublicIndexing,
-                "isEligibleForPrediction": isEligibleForPrediction,
-                "persistentIdentifier": persistentIdentifier?.debugDescription as Any)
+                "isEligibleForPrediction": isEligibleForPrediction, // not available on macOS and watchOS
+                "persistentIdentifier": persistentIdentifier as Any // not available on watchOS
             ],
             displayStyle: .class
         )
