@@ -42,68 +42,6 @@ extension CIDataMatrixCodeDescriptor.ECCVersion: CustomDumpStringConvertible {
     }
 }
 
-extension CIContextOption: CustomDumpStringConvertible {
-    public var customDumpDescription: String {
-        switch self {
-        default:
-            return "CIContextOption.(default, rawValue: \(self.rawValue))"
-        }
-    }
-}
-
-extension CIImageRepresentationOption: CustomDumpStringConvertible {
-    public var customDumpDescription: String {
-        switch self {
-        default:
-            return "CIImageRepresentationOption.(default, rawValue: \(self.rawValue))"
-        }
-    }
-}
-
-extension CIFormat: CustomDumpStringConvertible {
-    public var customDumpDescription: String {
-        switch self {
-        default:
-            return "CIFormat.(default, rawValue: \(self.rawValue))"
-        }
-    }
-}
-
-extension CIImageOption: CustomDumpStringConvertible {
-    public var customDumpDescription: String {
-        switch self {
-        default:
-            return "CIImageOption.(default, rawValue: \(self.rawValue))"
-        }
-    }
-}
-
-extension CIImageAutoAdjustmentOption: CustomDumpStringConvertible {
-    public var customDumpDescription: String {
-        switch self {
-        default:
-            return "CIImageAutoAdjustmentOption.(default, rawValue: \(self.rawValue))"
-        }
-    }
-}
-
-extension CIKernel: CustomDumpStringConvertible {
-    public var customDumpDescription: String {
-        switch self {
-        default:
-            return "CIKernel.(default, rawValue: \(self))"
-        }
-    }
-}
-
-extension CGRect: CustomDumpStringConvertible {
-    public var customDumpDescription: String {
-        switch self {
-        default:
-            return "CGRect.(default, rawValue: \(self))"
-        }
-    }
-}
 
 extension CIRenderDestinationAlphaMode: CustomDumpStringConvertible {
     public var customDumpDescription: String {
