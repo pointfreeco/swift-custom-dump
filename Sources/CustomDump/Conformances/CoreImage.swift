@@ -105,15 +105,6 @@ extension CGRect: CustomDumpStringConvertible {
     }
 }
 
-extension CIRAWFilterOption: CustomDumpStringConvertible {
-    public var customDumpDescription: String {
-        switch self {
-        default:
-            return "CIRAWFilterOption.(default, rawValue: \(self.rawValue))"
-        }
-    }
-}
-
 extension CIRenderDestinationAlphaMode: CustomDumpStringConvertible {
     public var customDumpDescription: String {
         switch self {
