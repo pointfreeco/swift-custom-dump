@@ -715,6 +715,12 @@ final class DumpTests: XCTestCase {
     )
   }
 
+  class SubclassedError: NSError {}
+
+  enum BridgedError: Error {
+    case thisIsFine(Int)
+  }
+
   func testFoundation() {
     var dump = ""
 
@@ -925,6 +931,53 @@ final class DumpTests: XCTestCase {
       )
       """
     )
+
+    dump = ""
+    customDump(
+      SubclassedError(
+        domain: "co.pointfree",
+        code: 43,
+        userInfo: [
+          NSLocalizedDescriptionKey: "An error occurred" as NSString
+        ]
+      ),
+      to: &dump
+    )
+    XCTAssertNoDifference(
+      dump,
+      """
+      NSError(
+        domain: "co.pointfree",
+        code: 43,
+        userInfo: [
+          "NSLocalizedDescription": "An error occurred"
+        ]
+      )
+      """
+    )
+
+    dump = ""
+    customDump(BridgedError.thisIsFine(94) as NSError, to: &dump)
+    #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
+    XCTAssertNoDifference(
+      dump,
+      """
+      DumpTests.BridgedError.thisIsFine(94)
+      """
+    )
+    #else
+    // Can't unwrap bridged Errors on Linux: https://bugs.swift.org/browse/SR-15191
+    XCTAssertNoDifference(
+      dump,
+      """
+      NSError(
+        domain: "CustomDumpTests.DumpTests.BridgedError",
+        code: 0,
+        userInfo: [:]
+      )
+      """
+    )
+    #endif
 
     // NB: `NSException` is unavailable on Linux
     #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
