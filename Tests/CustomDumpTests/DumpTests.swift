@@ -718,7 +718,7 @@ final class DumpTests: XCTestCase {
   func testFoundation() {
     var dump = ""
 
-    #if compiler(>=5.5)
+    #if compiler(>=5.5) && !os(macOS)
       if #available(iOS 15, macOS 12, tvOS 15, watchOS 8, *) {
         dump = ""
         customDump(
