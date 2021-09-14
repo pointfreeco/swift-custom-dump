@@ -4,7 +4,8 @@ import Foundation
   import FoundationNetworking
 #endif
 
-#if compiler(>=5.5)
+// NB: Xcode 13 does not include macOS 12 SDK
+#if compiler(>=5.5) && !os(macOS)
   @available(iOS 15, macOS 12, tvOS 15, watchOS 8, *)
   extension AttributedString: CustomDumpRepresentable {
     public var customDumpValue: Any {
