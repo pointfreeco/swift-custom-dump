@@ -93,7 +93,11 @@ extension NSDate: CustomDumpRepresentable {
 
 extension NSError: CustomDumpReflectable {
   public var customDumpMirror: Mirror {
-    .init(
+    let swiftError = self as Error
+    guard type(of: swiftError) is NSError.Type else {
+      return Mirror(reflecting: swiftError)
+    }
+    return Mirror(
       self,
       children: [
         "domain": self.domain,
