@@ -1119,12 +1119,21 @@ final class DumpTests: XCTestCase {
       NSURL(fileURLWithPath: "/tmp"),
       to: &dump
     )
-    XCTAssertNoDifference(
-      dump,
-      """
-      URL(file:///tmp/)
-      """
-    )
+    #if os(Windows)
+      XCTAssertNoDifference(
+        dump,
+        """
+        URL(file:///tmp)
+        """
+      )
+    #else
+      XCTAssertNoDifference(
+        dump,
+        """
+        URL(file:///tmp/)
+        """
+      )
+    #endif
 
     dump = ""
     customDump(
