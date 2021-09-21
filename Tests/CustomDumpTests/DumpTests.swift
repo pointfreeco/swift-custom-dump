@@ -964,7 +964,7 @@ final class DumpTests: XCTestCase {
       XCTAssertNoDifference(
         dump,
         """
-        DumpTests.BridgedError.thisIsFine(94)
+        DumpTests.(unknown context).(unknown context).BridgedError.thisIsFine(94)
         """
       )
     #else
