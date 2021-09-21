@@ -5,7 +5,7 @@ import Foundation
 #endif
 
 // NB: Xcode 13 does not include macOS 12 SDK
-#if compiler(>=5.5) && !os(macOS)
+#if compiler(>=5.5) && !os(macOS) && !targetEnvironment(macCatalyst)
   @available(iOS 15, macOS 12, tvOS 15, watchOS 8, *)
   extension AttributedString: CustomDumpRepresentable {
     public var customDumpValue: Any {
