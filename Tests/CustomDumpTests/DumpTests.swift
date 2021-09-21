@@ -715,12 +715,6 @@ final class DumpTests: XCTestCase {
     )
   }
 
-  class SubclassedError: NSError {}
-
-  enum BridgedError: Error {
-    case thisIsFine(Int)
-  }
-
   func testFoundation() {
     var dump = ""
 
@@ -932,6 +926,9 @@ final class DumpTests: XCTestCase {
       """
     )
 
+    #if !os(Windows)
+    class SubclassedError: NSError {}
+
     dump = ""
     customDump(
       SubclassedError(
@@ -955,6 +952,11 @@ final class DumpTests: XCTestCase {
       )
       """
     )
+    #endif
+
+    enum BridgedError: Error {
+      case thisIsFine(Int)
+    }
 
     dump = ""
     customDump(BridgedError.thisIsFine(94) as NSError, to: &dump)
