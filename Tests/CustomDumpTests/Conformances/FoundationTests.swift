@@ -289,7 +289,7 @@ final class FoundationTests: XCTestCase {
         ),
         """
         NSError(
-          domain: "CustomDumpTests.DumpTests.BridgedError",
+          domain: "CustomDumpTests.FoundationTests.BridgedError",
           code: 0,
           userInfo: [:]
         )
