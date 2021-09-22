@@ -32,10 +32,15 @@ jobs:
   linux:
     name: Ubuntu
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        swift:
+          - 5.4
+          - 5.5
     steps:
       - uses: actions/checkout@v2
       - name: Run tests
-        run: make test-linux
+        run: make test-linux-${{ matrix.swift }}
 
   windows:
     name: Windows

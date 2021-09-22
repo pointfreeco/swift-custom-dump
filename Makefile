@@ -3,15 +3,22 @@ PLATFORM_MACOS = macOS
 PLATFORM_TVOS = tvOS Simulator,name=Apple TV 4K (at 1080p)
 PLATFORM_WATCHOS = watchOS Simulator,name=Apple Watch Series 4 - 44mm
 
-test-all: test-linux test-swift test-platforms
+test-all: test-linux-all test-swift test-platforms
 
-test-linux:
-	docker run \
-		--rm \
-		-v "$(PWD):$(PWD)" \
-		-w "$(PWD)" \
-		swift:5.4 \
-		bash -c 'make test-swift'
+test-linux-all: test-linux-5.4 test-linux-5.5
+
+test-linux-5.4:
+	$(call test-linux,5.4)
+
+test-linux-5.5:
+	$(call test-linux,5.5)
+
+test-linux = docker run \
+	--rm \
+	-v "$(PWD):$(PWD)" \
+	-w "$(PWD)" \
+	swift:$(1) \
+	bash -c 'make test-swift'
 
 test-swift:
 	swift test \
