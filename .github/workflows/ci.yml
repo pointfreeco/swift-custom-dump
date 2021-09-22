@@ -35,20 +35,28 @@ jobs:
     strategy:
       matrix:
         swift:
+          - 5.3
           - 5.4
           - 5.5
     steps:
       - uses: actions/checkout@v2
       - name: Run tests
-        run: make test-linux-${{ matrix.swift }}
+        run: make test-linux SWIFT_VERSION=${{ matrix.swift }}
 
   windows:
     name: Windows
     runs-on: windows-latest
+    strategy:
+      matrix:
+        swift:
+          #- 5.3
+          - 5.4
+          - 5.5
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v2
       - name: Install Swift & Run tests
         uses: MaxDesiatov/swift-windows-action@v1
         with:
-          shell-action: swift test && swift build -c release
+          shell-action: swift test && swift build --configuration release
+          swift-version: ${{ matrix.swift }}

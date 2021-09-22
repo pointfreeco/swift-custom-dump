@@ -718,7 +718,7 @@ final class DumpTests: XCTestCase {
   func testFoundation() {
     var dump = ""
 
-    #if compiler(>=5.5) && !os(macOS) && !targetEnvironment(macCatalyst) && !os(Linux)
+    #if compiler(>=5.5) && !targetEnvironment(macCatalyst) && (os(iOS) || os(tvOS) || os(watchOS))
       if #available(iOS 15, macOS 12, tvOS 15, watchOS 8, *) {
         dump = ""
         customDump(
@@ -967,7 +967,7 @@ final class DumpTests: XCTestCase {
         DumpTests.(unknown context).(unknown context).BridgedError.thisIsFine(94)
         """
       )
-    #else
+    #elseif compiler(>=5.4)
       // Can't unwrap bridged Errors on Linux: https://bugs.swift.org/browse/SR-15191
       XCTAssertNoDifference(
         dump.replacingOccurrences(
