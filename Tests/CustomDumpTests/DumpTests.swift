@@ -13,12 +13,6 @@ import XCTest
   import SwiftUI
 #endif
 
-#if os(Windows)
-  let unknownContext = ".(unknown context).(unknown context)."
-#else
-  let unknownContext = ".(unknown context).(unknown context)."
-#endif
-
 @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
 final class DumpTests: XCTestCase {
   func testAnyType() {
@@ -631,7 +625,7 @@ final class DumpTests: XCTestCase {
     XCTAssertNoDifference(
       dump,
       """
-      DumpTests\(unknownContext)Inline.self
+      DumpTests.(unknown context).(unknown context).Inline.self
       """
     )
 
@@ -643,7 +637,7 @@ final class DumpTests: XCTestCase {
     XCTAssertNoDifference(
       dump,
       """
-      DumpTests\(unknownContext)Inline()
+      DumpTests.(unknown context).(unknown context).Inline()
       """
     )
   }
@@ -970,7 +964,7 @@ final class DumpTests: XCTestCase {
       XCTAssertNoDifference(
         dump,
         """
-        DumpTests\(unknownContext)BridgedError.thisIsFine(94)
+        DumpTests.(unknown context).(unknown context).BridgedError.thisIsFine(94)
         """
       )
     #else
@@ -983,7 +977,7 @@ final class DumpTests: XCTestCase {
         ),
         """
         NSError(
-          domain: "CustomDumpTests.DumpTests\(unknownContext)BridgedError",
+          domain: "CustomDumpTests.DumpTests.(unknown context).(unknown context).BridgedError",
           code: 0,
           userInfo: [:]
         )
