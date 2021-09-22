@@ -976,7 +976,11 @@ final class DumpTests: XCTestCase {
     #else
       // Can't unwrap bridged Errors on Linux: https://bugs.swift.org/browse/SR-15191
       XCTAssertNoDifference(
-        dump,
+        dump.replacingOccurrences(
+          of: #"\(unknown context at \$[[:xdigit:]]+\)"#,
+          with: "(unknown context)",
+          options: .regularExpression
+        ),
         """
         NSError(
           domain: "CustomDumpTests.DumpTests\(unknownContext)BridgedError",
@@ -984,11 +988,6 @@ final class DumpTests: XCTestCase {
           userInfo: [:]
         )
         """
-        .replacingOccurrences(
-          of: #"\(unknown context at \$[[:xdigit:]]+\)"#,
-          with: "(unknown context)",
-          options: .regularExpression
-        )
       )
     #endif
 
