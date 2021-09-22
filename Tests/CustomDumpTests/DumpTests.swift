@@ -14,7 +14,7 @@ import XCTest
 #endif
 
 #if os(Windows)
-  let unknownContext = "."
+  let unknownContext = ".(unknown context).(unknown context)."
 #else
   let unknownContext = ".(unknown context).(unknown context)."
 #endif
