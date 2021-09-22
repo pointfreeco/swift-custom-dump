@@ -979,11 +979,16 @@ final class DumpTests: XCTestCase {
         dump,
         """
         NSError(
-          domain: "CustomDumpTests.DumpTests.BridgedError",
+          domain: "CustomDumpTests.DumpTests\(unknownContext)BridgedError",
           code: 0,
           userInfo: [:]
         )
         """
+        .replacingOccurrences(
+          of: #"\(unknown context at \$[[:xdigit:]]+\)"#,
+          with: "(unknown context)",
+          options: .regularExpression
+        )
       )
     #endif
 
