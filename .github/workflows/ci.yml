@@ -49,7 +49,7 @@ jobs:
     strategy:
       matrix:
         swift:
-          - 5.3
+          #- 5.3
           - 5.4
           - 5.5
     timeout-minutes: 30
