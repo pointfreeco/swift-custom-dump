@@ -6,13 +6,8 @@ func typeName(_ type: Any.Type) -> String {
   return
     name
     .replacingOccurrences(
-      of: #"<.+>"#,
+      of: #"<.+>|\(unknown context at \$[[:xdigit:]]+\)\."#,
       with: "",
-      options: .regularExpression
-    )
-    .replacingOccurrences(
-      of: #"\(unknown context at \$[[:xdigit:]]+\)"#,
-      with: "(unknown context)",
       options: .regularExpression
     )
 }
