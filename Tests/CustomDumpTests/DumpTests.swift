@@ -625,7 +625,7 @@ final class DumpTests: XCTestCase {
     XCTAssertNoDifference(
       dump,
       """
-      DumpTests.(unknown context).(unknown context).Inline.self
+      DumpTests.Inline.self
       """
     )
 
@@ -637,7 +637,7 @@ final class DumpTests: XCTestCase {
     XCTAssertNoDifference(
       dump,
       """
-      DumpTests.(unknown context).(unknown context).Inline()
+      DumpTests.Inline()
       """
     )
   }
@@ -964,20 +964,16 @@ final class DumpTests: XCTestCase {
       XCTAssertNoDifference(
         dump,
         """
-        DumpTests.(unknown context).(unknown context).BridgedError.thisIsFine(94)
+        DumpTests.BridgedError.thisIsFine(94)
         """
       )
     #elseif compiler(>=5.4)
       // Can't unwrap bridged Errors on Linux: https://bugs.swift.org/browse/SR-15191
       XCTAssertNoDifference(
-        dump.replacingOccurrences(
-          of: #"\(unknown context at \$[[:xdigit:]]+\)"#,
-          with: "(unknown context)",
-          options: .regularExpression
-        ),
+        dump,
         """
         NSError(
-          domain: "CustomDumpTests.DumpTests.(unknown context).(unknown context).BridgedError",
+          domain: "CustomDumpTests.DumpTests.BridgedError",
           code: 0,
           userInfo: [:]
         )
