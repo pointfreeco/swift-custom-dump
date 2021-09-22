@@ -927,31 +927,31 @@ final class DumpTests: XCTestCase {
     )
 
     #if !os(Windows)
-    class SubclassedError: NSError {}
+      class SubclassedError: NSError {}
 
-    dump = ""
-    customDump(
-      SubclassedError(
-        domain: "co.pointfree",
-        code: 43,
-        userInfo: [
-          NSLocalizedDescriptionKey: "An error occurred" as NSString
-        ]
-      ),
-      to: &dump
-    )
-    XCTAssertNoDifference(
-      dump,
-      """
-      NSError(
-        domain: "co.pointfree",
-        code: 43,
-        userInfo: [
-          "NSLocalizedDescription": "An error occurred"
-        ]
+      dump = ""
+      customDump(
+        SubclassedError(
+          domain: "co.pointfree",
+          code: 43,
+          userInfo: [
+            NSLocalizedDescriptionKey: "An error occurred" as NSString
+          ]
+        ),
+        to: &dump
       )
-      """
-    )
+      XCTAssertNoDifference(
+        dump,
+        """
+        NSError(
+          domain: "co.pointfree",
+          code: 43,
+          userInfo: [
+            "NSLocalizedDescription": "An error occurred"
+          ]
+        )
+        """
+      )
     #endif
 
     enum BridgedError: Error {
