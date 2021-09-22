@@ -715,12 +715,6 @@ final class DumpTests: XCTestCase {
     )
   }
 
-  class SubclassedError: NSError {}
-
-  enum BridgedError: Error {
-    case thisIsFine(Int)
-  }
-
   func testFoundation() {
     var dump = ""
 
@@ -932,6 +926,9 @@ final class DumpTests: XCTestCase {
       """
     )
 
+    #if !os(Windows)
+    class SubclassedError: NSError {}
+
     dump = ""
     customDump(
       SubclassedError(
@@ -955,6 +952,11 @@ final class DumpTests: XCTestCase {
       )
       """
     )
+    #endif
+
+    enum BridgedError: Error {
+      case thisIsFine(Int)
+    }
 
     dump = ""
     customDump(BridgedError.thisIsFine(94) as NSError, to: &dump)
@@ -962,16 +964,20 @@ final class DumpTests: XCTestCase {
       XCTAssertNoDifference(
         dump,
         """
-        DumpTests.BridgedError.thisIsFine(94)
+        DumpTests.(unknown context).(unknown context).BridgedError.thisIsFine(94)
         """
       )
     #else
       // Can't unwrap bridged Errors on Linux: https://bugs.swift.org/browse/SR-15191
       XCTAssertNoDifference(
-        dump,
+        dump.replacingOccurrences(
+          of: #"\(unknown context at \$[[:xdigit:]]+\)"#,
+          with: "(unknown context)",
+          options: .regularExpression
+        ),
         """
         NSError(
-          domain: "CustomDumpTests.DumpTests.BridgedError",
+          domain: "CustomDumpTests.DumpTests.(unknown context).(unknown context).BridgedError",
           code: 0,
           userInfo: [:]
         )
