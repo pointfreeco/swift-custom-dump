@@ -13,6 +13,12 @@ import XCTest
   import SwiftUI
 #endif
 
+#if os(Windows)
+  let unknownContext = "."
+#else
+  let unknownContext = ".(unknown context).(unknown context)."
+#endif
+
 @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
 final class DumpTests: XCTestCase {
   func testAnyType() {
@@ -625,7 +631,7 @@ final class DumpTests: XCTestCase {
     XCTAssertNoDifference(
       dump,
       """
-      DumpTests.(unknown context).(unknown context).Inline.self
+      DumpTests\(unknownContext)Inline.self
       """
     )
 
@@ -637,7 +643,7 @@ final class DumpTests: XCTestCase {
     XCTAssertNoDifference(
       dump,
       """
-      DumpTests.(unknown context).(unknown context).Inline()
+      DumpTests\(unknownContext)Inline()
       """
     )
   }
@@ -964,7 +970,7 @@ final class DumpTests: XCTestCase {
       XCTAssertNoDifference(
         dump,
         """
-        DumpTests.(unknown context).(unknown context).BridgedError.thisIsFine(94)
+        DumpTests\(unknownContext)BridgedError.thisIsFine(94)
         """
       )
     #else
