@@ -41,7 +41,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run tests
-        run: make test-linux SWIFT_VERSION=${{ matrix.swift }}
+        run: make test-linux-${{ matrix.swift }}
 
   windows:
     name: Windows
@@ -58,5 +58,5 @@ jobs:
       - name: Install Swift & Run tests
         uses: MaxDesiatov/swift-windows-action@v1
         with:
-          shell-action: swift test && swift build -c release
+          shell-action: make test-swift SWIFT_VERSION=${{ matrix.swift }}
           swift-version: ${{ matrix.swift }}

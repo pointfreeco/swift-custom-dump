@@ -967,7 +967,7 @@ final class DumpTests: XCTestCase {
         DumpTests.(unknown context).(unknown context).BridgedError.thisIsFine(94)
         """
       )
-    #else
+    #elseif compiler(>=5.4)
       // Can't unwrap bridged Errors on Linux: https://bugs.swift.org/browse/SR-15191
       XCTAssertNoDifference(
         dump.replacingOccurrences(
