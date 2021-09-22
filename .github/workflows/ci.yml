@@ -58,5 +58,5 @@ jobs:
       - name: Install Swift & Run tests
         uses: MaxDesiatov/swift-windows-action@v1
         with:
-          shell-action: make test-swift SWIFT_VERSION=${{ matrix.swift }}
+          shell-action: swift test && swift build --configuration release
           swift-version: ${{ matrix.swift }}
