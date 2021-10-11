@@ -59,13 +59,18 @@ public func customDump<T, TargetStream>(
 
   var visitedItems: Set<ObjectIdentifier> = []
 
-  func customDumpHelp<TargetStream>(
-    _ value: Any,
+  func customDumpHelp<T, TargetStream>(
+    _ value: T,
     to target: inout TargetStream,
     name: String?,
     indent: Int,
     maxDepth: Int
   ) where TargetStream: TextOutputStream {
+    if T.self is AnyObject.Type, withUnsafeBytes(of: value, { $0.allSatisfy { $0 == 0 } }) {
+      target.write((name.map { "\($0): " } ?? "").appending("(null pointer)").indenting(by: indent))
+      return
+    }
+
     let mirror = Mirror(customDumpReflecting: value)
     var out = ""
 
