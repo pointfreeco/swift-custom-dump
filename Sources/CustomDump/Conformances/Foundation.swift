@@ -271,7 +271,7 @@ extension URL: CustomDumpStringConvertible {
 
 extension URLRequest.NetworkServiceType: CustomDumpStringConvertible {
   public var customDumpDescription: String {
-    switch self {#if canImport(FoundationNetworking)
+    switch self { #if canImport(FoundationNetworking)
       case .background:
         return "URLRequest.NetworkServiceType.background"
       case .default:
