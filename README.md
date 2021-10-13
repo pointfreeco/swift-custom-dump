@@ -218,7 +218,7 @@ print(diff(users, other)!)
 ```diff
   [
     … (4 unchanged),
-+   [5]: User(
++   [4]: User(
 +     favoriteNumbers: [
 +       [0]: 42,
 +       [1]: 1729
@@ -406,7 +406,7 @@ If you want to use Custom Dump in a [SwiftPM](https://swift.org/package-manager/
 
 ``` swift
 dependencies: [
-  .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "0.1.0")
+  .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "0.2.0")
 ]
 ```
 
