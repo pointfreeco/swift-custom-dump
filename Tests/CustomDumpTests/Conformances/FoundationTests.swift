@@ -432,7 +432,7 @@ final class FoundationTests: XCTestCase {
   func testNSNumber() {
     var dump = ""
     customDump(
-      NSNumber(booleanLiteral: true),
+      1 as NSNumber,
       to: &dump
     )
     XCTAssertNoDifference(
@@ -441,6 +441,20 @@ final class FoundationTests: XCTestCase {
       1
       """
     )
+
+    #if canImport(ObjectiveC)
+      dump = ""
+      customDump(
+        NSNumber(),
+        to: &dump
+      )
+      XCTAssertNoDifference(
+        dump,
+        """
+        (null pointer)
+        """
+      )
+    #endif
   }
 
   func testNSOrderedSet() {
