@@ -81,7 +81,10 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
       areInIncreasingOrder: ((Mirror.Child, Mirror.Child) -> Bool)? = nil,
       _ transform: (inout Mirror.Child, Int) -> Void = { _, _ in }
     ) {
-      guard !isMirrorEqual(Array(lhsMirror.children), Array(rhsMirror.children))
+      var lhsChildren = Array(lhsMirror.children)
+      var rhsChildren = Array(rhsMirror.children)
+
+      guard !isMirrorEqual(lhsChildren, rhsChildren)
       else {
         print(
           "// Not equal but no difference detected:"
@@ -147,9 +150,6 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
           .indenting(with: format.both + " "),
         to: &out
       )
-
-      var lhsChildren = Array(lhsMirror.children)
-      var rhsChildren = Array(rhsMirror.children)
 
       if let areInIncreasingOrder = areInIncreasingOrder {
         lhsChildren.sort(by: areInIncreasingOrder)
