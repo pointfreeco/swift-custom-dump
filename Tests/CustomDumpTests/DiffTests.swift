@@ -76,6 +76,28 @@ final class DiffTests: XCTestCase {
     )
   }
 
+  func testClassObjectIdentity() {
+    class User: NSObject {
+      let id = 42
+      let name = "Blob"
+    }
+
+    XCTAssertNoDifference(
+      diff(
+        User(),
+        User()
+      )?.replacingOccurrences(of: "0x[[:xdigit:]]+", with: "…", options: .regularExpression),
+      """
+        DiffTests.User(
+      -   _: ObjectIdentifier(…),
+      +   _: ObjectIdentifier(…),
+          id: 42,
+          name: "Blob"
+        )
+      """
+    )
+  }
+
   func testCollection() {
     XCTAssertNoDifference(
       diff(

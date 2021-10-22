@@ -311,6 +311,14 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
           to: &out
         )
       } else {
+        let showObjectIdentifiers = lhsItem != rhsItem
+          && isMirrorEqual(Array(lhsMirror.children), Array(rhsMirror.children))
+        let lhsMirror = showObjectIdentifiers
+          ? Mirror(lhs, children: [("_", lhsItem)] + lhsMirror.children, displayStyle: .class)
+          : lhsMirror
+        let rhsMirror = showObjectIdentifiers
+          ? Mirror(rhs, children: [("_", rhsItem)] + rhsMirror.children, displayStyle: .class)
+          : rhsMirror
         visitedItems.insert(lhsItem)
         diffChildren(
           lhsMirror,
