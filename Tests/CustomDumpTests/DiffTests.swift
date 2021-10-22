@@ -379,6 +379,7 @@ final class DiffTests: XCTestCase {
         NeverEqual()
       ),
       """
+        // Not equal but no difference detected:
       - NeverEqual()
       + NeverEqual()
       """
@@ -436,6 +437,18 @@ final class DiffTests: XCTestCase {
       +     name: "Blob, Sr."
           )
         )
+      """
+    )
+
+    XCTAssertNoDifference(
+      diff(
+        NeverEqualUser(id: 1, name: "Blob"),
+        NeverEqualUser(id: 1, name: "Blob")
+      ),
+      """
+        // Not equal but no difference detected:
+      - NeverEqualUser(…)
+      + NeverEqualUser(…)
       """
     )
   }
