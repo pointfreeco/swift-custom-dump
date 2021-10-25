@@ -76,6 +76,28 @@ final class DiffTests: XCTestCase {
     )
   }
 
+  func testClassObjectIdentity() {
+    class User: NSObject {
+      let id = 42
+      let name = "Blob"
+    }
+
+    XCTAssertNoDifference(
+      diff(
+        User(),
+        User()
+      )?.replacingOccurrences(of: "0x[[:xdigit:]]+", with: "…", options: .regularExpression),
+      """
+        DiffTests.User(
+      -   _: ObjectIdentifier(…),
+      +   _: ObjectIdentifier(…),
+          id: 42,
+          name: "Blob"
+        )
+      """
+    )
+  }
+
   func testCollection() {
     XCTAssertNoDifference(
       diff(
@@ -357,6 +379,7 @@ final class DiffTests: XCTestCase {
         NeverEqual()
       ),
       """
+        // Not equal but no difference detected:
       - NeverEqual()
       + NeverEqual()
       """
@@ -414,6 +437,18 @@ final class DiffTests: XCTestCase {
       +     name: "Blob, Sr."
           )
         )
+      """
+    )
+
+    XCTAssertNoDifference(
+      diff(
+        NeverEqualUser(id: 1, name: "Blob"),
+        NeverEqualUser(id: 1, name: "Blob")
+      ),
+      """
+        // Not equal but no difference detected:
+      - NeverEqualUser(…)
+      + NeverEqualUser(…)
       """
     )
   }

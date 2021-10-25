@@ -82,6 +82,13 @@ struct NestedDate { var date: Date? }
 
 struct NeverEqual: Equatable { static func == (lhs: Self, rhs: Self) -> Bool { false } }
 
+struct NeverEqualUser: Equatable {
+  let id: Int
+  let name: String
+
+  static func == (lhs: Self, rhs: Self) -> Bool { false }
+}
+
 struct Pair { let driver: User, passenger: User }
 
 struct Redacted<RawValue>: CustomDumpStringConvertible {
