@@ -172,7 +172,7 @@
         displayStyle: .set
       )
     }
-      
+
     // NB: Workaround for Xcode 13.2's new, experimental build system.
     //
     //     defaults write com.apple.dt.XCBuild EnableSwiftBuildSystemIntegration 1
