@@ -154,9 +154,7 @@
         .alert,
         .badge,
       ]
-      if #available(iOS 14, macOS 11, tvOS 14, watchOS 7, *) {
-        allCases.append(contentsOf: [.banner, .list])
-      }
+      appendBannerList(&allCases)
       allCases.append(.sound)
       for option in allCases {
         if options.contains(option) {
@@ -173,6 +171,15 @@
         unlabeledChildren: children,
         displayStyle: .set
       )
+    }
+      
+    // NB: Workaround for Xcode 13.2's new, experimental build system.
+    //
+    //     defaults write com.apple.dt.XCBuild EnableSwiftBuildSystemIntegration 1
+    private func appendBannerList(_ allCases: inout [UNNotificationPresentationOptions]) {
+      if #available(iOS 14, macOS 11, tvOS 14, watchOS 7, *) {
+        allCases.append(contentsOf: [.banner, .list])
+      }
     }
   }
 
