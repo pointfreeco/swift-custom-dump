@@ -1,7 +1,6 @@
 import CustomDump
 import XCTest
 
-@available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
 final class DiffTests: XCTestCase {
   func testAny() {
     XCTAssertEqual(

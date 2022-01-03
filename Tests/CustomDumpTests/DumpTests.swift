@@ -13,7 +13,6 @@ import XCTest
   import SwiftUI
 #endif
 
-@available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
 final class DumpTests: XCTestCase {
   func testAnyType() {
     var dump = ""
