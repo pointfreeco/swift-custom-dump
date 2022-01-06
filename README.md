@@ -406,7 +406,7 @@ If you want to use Custom Dump in a [SwiftPM](https://swift.org/package-manager/
 
 ``` swift
 dependencies: [
-  .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "0.2.0")
+  .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "0.3.0")
 ]
 ```
 
