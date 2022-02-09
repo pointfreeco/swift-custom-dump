@@ -406,7 +406,3 @@ extension CollectionDifference.Change: Codable where ChangeElement: Codable {
 }
 
 extension CollectionDifference: Codable where ChangeElement: Codable {}
-
-extension CollectionDifference: Sendable where ChangeElement: Sendable { }
-extension CollectionDifference.Change: Sendable where ChangeElement: Sendable { }
-extension CollectionDifference.Index: Sendable where ChangeElement: Sendable { }
