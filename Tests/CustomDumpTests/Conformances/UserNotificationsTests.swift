@@ -5,6 +5,7 @@
 
   class UserNotificationsTests: XCTestCase {
     func testUNAuthorizationOptions() {
+      guard #available(iOS 10, *) else { return }
       var dump: String = ""
       customDump([.badge, .alert] as UNAuthorizationOptions, to: &dump)
       XCTAssertEqual(
