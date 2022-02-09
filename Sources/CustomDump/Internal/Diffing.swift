@@ -140,7 +140,7 @@ extension BidirectionalCollection {
   /// - Complexity: Worst case performance is O(*n* * *m*), where *n* is the
   ///   count of this collection and *m* is `other.count`. You can expect
   ///   faster execution when the collections share many common elements.
-  func difference<C: BidirectionalCollection>(
+  func _difference<C: BidirectionalCollection>(
     from other: C,
     by areEquivalent: (C.Element, Element) -> Bool
   ) -> CollectionDifference<Element>
@@ -169,7 +169,7 @@ extension BidirectionalCollection where Element: Equatable {
   func difference<C: BidirectionalCollection>(
     from other: C
   ) -> CollectionDifference<Element> where C.Element == Self.Element {
-    return difference(from: other, by: ==)
+    return _difference(from: other, by: ==)
   }
 }
 
