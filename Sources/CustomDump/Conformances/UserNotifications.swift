@@ -27,11 +27,11 @@
 
         var customDumpDescription: String {
           #if os(iOS) || os(watchOS)
-            if #available(iOS 13, *), self.rawValue == .announcement {
+            if #available(iOS 13, watchOS 6, *), self.rawValue == .announcement {
               return "UNAuthorizationOptions.announcement"
             }
           #endif
-          if #available(iOS 12, *) {
+          if #available(iOS 12, tvOS 12, watchOS 5, *) {
             switch self.rawValue {
             case .alert:
               return "UNAuthorizationOptions.alert"
@@ -77,7 +77,7 @@
           allCases.append(.announcement)
         }
       #endif
-      if #available(iOS 12, *) {
+      if #available(iOS 12, tvOS 12, watchOS 5, *) {
         allCases.append(contentsOf: [
           .badge,
           .carPlay,
