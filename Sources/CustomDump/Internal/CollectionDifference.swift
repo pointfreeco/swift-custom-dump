@@ -33,33 +33,27 @@ struct CollectionDifference<ChangeElement> {
 
     // Internal common field accessors
     internal var _offset: Int {
-      get {
-        switch self {
-        case .insert(offset: let o, element: _, associatedWith: _):
-          return o
-        case .remove(offset: let o, element: _, associatedWith: _):
-          return o
-        }
+      switch self {
+      case .insert(offset: let o, element: _, associatedWith: _):
+        return o
+      case .remove(offset: let o, element: _, associatedWith: _):
+        return o
       }
     }
     internal var _element: ChangeElement {
-      get {
-        switch self {
-        case .insert(offset: _, element: let e, associatedWith: _):
-          return e
-        case .remove(offset: _, element: let e, associatedWith: _):
-          return e
-        }
+      switch self {
+      case .insert(offset: _, element: let e, associatedWith: _):
+        return e
+      case .remove(offset: _, element: let e, associatedWith: _):
+        return e
       }
     }
     internal var _associatedOffset: Int? {
-      get {
-        switch self {
-        case .insert(offset: _, element: _, associatedWith: let o):
-          return o
-        case .remove(offset: _, element: _, associatedWith: let o):
-          return o
-        }
+      switch self {
+      case .insert(offset: _, element: _, associatedWith: let o):
+        return o
+      case .remove(offset: _, element: _, associatedWith: let o):
+        return o
       }
     }
   }
@@ -162,12 +156,12 @@ struct CollectionDifference<ChangeElement> {
   ///
   /// Complexity: O(`changes.count`)
   private static func _validateChanges<Changes: Collection>(
-    _ changes : Changes
+    _ changes: Changes
   ) -> Bool where Changes.Element == Change {
     if changes.isEmpty { return true }
 
-    var insertAssocToOffset = Dictionary<Int,Int>()
-    var removeOffsetToAssoc = Dictionary<Int,Int>()
+    var insertAssocToOffset = [Int: Int]()
+    var removeOffsetToAssoc = [Int: Int]()
     var insertOffset = Set<Int>()
     var removeOffset = Set<Int>()
 
@@ -201,14 +195,15 @@ struct CollectionDifference<ChangeElement> {
   }
 
   func inverse() -> Self {
-    return CollectionDifference(_validatedChanges: self.map { c in
-      switch c {
+    return CollectionDifference(
+      _validatedChanges: self.map { c in
+        switch c {
         case .remove(let o, let e, let a):
           return .insert(offset: o, element: e, associatedWith: a)
         case .insert(let o, let e, let a):
           return .remove(offset: o, element: e, associatedWith: a)
-      }
-    })
+        }
+      })
   }
 }
 
@@ -321,8 +316,9 @@ extension CollectionDifference where ChangeElement: Hashable {
   ///
   /// - Complexity: O(*n*) where *n* is the number of collection differences.
   func inferringMoves() -> CollectionDifference<ChangeElement> {
-    let uniqueRemovals: [ChangeElement:Int?] = {
-      var result = [ChangeElement:Int?](minimumCapacity: Swift.min(removals.count, insertions.count))
+    let uniqueRemovals: [ChangeElement: Int?] = {
+      var result = [ChangeElement: Int?](
+        minimumCapacity: Swift.min(removals.count, insertions.count))
       for removal in removals {
         let element = removal._element
         if result[element] != .none {
@@ -334,8 +330,9 @@ extension CollectionDifference where ChangeElement: Hashable {
       return result.filter { (_, v) -> Bool in v != .none }
     }()
 
-    let uniqueInsertions: [ChangeElement:Int?] = {
-      var result = [ChangeElement:Int?](minimumCapacity: Swift.min(removals.count, insertions.count))
+    let uniqueInsertions: [ChangeElement: Int?] = {
+      var result = [ChangeElement: Int?](
+        minimumCapacity: Swift.min(removals.count, insertions.count))
       for insertion in insertions {
         let element = insertion._element
         if result[element] != .none {
@@ -347,25 +344,26 @@ extension CollectionDifference where ChangeElement: Hashable {
       return result.filter { (_, v) -> Bool in v != .none }
     }()
 
-    return CollectionDifference(_validatedChanges: map({ (change: Change) -> Change in
-      switch change {
-      case .remove(offset: let offset, element: let element, associatedWith: _):
-        if uniqueRemovals[element] == nil {
-          return change
+    return CollectionDifference(
+      _validatedChanges: map({ (change: Change) -> Change in
+        switch change {
+        case .remove(let offset, let element, associatedWith: _):
+          if uniqueRemovals[element] == nil {
+            return change
+          }
+          if let assoc = uniqueInsertions[element] {
+            return .remove(offset: offset, element: element, associatedWith: assoc)
+          }
+        case .insert(let offset, let element, associatedWith: _):
+          if uniqueInsertions[element] == nil {
+            return change
+          }
+          if let assoc = uniqueRemovals[element] {
+            return .insert(offset: offset, element: element, associatedWith: assoc)
+          }
         }
-        if let assoc = uniqueInsertions[element] {
-          return .remove(offset: offset, element: element, associatedWith: assoc)
-        }
-      case .insert(offset: let offset, element: let element, associatedWith: _):
-        if uniqueInsertions[element] == nil {
-          return change
-        }
-        if let assoc = uniqueRemovals[element] {
-          return .insert(offset: offset, element: element, associatedWith: assoc)
-        }
-      }
-      return change
-    }))
+        return change
+      }))
   }
 }
 

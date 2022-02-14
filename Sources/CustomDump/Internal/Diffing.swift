@@ -53,7 +53,7 @@ extension CollectionDifference {
 }
 
 // Error type allows the use of throw to unroll state on application failure
-private enum _ApplicationError : Error { case failed }
+private enum _ApplicationError: Error { case failed }
 
 extension RangeReplaceableCollection {
   /// Applies the given difference to this collection.
@@ -88,17 +88,17 @@ extension RangeReplaceableCollection {
       var currentIndex = self.startIndex
       try difference._fastEnumeratedApply { change in
         switch change {
-        case .remove(offset: let offset, element: _, associatedWith: _):
+        case .remove(let offset, element: _, associatedWith: _):
           let origCount = offset - enumeratedOriginals
           try append(into: &result, contentsOf: self, from: &currentIndex, count: origCount)
           if currentIndex == self.endIndex {
             // Removing nonexistent element off the end of the collection
             throw _ApplicationError.failed
           }
-          enumeratedOriginals += origCount + 1 // Removal consumes an original element
+          enumeratedOriginals += origCount + 1  // Removal consumes an original element
           currentIndex = self.index(after: currentIndex)
           enumeratedRemoves += 1
-        case .insert(offset: let offset, element: let element, associatedWith: _):
+        case .insert(let offset, let element, associatedWith: _):
           let origCount = (offset + enumeratedRemoves - enumeratedInserts) - enumeratedOriginals
           try append(into: &result, contentsOf: self, from: &currentIndex, count: origCount)
           result.append(element)
@@ -185,15 +185,15 @@ extension BidirectionalCollection where Element: Equatable {
 private struct _V {
 
   private var a: [Int]
-#if INTERNAL_CHECKS_ENABLED
-  private let isOdd: Bool
-#endif
+  #if INTERNAL_CHECKS_ENABLED
+    private let isOdd: Bool
+  #endif
 
   init(maxIndex largest: Int) {
-#if INTERNAL_CHECKS_ENABLED
-    _internalInvariant(largest >= 0)
-    isOdd = largest % 2 == 1
-#endif
+    #if INTERNAL_CHECKS_ENABLED
+      _internalInvariant(largest >= 0)
+      isOdd = largest % 2 == 1
+    #endif
     a = [Int](repeating: 0, count: largest + 1)
   }
 
@@ -206,33 +206,35 @@ private struct _V {
 
   subscript(index: Int) -> Int {
     get {
-#if INTERNAL_CHECKS_ENABLED
-      _internalInvariant(isOdd == (index % 2 != 0))
-#endif
+      #if INTERNAL_CHECKS_ENABLED
+        _internalInvariant(isOdd == (index % 2 != 0))
+      #endif
       return a[_V.transform(index)]
     }
     set(newValue) {
-#if INTERNAL_CHECKS_ENABLED
-      _internalInvariant(isOdd == (index % 2 != 0))
-#endif
+      #if INTERNAL_CHECKS_ENABLED
+        _internalInvariant(isOdd == (index % 2 != 0))
+      #endif
       a[_V.transform(index)] = newValue
     }
   }
 }
 
-private func _myers<C,D>(
+private func _myers<C, D>(
   from old: C, to new: D,
   using cmp: (C.Element, D.Element) -> Bool
 ) -> CollectionDifference<C.Element>
-  where
-    C: BidirectionalCollection,
-    D: BidirectionalCollection,
-    C.Element == D.Element
+where
+  C: BidirectionalCollection,
+  D: BidirectionalCollection,
+  C.Element == D.Element
 {
 
   // Core implementation of the algorithm described at http://www.xmailserver.org/diff2.pdf
   // Variable names match those used in the paper as closely as possible
-  func _descent(from a: UnsafeBufferPointer<C.Element>, to b: UnsafeBufferPointer<D.Element>) -> [_V] {
+  func _descent(from a: UnsafeBufferPointer<C.Element>, to b: UnsafeBufferPointer<D.Element>)
+    -> [_V]
+  {
     let n = a.count
     let m = b.count
     let max = n + m
@@ -271,7 +273,7 @@ private func _myers<C,D>(
 
         while x < n && y < m {
           if !cmp(a[x], b[y]) {
-            break;
+            break
           }
           x &+= 1
           y &+= 1
@@ -355,7 +357,7 @@ private func _myers<C,D>(
 
   return _withContiguousStorage(for: old) { a in
     return _withContiguousStorage(for: new) { b in
-      return CollectionDifference(_formChanges(from: a, to: b, using:_descent(from: a, to: b)))!
+      return CollectionDifference(_formChanges(from: a, to: b, using: _descent(from: a, to: b)))!
     }
   }
 }
