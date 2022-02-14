@@ -39,7 +39,6 @@ import XCTestDynamicOverlay
 ///     you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you
 ///     call this function.
-@available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
 public func XCTAssertNoDifference<T>(
   _ expression1: @autoclosure () throws -> T,
   _ expression2: @autoclosure () throws -> T,

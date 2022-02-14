@@ -739,20 +739,4 @@ final class DumpTests: XCTestCase {
       )
     }
   #endif
-
-  #if canImport(SwiftUI)
-    func testSwiftUI() {
-      var dump = ""
-      customDump(
-        Animation.easeInOut,
-        to: &dump
-      )
-      XCTAssertNoDifference(
-        dump,
-        """
-        Animation.easeInOut
-        """
-      )
-    }
-  #endif
 }
