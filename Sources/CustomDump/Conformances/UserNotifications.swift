@@ -73,20 +73,9 @@
         .alert
       ]
       #if os(iOS) || os(watchOS)
-        if #available(iOS 13, watchOS 6, *) {
-          allCases.append(.announcement)
-        }
+        self.append_iOS_13_watchOS_6(&allCases)
       #endif
-      if #available(iOS 12, tvOS 12, watchOS 5, *) {
-        allCases.append(contentsOf: [
-          .badge,
-          .carPlay,
-          .criticalAlert,
-          .providesAppNotificationSettings,
-          .provisional,
-          .sound,
-        ])
-      }
+      self.append_iOS_12_tvOS_12_watchOS_5(&allCases)
       for option in allCases {
         if options.contains(option) {
           children.append(.init(rawValue: option))
@@ -102,6 +91,31 @@
         unlabeledChildren: children,
         displayStyle: .set
       )
+    }
+
+    // NB: Workaround for Xcode 13.2's new, experimental build system. (Fixed in Xcode 13.3.)
+    //
+    //     defaults write com.apple.dt.XCBuild EnableSwiftBuildSystemIntegration 1
+    private func append_iOS_13_watchOS_6(_ allCases: inout [UNAuthorizationOptions]) {
+      if #available(iOS 13, watchOS 6, *) {
+        allCases.append(.announcement)
+      }
+    }
+
+    // NB: Workaround for Xcode 13.2's new, experimental build system. (Fixed in Xcode 13.3.)
+    //
+    //     defaults write com.apple.dt.XCBuild EnableSwiftBuildSystemIntegration 1
+    private func append_iOS_12_tvOS_12_watchOS_5(_ allCases: inout [UNAuthorizationOptions]) {
+      if #available(iOS 12, tvOS 12, watchOS 5, *) {
+        allCases.append(contentsOf: [
+          .badge,
+          .carPlay,
+          .criticalAlert,
+          .providesAppNotificationSettings,
+          .provisional,
+          .sound,
+        ])
+      }
     }
   }
 
@@ -193,7 +207,7 @@
       )
     }
 
-    // NB: Workaround for Xcode 13.2's new, experimental build system.
+    // NB: Workaround for Xcode 13.2's new, experimental build system. (Fixed in Xcode 13.3.)
     //
     //     defaults write com.apple.dt.XCBuild EnableSwiftBuildSystemIntegration 1
     private func appendBannerList(_ allCases: inout [UNNotificationPresentationOptions]) {
