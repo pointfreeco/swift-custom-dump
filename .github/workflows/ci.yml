@@ -15,11 +15,11 @@ jobs:
     runs-on: macOS-11.0
     strategy:
       matrix:
-        experimental-build-system: [false]
         xcode:
           - '13.0'
           - '13.1'
           - '13.2.1'
+        experimental-build-system: [false]
         include:
           - xcode: '13.2.1'
             experimental-build-system: true
