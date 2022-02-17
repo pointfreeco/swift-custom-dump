@@ -72,9 +72,7 @@
       var allCases: [UNAuthorizationOptions] = [
         .alert
       ]
-      #if os(iOS) || os(watchOS)
-        self.append_iOS_13_watchOS_6(&allCases)
-      #endif
+      self.append_iOS_13_watchOS_6(&allCases)
       self.append_iOS_12_tvOS_12_watchOS_5(&allCases)
       for option in allCases {
         if options.contains(option) {
@@ -97,9 +95,11 @@
     //
     //     defaults write com.apple.dt.XCBuild EnableSwiftBuildSystemIntegration 1
     private func append_iOS_13_watchOS_6(_ allCases: inout [UNAuthorizationOptions]) {
-      if #available(iOS 13, watchOS 6, *) {
-        allCases.append(.announcement)
-      }
+      #if os(iOS) || os(watchOS)
+        if #available(iOS 13, watchOS 6, *) {
+          allCases.append(.announcement)
+        }
+      #endif
     }
 
     // NB: Workaround for Xcode 13.2's new, experimental build system. (Fixed in Xcode 13.3.)
