@@ -22,7 +22,7 @@ jobs:
           - '13.2.1'
         include:
           - xcode: '13.2.1'
-          - experimental-build-system: true
+            experimental-build-system: true
     steps:
       - uses: actions/checkout@v2
       - name: Enable Experimental Build System
