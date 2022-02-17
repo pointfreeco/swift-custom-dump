@@ -19,10 +19,17 @@ jobs:
           - '13.0'
           - '13.1'
           - '13.2.1'
+        experimental-build-system: [false]
+        include:
+          - xcode: '13.2.1'
+            experimental-build-system: true
     steps:
       - uses: actions/checkout@v2
       - name: Select Xcode ${{ matrix.xcode }}
         run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
+      - name: Enable Experimental Build System
+        if: ${{ matrix.experimental-build-system }}
+        run: defaults write com.apple.dt.XCBuild EnableSwiftBuildSystemIntegration 1
       - name: Print Swift version
         run: swift --version
       - name: Run tests (Swift)
