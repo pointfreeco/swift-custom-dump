@@ -11,7 +11,7 @@ on:
 
 jobs:
   macos:
-    name: MacOS
+    name: MacOS (Xcode ${{ matrix.xcode }}${{ matrix.experimental-build-system && ', experimental build system' || '' }})
     runs-on: macOS-11.0
     strategy:
       matrix:
