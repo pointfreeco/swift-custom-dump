@@ -156,7 +156,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         rhsChildren.sort(by: areInIncreasingOrder)
       }
 
-      let difference = rhsChildren._difference(from: lhsChildren, by: areEquivalent)
+      let difference = rhsChildren.difference(from: lhsChildren, by: areEquivalent)
 
       var lhsOffset = 0
       var rhsOffset = 0

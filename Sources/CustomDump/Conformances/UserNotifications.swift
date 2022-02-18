@@ -26,43 +26,27 @@
         var rawValue: UNAuthorizationOptions
 
         var customDumpDescription: String {
+          switch self.rawValue {
+          case .alert:
+            return "UNAuthorizationOptions.alert"
           #if os(iOS) || os(watchOS)
-            if #available(iOS 13, watchOS 6, *), self.rawValue == .announcement {
+            case .announcement:
               return "UNAuthorizationOptions.announcement"
-            }
           #endif
-          if #available(iOS 12, tvOS 12, watchOS 5, *) {
-            switch self.rawValue {
-            case .alert:
-              return "UNAuthorizationOptions.alert"
-            case .badge:
-              return "UNAuthorizationOptions.badge"
-            case .carPlay:
-              return "UNAuthorizationOptions.carPlay"
-            case .criticalAlert:
-              return "UNAuthorizationOptions.criticalAlert"
-            case .providesAppNotificationSettings:
-              return "UNAuthorizationOptions.providesAppNotificationSettings"
-            case .provisional:
-              return "UNAuthorizationOptions.provisional"
-            case .sound:
-              return "UNAuthorizationOptions.sound"
-            default:
-              return "UNAuthorizationOptions(rawValue: \(self.rawValue))"
-            }
-          } else {
-            switch self.rawValue {
-            case .alert:
-              return "UNAuthorizationOptions.alert"
-            case .badge:
-              return "UNAuthorizationOptions.badge"
-            case .carPlay:
-              return "UNAuthorizationOptions.carPlay"
-            case .sound:
-              return "UNAuthorizationOptions.sound"
-            default:
-              return "UNAuthorizationOptions(rawValue: \(self.rawValue))"
-            }
+          case .badge:
+            return "UNAuthorizationOptions.badge"
+          case .carPlay:
+            return "UNAuthorizationOptions.carPlay"
+          case .criticalAlert:
+            return "UNAuthorizationOptions.criticalAlert"
+          case .providesAppNotificationSettings:
+            return "UNAuthorizationOptions.providesAppNotificationSettings"
+          case .provisional:
+            return "UNAuthorizationOptions.provisional"
+          case .sound:
+            return "UNAuthorizationOptions.sound"
+          default:
+            return "UNAuthorizationOptions(rawValue: \(self.rawValue))"
           }
         }
       }
@@ -73,20 +57,16 @@
         .alert
       ]
       #if os(iOS) || os(watchOS)
-        if #available(iOS 13, watchOS 6, *) {
-          allCases.append(.announcement)
-        }
+        allCases.append(.announcement)
       #endif
-      if #available(iOS 12, tvOS 12, watchOS 5, *) {
-        allCases.append(contentsOf: [
-          .badge,
-          .carPlay,
-          .criticalAlert,
-          .providesAppNotificationSettings,
-          .provisional,
-          .sound,
-        ])
-      }
+      allCases.append(contentsOf: [
+        .badge,
+        .carPlay,
+        .criticalAlert,
+        .providesAppNotificationSettings,
+        .provisional,
+        .sound,
+      ])
       for option in allCases {
         if options.contains(option) {
           children.append(.init(rawValue: option))

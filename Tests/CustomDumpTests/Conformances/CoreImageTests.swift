@@ -5,7 +5,6 @@
 
   final class CoreImageTests: XCTestCase {
     func testCIQRCodeDescriptor() {
-      guard #available(iOS 11, tvOS 11, *) else { return }
       var dump = ""
       customDump(
         [.levelH, .levelL, .levelM, .levelQ] as [CIQRCodeDescriptor.ErrorCorrectionLevel],

@@ -1,4 +1,4 @@
-#if canImport(SwiftUI) && DEBUG
+#if canImport(SwiftUI)
   import SwiftUI
 
   @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
