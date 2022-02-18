@@ -2,7 +2,6 @@
   import CoreImage
 
   @available(watchOS, unavailable)
-  @available(iOS 11, macOS 10.13, tvOS 11, *)
   extension CIQRCodeDescriptor.ErrorCorrectionLevel: CustomDumpStringConvertible {
     public var customDumpDescription: String {
       switch self {
@@ -21,8 +20,6 @@
     }
   }
 
-  @available(watchOS, unavailable)
-  @available(iOS 11, macOS 10.13, tvOS 11, *)
   extension CIDataMatrixCodeDescriptor.ECCVersion: CustomDumpStringConvertible {
     public var customDumpDescription: String {
       switch self {

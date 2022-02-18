@@ -26,43 +26,27 @@
         var rawValue: UNAuthorizationOptions
 
         var customDumpDescription: String {
+          switch self.rawValue {
+          case .alert:
+            return "UNAuthorizationOptions.alert"
           #if os(iOS) || os(watchOS)
-            if #available(iOS 13, watchOS 6, *), self.rawValue == .announcement {
+            case .announcement:
               return "UNAuthorizationOptions.announcement"
-            }
           #endif
-          if #available(iOS 12, tvOS 12, watchOS 5, *) {
-            switch self.rawValue {
-            case .alert:
-              return "UNAuthorizationOptions.alert"
-            case .badge:
-              return "UNAuthorizationOptions.badge"
-            case .carPlay:
-              return "UNAuthorizationOptions.carPlay"
-            case .criticalAlert:
-              return "UNAuthorizationOptions.criticalAlert"
-            case .providesAppNotificationSettings:
-              return "UNAuthorizationOptions.providesAppNotificationSettings"
-            case .provisional:
-              return "UNAuthorizationOptions.provisional"
-            case .sound:
-              return "UNAuthorizationOptions.sound"
-            default:
-              return "UNAuthorizationOptions(rawValue: \(self.rawValue))"
-            }
-          } else {
-            switch self.rawValue {
-            case .alert:
-              return "UNAuthorizationOptions.alert"
-            case .badge:
-              return "UNAuthorizationOptions.badge"
-            case .carPlay:
-              return "UNAuthorizationOptions.carPlay"
-            case .sound:
-              return "UNAuthorizationOptions.sound"
-            default:
-              return "UNAuthorizationOptions(rawValue: \(self.rawValue))"
-            }
+          case .badge:
+            return "UNAuthorizationOptions.badge"
+          case .carPlay:
+            return "UNAuthorizationOptions.carPlay"
+          case .criticalAlert:
+            return "UNAuthorizationOptions.criticalAlert"
+          case .providesAppNotificationSettings:
+            return "UNAuthorizationOptions.providesAppNotificationSettings"
+          case .provisional:
+            return "UNAuthorizationOptions.provisional"
+          case .sound:
+            return "UNAuthorizationOptions.sound"
+          default:
+            return "UNAuthorizationOptions(rawValue: \(self.rawValue))"
           }
         }
       }
@@ -72,8 +56,17 @@
       var allCases: [UNAuthorizationOptions] = [
         .alert
       ]
-      self.append_iOS_13_watchOS_6(&allCases)
-      self.append_iOS_12_tvOS_12_watchOS_5(&allCases)
+      #if os(iOS) || os(watchOS)
+        allCases.append(.announcement)
+      #endif
+      allCases.append(contentsOf: [
+        .badge,
+        .carPlay,
+        .criticalAlert,
+        .providesAppNotificationSettings,
+        .provisional,
+        .sound,
+      ])
       for option in allCases {
         if options.contains(option) {
           children.append(.init(rawValue: option))
@@ -89,33 +82,6 @@
         unlabeledChildren: children,
         displayStyle: .set
       )
-    }
-
-    // NB: Workaround for Xcode 13.2's new, experimental build system. (Fixed in Xcode 13.3.)
-    //
-    //     defaults write com.apple.dt.XCBuild EnableSwiftBuildSystemIntegration 1
-    private func append_iOS_13_watchOS_6(_ allCases: inout [UNAuthorizationOptions]) {
-      #if os(iOS) || os(watchOS)
-        if #available(iOS 13, watchOS 6, *) {
-          allCases.append(.announcement)
-        }
-      #endif
-    }
-
-    // NB: Workaround for Xcode 13.2's new, experimental build system. (Fixed in Xcode 13.3.)
-    //
-    //     defaults write com.apple.dt.XCBuild EnableSwiftBuildSystemIntegration 1
-    private func append_iOS_12_tvOS_12_watchOS_5(_ allCases: inout [UNAuthorizationOptions]) {
-      if #available(iOS 12, tvOS 12, watchOS 5, *) {
-        allCases.append(contentsOf: [
-          .badge,
-          .carPlay,
-          .criticalAlert,
-          .providesAppNotificationSettings,
-          .provisional,
-          .sound,
-        ])
-      }
     }
   }
 
@@ -207,7 +173,7 @@
       )
     }
 
-    // NB: Workaround for Xcode 13.2's new, experimental build system. (Fixed in Xcode 13.3.)
+    // NB: Workaround for Xcode 13.2's new, experimental build system.
     //
     //     defaults write com.apple.dt.XCBuild EnableSwiftBuildSystemIntegration 1
     private func appendBannerList(_ allCases: inout [UNNotificationPresentationOptions]) {

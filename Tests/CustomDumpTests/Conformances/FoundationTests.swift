@@ -385,7 +385,6 @@ final class FoundationTests: XCTestCase {
   }
 
   func testNSMeasurement() {
-    guard #available(iOS 10, tvOS 10, *) else { return }
     var dump = ""
     customDump(
       NSMeasurement(doubleValue: 42, unit: Unit(symbol: "kg")),

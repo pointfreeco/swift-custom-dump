@@ -1,4 +1,4 @@
-#if canImport(UIKit) && !os(watchOS)
+#if canImport(UIKit)
   import CustomDump
   import XCTest
   import UIKit
