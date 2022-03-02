@@ -74,6 +74,23 @@ final class DiffTests: XCTestCase {
       + NSObject()
       """
     )
+
+    XCTAssertNoDifference(
+      diff(
+        RepeatedObject(id: "a"),
+        RepeatedObject(id: "b")
+      ),
+      """
+        RepeatedObject(
+          child: RepeatedObject.Child(
+      -     grandchild: RepeatedObject.Grandchild(id: "a")
+      +     grandchild: RepeatedObject.Grandchild(id: "b")
+          ),
+      -   grandchild: RepeatedObject.Grandchild(↩︎)
+      +   grandchild: RepeatedObject.Grandchild(↩︎)
+        )
+      """
+    )
   }
 
   func testClassObjectIdentity() {

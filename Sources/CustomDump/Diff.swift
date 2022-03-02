@@ -304,13 +304,13 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
       let subjectType = typeName(lhsMirror.subjectType)
       if visitedItems.contains(lhsItem) || visitedItems.contains(rhsItem) {
         print(
-          "\(subjectType)(↩︎)"
+          "\(lhsName.map { "\($0): " } ?? "")\(subjectType)(↩︎)"
             .indenting(by: indent)
             .indenting(with: format.first + " "),
           to: &out
         )
         print(
-          "\(subjectType)(↩︎)"
+          "\(rhsName.map { "\($0): " } ?? "")\(subjectType)(↩︎)"
             .indenting(by: indent)
             .indenting(with: format.second + " "),
           terminator: "",
