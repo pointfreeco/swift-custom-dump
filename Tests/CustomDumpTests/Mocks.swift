@@ -4,25 +4,25 @@ import Foundation
 class RecursiveFoo { var foo: RecursiveFoo? }
 
 class RepeatedObject {
-    class Child {
-        let grandchild: Grandchild
-        init(id: String) {
-            grandchild = Grandchild(id: id)
-        }
-    }
-    class Grandchild {
-        let id: String
-        init(id: String) {
-            self.id = id
-        }
-    }
-
-    let child: Child
+  class Child {
     let grandchild: Grandchild
     init(id: String) {
-        child = Child(id: id)
-        grandchild = child.grandchild
+      grandchild = Grandchild(id: id)
     }
+  }
+  class Grandchild {
+    let id: String
+    init(id: String) {
+      self.id = id
+    }
+  }
+
+  let child: Child
+  let grandchild: Grandchild
+  init(id: String) {
+    child = Child(id: id)
+    grandchild = child.grandchild
+  }
 }
 
 class UserClass {
