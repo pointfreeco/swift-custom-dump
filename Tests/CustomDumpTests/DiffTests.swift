@@ -900,10 +900,10 @@ final class DiffTests: XCTestCase {
     XCTAssertNoDifference(
       diff(
         [
-          "value": 29.99 as Float,
+          "value": 29.99 as Float
         ],
         [
-          "value": 29.99 as Double,
+          "value": 29.99 as Double
         ]
       ),
       """
