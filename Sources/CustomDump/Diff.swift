@@ -48,16 +48,23 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
     var out = ""
 
     func diffEverything() {
+      var lhs = _customDump(lhs, name: lhsName, indent: indent, maxDepth: .max)
+      var rhs = _customDump(rhs, name: rhsName, indent: indent, maxDepth: .max)
+      if lhs == rhs {
+        if lhsMirror.subjectType != rhsMirror.subjectType {
+          lhs.append(" as \(typeName(lhsMirror.subjectType))")
+          rhs.append(" as \(typeName(rhsMirror.subjectType))")
+        }
+      }
+      lhs.append(separator)
+      rhs.append(separator)
+
       print(
-        _customDump(lhs, name: lhsName, indent: indent, maxDepth: .max)
-          .appending(separator)
-          .indenting(with: format.first + " "),
+        lhs.indenting(with: format.first + " "),
         to: &out
       )
       print(
-        _customDump(rhs, name: rhsName, indent: indent, maxDepth: .max)
-          .appending(separator)
-          .indenting(with: format.second + " "),
+        rhs.indenting(with: format.second + " "),
         terminator: "",
         to: &out
       )

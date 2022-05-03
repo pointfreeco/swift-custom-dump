@@ -883,6 +883,35 @@ final class DiffTests: XCTestCase {
         )
       """
     )
+  }
 
+  func testDifferentTypes() {
+    XCTAssertNoDifference(
+      diff(
+        29.99 as Float as Any,
+        29.99 as Double as Any
+      ),
+      """
+      - 29.99 as Float
+      + 29.99 as Double
+      """
+    )
+
+    XCTAssertNoDifference(
+      diff(
+        [
+          "value": 29.99 as Float,
+        ],
+        [
+          "value": 29.99 as Double,
+        ]
+      ),
+      """
+        [
+      -   "value": 29.99 as Float
+      +   "value": 29.99 as Double
+        ]
+      """
+    )
   }
 }
