@@ -25,7 +25,8 @@
 ///     unchanged lines.
 /// - Returns: A string describing any difference detected between values, or `nil` if no difference
 ///   is detected.
-public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String? {
+public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default,
+                    excludedNoChangedProperty: Bool = false) -> String? {
   var visitedItems: Set<ObjectIdentifier> = []
 
   func diffHelp(
@@ -482,7 +483,11 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         suffix: ")",
         elementIndent: 2,
         elementSeparator: ",",
-        collapseUnchanged: false
+        collapseUnchanged: excludedNoChangedProperty,
+        areInIncreasingOrder:
+            excludedNoChangedProperty
+        ? { ($0.label ?? "") > ($1.label ?? "") }
+        : nil
       )
 
     case (_, .tuple?, _, .tuple?):
