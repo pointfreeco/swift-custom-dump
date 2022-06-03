@@ -914,4 +914,21 @@ final class DiffTests: XCTestCase {
       """
     )
   }
+
+  func testSpeech() {
+    struct AppState: Equatable {
+      var isRecording = false
+      var status: SFSpeechRecognizerAuthorizationStatus
+      var transcribedText = ""
+    }
+    XCTAssertEqual(
+      diff(
+        AppState(status: .notDetermined),
+        AppState(status: .authorized)
+      ),
+      ""
+    )
+  }
 }
+
+import Speech
