@@ -1,5 +1,5 @@
 func typeName(_ type: Any.Type) -> String {
-  var name = String(reflecting: type)
+  var name = _typeName(type)
   if let index = name.firstIndex(of: ".") {
     name.removeSubrange(...index)
   }
