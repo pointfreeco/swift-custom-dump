@@ -914,4 +914,116 @@ final class DiffTests: XCTestCase {
       """
     )
   }
+    
+  func testExcludedNoChangedProperty() throws {
+    XCTAssertNoDifference(
+      diff(
+        User(
+          id: 42,
+          name: "Blob"
+        ),
+        User(
+          id: 42,
+          name: "Blob, Jr."
+        ),
+        excludedNoChangedProperty: true
+      ),
+      """
+        User(
+      -   name: "Blob",
+      +   name: "Blob, Jr.",
+          … (1 unchanged)
+        )
+      """
+    )
+
+      XCTAssertNoDifference(
+        diff(
+            User(
+                id: 41,
+                name: "Blob"
+            ),
+            User(
+                id: 42,
+                name: "Blob"
+            ),
+            excludedNoChangedProperty: true
+        ),
+        """
+          User(
+        -   id: 41
+        +   id: 42
+            … (1 unchanged)
+          )
+        """
+      )
+      XCTAssertNoDifference(
+        diff(
+            Triple(
+                id: 42,
+                name: "Blob",
+                other: true
+            ),
+            Triple(
+                id: 42,
+                name: "Blob",
+                other: false
+            ),
+            excludedNoChangedProperty: true
+        ),
+        """
+          Triple(
+        -   other: true,
+        +   other: false,
+            … (2 unchanged)
+          )
+        """
+      )
+    
+    XCTAssertNoDifference(
+      diff(
+        Triple(
+          id: 41,
+          name: "Blob",
+          other: true
+        ),
+        Triple(
+          id: 42,
+          name: "Blob",
+          other: true
+        ),
+        excludedNoChangedProperty: true
+      ),
+          """
+            Triple(
+          -   id: 41
+          +   id: 42
+              … (2 unchanged)
+            )
+          """
+    )
+
+    XCTAssertNoDifference(
+      diff(
+        Triple(
+          id: 42,
+          name: "Blob",
+          other: true
+        ),
+        Triple(
+          id: 42,
+          name: "Blob, Jr",
+          other: true
+        ),
+        excludedNoChangedProperty: true
+      ),
+        """
+          Triple(
+        -   name: "Blob",
+        +   name: "Blob, Jr",
+            … (2 unchanged)
+          )
+        """
+    )
+  }
 }

@@ -122,3 +122,4 @@ struct Redacted<RawValue>: CustomDumpStringConvertible {
 }
 
 struct User: Equatable, Identifiable { var id: Int, name: String }
+struct Triple: Equatable, Identifiable { var id: Int, name: String, other: Bool }
