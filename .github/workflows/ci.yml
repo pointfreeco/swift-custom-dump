@@ -53,14 +53,14 @@ jobs:
       - name: Run tests
         run: make test-linux SWIFT_VERSION=${{ matrix.swift }}
 
-  windows:
-    name: Windows
-    runs-on: windows-latest
-    steps:
-      - uses: compnerd/gha-setup-swift@main
-        with:
-          branch: swift-5.5-release
-          tag: 5.5-RELEASE
-
-      - uses: actions/checkout@v2
-      - run: swift test && swift build --configuration release
+  #windows:
+  #  name: Windows
+  #  runs-on: windows-latest
+  #  steps:
+  #    - uses: compnerd/gha-setup-swift@main
+  #      with:
+  #        branch: swift-5.5-release
+  #        tag: 5.5-RELEASE
+  #
+  #    - uses: actions/checkout@v2
+  #    - run: swift test && swift build --configuration release
