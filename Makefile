@@ -57,7 +57,7 @@ test-platforms:
 		-destination platform="$(PLATFORM_TVOS)"
 
 	xcodebuild \
-		-scheme CustomDump_watchOS \
+		-scheme swift-custom-dump \
 		-destination platform="$(PLATFORM_WATCHOS)"
 	xcodebuild \
 		-scheme CustomDump_watchOS \
