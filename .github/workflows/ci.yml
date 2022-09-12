@@ -56,17 +56,11 @@ jobs:
   windows:
     name: Windows
     runs-on: windows-latest
-    strategy:
-      matrix:
-        swift:
-          #- 5.3
-          - 5.4
-          - 5.5
-    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v2
-      - name: Install Swift & Run tests
-        uses: MaxDesiatov/swift-windows-action@v1
+      - uses: compnerd/gha-setup-swift@main
         with:
-          shell-action: swift test && swift build --configuration release
-          swift-version: ${{ matrix.swift }}
+          branch: swift-5.5-release
+          tag: 5.5-RELEASE
+
+      - uses: actions/checkout@v2
+      - run: swift test && swift build --configuration release
