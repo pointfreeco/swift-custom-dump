@@ -25,42 +25,52 @@ test-swift:
 
 test-platforms:
 	xcodebuild test \
-		-scheme swift-custom-dump \
+		-workspace CustomDump.xcworkspace \
+		-scheme CustomDump \
 		-destination platform="$(PLATFORM_IOS)"
 	xcodebuild \
-		-scheme swift-custom-dump \
+		-workspace CustomDump.xcworkspace \
+		-scheme CustomDump \
 		-configuration Release \
 		-destination platform="$(PLATFORM_IOS)"
 
 	xcodebuild test \
-		-scheme swift-custom-dump \
+		-workspace CustomDump.xcworkspace \
+		-scheme CustomDump \
 		-destination platform="$(PLATFORM_MACOS)"
 	xcodebuild \
-		-scheme swift-custom-dump \
+		-workspace CustomDump.xcworkspace \
+		-scheme CustomDump \
 		-configuration Release \
 		-destination platform="$(PLATFORM_MACOS)"
 
 	xcodebuild test \
-		-scheme swift-custom-dump \
+		-workspace CustomDump.xcworkspace \
+		-scheme CustomDump \
 		-destination platform="$(PLATFORM_MAC_CATALYST)"
 	xcodebuild \
-		-scheme swift-custom-dump \
+		-workspace CustomDump.xcworkspace \
+		-scheme CustomDump \
 		-configuration Release \
 		-destination platform="$(PLATFORM_MAC_CATALYST)"
 
 	xcodebuild test \
-		-scheme swift-custom-dump \
+		-workspace CustomDump.xcworkspace \
+		-scheme CustomDump \
 		-destination platform="$(PLATFORM_TVOS)"
 	xcodebuild \
-		-scheme swift-custom-dump \
+		-workspace CustomDump.xcworkspace \
+		-scheme CustomDump \
 		-configuration Release \
 		-destination platform="$(PLATFORM_TVOS)"
 
 	xcodebuild \
-		-scheme swift-custom-dump \
+		-workspace CustomDump.xcworkspace \
+		-scheme CustomDump \
 		-destination platform="$(PLATFORM_WATCHOS)"
 	xcodebuild \
-		-scheme swift-custom-dump \
+		-workspace CustomDump.xcworkspace \
+		-scheme CustomDump \
 		-configuration Release \
 		-destination platform="$(PLATFORM_WATCHOS)"
 
