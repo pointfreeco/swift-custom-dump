@@ -25,42 +25,42 @@ test-swift:
 
 test-platforms:
 	xcodebuild test \
-		-scheme CustomDump \
+		-scheme swift-custom-dump \
 		-destination platform="$(PLATFORM_IOS)"
 	xcodebuild \
-		-scheme CustomDump \
+		-scheme swift-custom-dump \
 		-configuration Release \
 		-destination platform="$(PLATFORM_IOS)"
 
 	xcodebuild test \
-		-scheme CustomDump \
+		-scheme swift-custom-dump \
 		-destination platform="$(PLATFORM_MACOS)"
 	xcodebuild \
-		-scheme CustomDump \
+		-scheme swift-custom-dump \
 		-configuration Release \
 		-destination platform="$(PLATFORM_MACOS)"
 
 	xcodebuild test \
-		-scheme CustomDump \
+		-scheme swift-custom-dump \
 		-destination platform="$(PLATFORM_MAC_CATALYST)"
 	xcodebuild \
-		-scheme CustomDump \
+		-scheme swift-custom-dump \
 		-configuration Release \
 		-destination platform="$(PLATFORM_MAC_CATALYST)"
 
 	xcodebuild test \
-		-scheme CustomDump \
+		-scheme swift-custom-dump \
 		-destination platform="$(PLATFORM_TVOS)"
 	xcodebuild \
-		-scheme CustomDump \
+		-scheme swift-custom-dump \
 		-configuration Release \
 		-destination platform="$(PLATFORM_TVOS)"
 
 	xcodebuild \
-		-scheme CustomDump \
+		-scheme swift-custom-dump \
 		-destination platform="$(PLATFORM_WATCHOS)"
 	xcodebuild \
-		-scheme CustomDump \
+		-scheme swift-custom-dump \
 		-configuration Release \
 		-destination platform="$(PLATFORM_WATCHOS)"
 
