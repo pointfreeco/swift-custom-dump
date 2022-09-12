@@ -11,7 +11,7 @@ on:
 
 jobs:
   macos:
-    name: MacOS (Xcode ${{ matrix.xcode }})
+    name: macOS (Xcode ${{ matrix.xcode }})
     runs-on: macOS-12
     strategy:
       matrix:
