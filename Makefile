@@ -1,8 +1,8 @@
 PLATFORM_IOS = iOS Simulator,name=iPhone 11 Pro Max
 PLATFORM_MACOS = macOS
 PLATFORM_MAC_CATALYST = macOS,variant=Mac Catalyst
-PLATFORM_TVOS = tvOS Simulator,name=Apple TV 4K (at 1080p)
-PLATFORM_WATCHOS = watchOS Simulator,name=Apple Watch Series 4 - 44mm
+PLATFORM_TVOS = tvOS Simulator,name=Apple TV
+PLATFORM_WATCHOS = watchOS Simulator,name=Apple Watch Series 5 - 44mm
 SWIFT_VERSION = 5.5
 ifeq ($(SWIFT_VERSION),5.3)
 SWIFT_BUILD_ARGS = --enable-test-discovery
