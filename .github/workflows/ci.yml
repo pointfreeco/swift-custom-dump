@@ -36,13 +36,28 @@ jobs:
     strategy:
       matrix:
         swift:
-          - 5.3
-          - 5.4
           - 5.5
+          - 5.6
+          - 5.7
     steps:
       - uses: actions/checkout@v2
       - name: Run tests
         run: make test-linux SWIFT_VERSION=${{ matrix.swift }}
+
+  wasm:
+    name: SwiftWASM
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - { toolchain: wasm-5.6.0-RELEASE }
+
+    steps:
+      - uses: actions/checkout@v2
+      - run: echo "${{ matrix.toolchain }}" > .swift-version
+      - uses: swiftwasm/swiftwasm-action@v5.6
+        with:
+          shell-action: carton test --environment node
 
   #windows:
   #  name: Windows
