@@ -692,58 +692,60 @@ final class DiffTests: XCTestCase {
     )
   }
 
-  func testDeeplyNested() {
-    let user = FriendlyUser(
-      id: 1,
-      name: "Blob",
-      friends: [
-        .init(
-          id: 2,
-          name: "Blob Jr.",
-          friends: [
-            .init(
-              id: 3,
-              name: "Blob Sr.",
-              friends: [.init(id: 4, name: "Someone", friends: [])]
-            )
-          ]
-        )
-      ]
-    )
+  #if !os(WASI)
+    func testDeeplyNested() {
+      let user = FriendlyUser(
+        id: 1,
+        name: "Blob",
+        friends: [
+          .init(
+            id: 2,
+            name: "Blob Jr.",
+            friends: [
+              .init(
+                id: 3,
+                name: "Blob Sr.",
+                friends: [.init(id: 4, name: "Someone", friends: [])]
+              )
+            ]
+          )
+        ]
+      )
 
-    var other = user
-    other.friends[0].friends[0].friends[0].name += " Else"
+      var other = user
+      other.friends[0].friends[0].friends[0].name += " Else"
 
-    XCTAssertNoDifference(
-      diff(user, other),
-      """
-        FriendlyUser(
-          id: 1,
-          name: "Blob",
-          friends: [
-            [0]: FriendlyUser(
-              id: 2,
-              name: "Blob Jr.",
-              friends: [
-                [0]: FriendlyUser(
-                  id: 3,
-                  name: "Blob Sr.",
-                  friends: [
-                    [0]: FriendlyUser(
-                      id: 4,
-      -               name: "Someone",
-      +               name: "Someone Else",
-                      friends: []
-                    )
-                  ]
-                )
-              ]
-            )
-          ]
-        )
-      """
-    )
-  }
+      XCTAssertNoDifference(
+        diff(user, other),
+        """
+          FriendlyUser(
+            id: 1,
+            name: "Blob",
+            friends: [
+              [0]: FriendlyUser(
+                id: 2,
+                name: "Blob Jr.",
+                friends: [
+                  [0]: FriendlyUser(
+                    id: 3,
+                    name: "Blob Sr.",
+                    friends: [
+                      [0]: FriendlyUser(
+                        id: 4,
+        -               name: "Someone",
+        +               name: "Someone Else",
+                        friends: []
+                      )
+                    ]
+                  )
+                ]
+              )
+            ]
+          )
+        """
+      )
+    }
+  #endif
 
   func testInterleavedIndices() {
     XCTAssertNoDifference(
