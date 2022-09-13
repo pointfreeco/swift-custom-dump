@@ -42,33 +42,35 @@ final class FoundationTests: XCTestCase {
     #endif
   }
 
-  func testDate() {
-    var dump = ""
-    customDump(
-      Date(timeIntervalSince1970: 0),
-      to: &dump
-    )
-    XCTAssertNoDifference(
-      dump,
-      """
-      Date(1970-01-01T00:00:00.000Z)
-      """
-    )
-
-    #if compiler(>=5.4)
-      dump = ""
+  #if !os(WASI)
+    func testDate() {
+      var dump = ""
       customDump(
-        NestedDate(date: Date(timeIntervalSince1970: 0)),
+        Date(timeIntervalSince1970: 0),
         to: &dump
       )
       XCTAssertNoDifference(
         dump,
         """
-        NestedDate(date: Date(1970-01-01T00:00:00.000Z))
+        Date(1970-01-01T00:00:00.000Z)
         """
       )
-    #endif
-  }
+
+      #if compiler(>=5.4)
+        dump = ""
+        customDump(
+          NestedDate(date: Date(timeIntervalSince1970: 0)),
+          to: &dump
+        )
+        XCTAssertNoDifference(
+          dump,
+          """
+          NestedDate(date: Date(1970-01-01T00:00:00.000Z))
+          """
+        )
+      #endif
+    }
+  #endif
 
   func testDecimal() {
     var dump = ""
@@ -167,33 +169,37 @@ final class FoundationTests: XCTestCase {
     )
   }
 
-  func testNSData() {
-    var dump = ""
-    customDump(
-      NSData(data: .init(repeating: 0, count: 4)),
-      to: &dump
-    )
-    XCTAssertNoDifference(
-      dump,
-      """
-      Data(4 bytes)
-      """
-    )
-  }
+  #if !os(WASI)
+    func testNSData() {
+      var dump = ""
+      customDump(
+        NSData(data: .init(repeating: 0, count: 4)),
+        to: &dump
+      )
+      XCTAssertNoDifference(
+        dump,
+        """
+        Data(4 bytes)
+        """
+      )
+    }
+  #endif
 
-  func testNSDate() {
-    var dump = ""
-    customDump(
-      NSDate(timeIntervalSince1970: 0),
-      to: &dump
-    )
-    XCTAssertNoDifference(
-      dump,
-      """
-      Date(1970-01-01T00:00:00.000Z)
-      """
-    )
-  }
+  #if !os(WASI)
+    func testNSDate() {
+      var dump = ""
+      customDump(
+        NSDate(timeIntervalSince1970: 0),
+        to: &dump
+      )
+      XCTAssertNoDifference(
+        dump,
+        """
+        Date(1970-01-01T00:00:00.000Z)
+        """
+      )
+    }
+  #endif
 
   func testNSDictionary() {
     var dump = ""
@@ -238,7 +244,7 @@ final class FoundationTests: XCTestCase {
       """
     )
 
-    #if !os(Windows)
+    #if !os(Windows) && !os(WASI)
       class SubclassedError: NSError {}
 
       dump = ""
@@ -401,19 +407,21 @@ final class FoundationTests: XCTestCase {
     )
   }
 
-  func testNSNotification() {
-    var dump = ""
-    customDump(
-      NSNotification(name: .init(rawValue: "co.pointfree"), object: nil, userInfo: nil),
-      to: &dump
-    )
-    XCTAssertNoDifference(
-      dump,
-      """
-      Notification(name: "co.pointfree")
-      """
-    )
-  }
+  #if !os(WASI)
+    func testNSNotification() {
+      var dump = ""
+      customDump(
+        NSNotification(name: .init(rawValue: "co.pointfree"), object: nil, userInfo: nil),
+        to: &dump
+      )
+      XCTAssertNoDifference(
+        dump,
+        """
+        Notification(name: "co.pointfree")
+        """
+      )
+    }
+  #endif
 
   func testNSNull() {
     var dump = ""
@@ -507,24 +515,26 @@ final class FoundationTests: XCTestCase {
     )
   }
 
-  func testNSTimeZone() {
-    var dump = ""
-    customDump(
-      NSTimeZone(forSecondsFromGMT: 0),
-      to: &dump
-    )
-    XCTAssertNoDifference(
-      dump,
-      """
-      TimeZone(
-        identifier: "GMT",
-        abbreviation: "GMT",
-        secondsFromGMT: 0,
-        isDaylightSavingTime: false
+  #if !os(WASI)
+    func testNSTimeZone() {
+      var dump = ""
+      customDump(
+        NSTimeZone(forSecondsFromGMT: 0),
+        to: &dump
       )
-      """
-    )
-  }
+      XCTAssertNoDifference(
+        dump,
+        """
+        TimeZone(
+          identifier: "GMT",
+          abbreviation: "GMT",
+          secondsFromGMT: 0,
+          isDaylightSavingTime: false
+        )
+        """
+      )
+    }
+  #endif
 
   func testNSURL() {
     var dump = ""
@@ -532,7 +542,7 @@ final class FoundationTests: XCTestCase {
       NSURL(fileURLWithPath: "/tmp"),
       to: &dump
     )
-    #if os(Windows)
+    #if os(Windows) || os(WASI)
       XCTAssertNoDifference(
         dump,
         """
@@ -590,37 +600,39 @@ final class FoundationTests: XCTestCase {
     )
   }
 
-  func testNSURLRequest() {
-    var dump = ""
-    let request = NSMutableURLRequest(url: URL(string: "https://www.pointfree.co")!)
-    request.addValue("text/html", forHTTPHeaderField: "Accept")
-    request.httpShouldUsePipelining = false
-    customDump(
-      request,
-      to: &dump
-    )
-    XCTAssertNoDifference(
-      dump,
-      """
-      URLRequest(
-        url: URL(https://www.pointfree.co),
-        cachePolicy: 0,
-        timeoutInterval: 60.0,
-        mainDocumentURL: nil,
-        networkServiceType: URLRequest.NetworkServiceType.default,
-        allowsCellularAccess: true,
-        httpMethod: "GET",
-        allHTTPHeaderFields: [
-          "Accept": "text/html"
-        ],
-        httpBody: nil,
-        httpBodyStream: nil,
-        httpShouldHandleCookies: true,
-        httpShouldUsePipelining: false
+  #if !os(WASI)
+    func testNSURLRequest() {
+      var dump = ""
+      let request = NSMutableURLRequest(url: URL(string: "https://www.pointfree.co")!)
+      request.addValue("text/html", forHTTPHeaderField: "Accept")
+      request.httpShouldUsePipelining = false
+      customDump(
+        request,
+        to: &dump
       )
-      """
-    )
-  }
+      XCTAssertNoDifference(
+        dump,
+        """
+        URLRequest(
+          url: URL(https://www.pointfree.co),
+          cachePolicy: 0,
+          timeoutInterval: 60.0,
+          mainDocumentURL: nil,
+          networkServiceType: URLRequest.NetworkServiceType.default,
+          allowsCellularAccess: true,
+          httpMethod: "GET",
+          allHTTPHeaderFields: [
+            "Accept": "text/html"
+          ],
+          httpBody: nil,
+          httpBodyStream: nil,
+          httpShouldHandleCookies: true,
+          httpShouldUsePipelining: false
+        )
+        """
+      )
+    }
+  #endif
 
   func testNSUUID() {
     var dump = ""
