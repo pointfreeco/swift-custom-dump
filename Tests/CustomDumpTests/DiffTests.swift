@@ -520,6 +520,7 @@ final class DiffTests: XCTestCase {
     )
   }
 
+#if !os(WASI)
   func testNestedCustomMirror() {
     #if compiler(>=5.4)
       XCTAssertNoDifference(
@@ -534,6 +535,7 @@ final class DiffTests: XCTestCase {
       )
     #endif
   }
+  #endif
 
   func testMultilineString() {
     XCTAssertNoDifference(

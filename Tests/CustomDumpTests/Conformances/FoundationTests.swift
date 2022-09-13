@@ -42,33 +42,35 @@ final class FoundationTests: XCTestCase {
     #endif
   }
 
-  func testDate() {
-    var dump = ""
-    customDump(
-      Date(timeIntervalSince1970: 0),
-      to: &dump
-    )
-    XCTAssertNoDifference(
-      dump,
-      """
-      Date(1970-01-01T00:00:00.000Z)
-      """
-    )
-
-    #if compiler(>=5.4)
-      dump = ""
+  #if !os(WASI)
+    func testDate() {
+      var dump = ""
       customDump(
-        NestedDate(date: Date(timeIntervalSince1970: 0)),
+        Date(timeIntervalSince1970: 0),
         to: &dump
       )
       XCTAssertNoDifference(
         dump,
         """
-        NestedDate(date: Date(1970-01-01T00:00:00.000Z))
+        Date(1970-01-01T00:00:00.000Z)
         """
       )
-    #endif
-  }
+
+      #if compiler(>=5.4)
+        dump = ""
+        customDump(
+          NestedDate(date: Date(timeIntervalSince1970: 0)),
+          to: &dump
+        )
+        XCTAssertNoDifference(
+          dump,
+          """
+          NestedDate(date: Date(1970-01-01T00:00:00.000Z))
+          """
+        )
+      #endif
+    }
+  #endif
 
   func testDecimal() {
     var dump = ""
@@ -181,19 +183,21 @@ final class FoundationTests: XCTestCase {
     )
   }
 
-  func testNSDate() {
-    var dump = ""
-    customDump(
-      NSDate(timeIntervalSince1970: 0),
-      to: &dump
-    )
-    XCTAssertNoDifference(
-      dump,
-      """
-      Date(1970-01-01T00:00:00.000Z)
-      """
-    )
-  }
+  #if !os(WASI)
+    func testNSDate() {
+      var dump = ""
+      customDump(
+        NSDate(timeIntervalSince1970: 0),
+        to: &dump
+      )
+      XCTAssertNoDifference(
+        dump,
+        """
+        Date(1970-01-01T00:00:00.000Z)
+        """
+      )
+    }
+  #endif
 
   func testNSDictionary() {
     var dump = ""
