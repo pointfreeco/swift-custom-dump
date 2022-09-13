@@ -238,7 +238,7 @@ final class FoundationTests: XCTestCase {
       """
     )
 
-    #if !os(Windows)
+    #if !os(Windows) && !os(WASI)
       class SubclassedError: NSError {}
 
       dump = ""
@@ -401,19 +401,21 @@ final class FoundationTests: XCTestCase {
     )
   }
 
-  func testNSNotification() {
-    var dump = ""
-    customDump(
-      NSNotification(name: .init(rawValue: "co.pointfree"), object: nil, userInfo: nil),
-      to: &dump
-    )
-    XCTAssertNoDifference(
-      dump,
-      """
-      Notification(name: "co.pointfree")
-      """
-    )
-  }
+  #if !os(WASI)
+    func testNSNotification() {
+      var dump = ""
+      customDump(
+        NSNotification(name: .init(rawValue: "co.pointfree"), object: nil, userInfo: nil),
+        to: &dump
+      )
+      XCTAssertNoDifference(
+        dump,
+        """
+        Notification(name: "co.pointfree")
+        """
+      )
+    }
+  #endif
 
   func testNSNull() {
     var dump = ""
@@ -590,37 +592,39 @@ final class FoundationTests: XCTestCase {
     )
   }
 
-  func testNSURLRequest() {
-    var dump = ""
-    let request = NSMutableURLRequest(url: URL(string: "https://www.pointfree.co")!)
-    request.addValue("text/html", forHTTPHeaderField: "Accept")
-    request.httpShouldUsePipelining = false
-    customDump(
-      request,
-      to: &dump
-    )
-    XCTAssertNoDifference(
-      dump,
-      """
-      URLRequest(
-        url: URL(https://www.pointfree.co),
-        cachePolicy: 0,
-        timeoutInterval: 60.0,
-        mainDocumentURL: nil,
-        networkServiceType: URLRequest.NetworkServiceType.default,
-        allowsCellularAccess: true,
-        httpMethod: "GET",
-        allHTTPHeaderFields: [
-          "Accept": "text/html"
-        ],
-        httpBody: nil,
-        httpBodyStream: nil,
-        httpShouldHandleCookies: true,
-        httpShouldUsePipelining: false
+  #if !os(WASI)
+    func testNSURLRequest() {
+      var dump = ""
+      let request = NSMutableURLRequest(url: URL(string: "https://www.pointfree.co")!)
+      request.addValue("text/html", forHTTPHeaderField: "Accept")
+      request.httpShouldUsePipelining = false
+      customDump(
+        request,
+        to: &dump
       )
-      """
-    )
-  }
+      XCTAssertNoDifference(
+        dump,
+        """
+        URLRequest(
+          url: URL(https://www.pointfree.co),
+          cachePolicy: 0,
+          timeoutInterval: 60.0,
+          mainDocumentURL: nil,
+          networkServiceType: URLRequest.NetworkServiceType.default,
+          allowsCellularAccess: true,
+          httpMethod: "GET",
+          allHTTPHeaderFields: [
+            "Accept": "text/html"
+          ],
+          httpBody: nil,
+          httpBodyStream: nil,
+          httpShouldHandleCookies: true,
+          httpShouldUsePipelining: false
+        )
+        """
+      )
+    }
+  #endif
 
   func testNSUUID() {
     var dump = ""
