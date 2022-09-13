@@ -31,17 +31,19 @@ extension Calendar: CustomDumpReflectable {
   }
 }
 
-extension Data: CustomDumpStringConvertible {
-  public var customDumpDescription: String {
-    "Data(\(Self.formatter.string(fromByteCount: .init(self.count))))"
-  }
+#if !os(WASI)
+  extension Data: CustomDumpStringConvertible {
+    public var customDumpDescription: String {
+      "Data(\(Self.formatter.string(fromByteCount: .init(self.count))))"
+    }
 
-  private static let formatter: ByteCountFormatter = {
-    let formatter = ByteCountFormatter()
-    formatter.allowedUnits = .useBytes
-    return formatter
-  }()
-}
+    private static let formatter: ByteCountFormatter = {
+      let formatter = ByteCountFormatter()
+      formatter.allowedUnits = .useBytes
+      return formatter
+    }()
+  }
+#endif
 
 #if !os(WASI)
   extension Date: CustomDumpStringConvertible {

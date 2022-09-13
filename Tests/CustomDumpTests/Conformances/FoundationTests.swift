@@ -169,19 +169,21 @@ final class FoundationTests: XCTestCase {
     )
   }
 
-  func testNSData() {
-    var dump = ""
-    customDump(
-      NSData(data: .init(repeating: 0, count: 4)),
-      to: &dump
-    )
-    XCTAssertNoDifference(
-      dump,
-      """
-      Data(4 bytes)
-      """
-    )
-  }
+  #if !os(WASI)
+    func testNSData() {
+      var dump = ""
+      customDump(
+        NSData(data: .init(repeating: 0, count: 4)),
+        to: &dump
+      )
+      XCTAssertNoDifference(
+        dump,
+        """
+        Data(4 bytes)
+        """
+      )
+    }
+  #endif
 
   #if !os(WASI)
     func testNSDate() {
