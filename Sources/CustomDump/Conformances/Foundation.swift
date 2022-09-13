@@ -43,6 +43,7 @@ extension Data: CustomDumpStringConvertible {
   }()
 }
 
+#if !os(WASI)
 extension Date: CustomDumpStringConvertible {
   public var customDumpDescription: String {
     "Date(\(Self.formatter.string(from: self)))"
@@ -55,6 +56,7 @@ extension Date: CustomDumpStringConvertible {
     return formatter
   }()
 }
+#endif
 
 extension Decimal: CustomDumpStringConvertible {
   public var customDumpDescription: String {
@@ -167,11 +169,13 @@ extension NSMeasurement: CustomDumpRepresentable {
   }
 }
 
+#if !os(WASI)
 extension NSNotification: CustomDumpRepresentable {
   public var customDumpValue: Any {
     self as Notification
   }
 }
+#endif
 
 extension NSOrderedSet: CustomDumpReflectable {
   public var customDumpMirror: Mirror {
@@ -230,11 +234,13 @@ extension NSURLQueryItem: CustomDumpRepresentable {
   }
 }
 
+#if !os(WASI)
 extension NSURLRequest: CustomDumpRepresentable {
   public var customDumpValue: Any {
     self as URLRequest
   }
 }
+#endif
 
 extension NSUUID: CustomDumpRepresentable {
   public var customDumpValue: Any {
@@ -269,6 +275,7 @@ extension URL: CustomDumpStringConvertible {
   }
 }
 
+#if !os(WASI)
 extension URLRequest.NetworkServiceType: CustomDumpStringConvertible {
   public var customDumpDescription: String {
     switch self { #if canImport(FoundationNetworking)
@@ -309,6 +316,7 @@ extension URLRequest.NetworkServiceType: CustomDumpStringConvertible {
     }
   }
 }
+#endif
 
 extension UUID: CustomDumpStringConvertible {
   public var customDumpDescription: String {
