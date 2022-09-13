@@ -515,24 +515,26 @@ final class FoundationTests: XCTestCase {
     )
   }
 
-  func testNSTimeZone() {
-    var dump = ""
-    customDump(
-      NSTimeZone(forSecondsFromGMT: 0),
-      to: &dump
-    )
-    XCTAssertNoDifference(
-      dump,
-      """
-      TimeZone(
-        identifier: "GMT",
-        abbreviation: "GMT",
-        secondsFromGMT: 0,
-        isDaylightSavingTime: false
+  #if !os(WASI)
+    func testNSTimeZone() {
+      var dump = ""
+      customDump(
+        NSTimeZone(forSecondsFromGMT: 0),
+        to: &dump
       )
-      """
-    )
-  }
+      XCTAssertNoDifference(
+        dump,
+        """
+        TimeZone(
+          identifier: "GMT",
+          abbreviation: "GMT",
+          secondsFromGMT: 0,
+          isDaylightSavingTime: false
+        )
+        """
+      )
+    }
+  #endif
 
   func testNSURL() {
     var dump = ""
@@ -540,7 +542,7 @@ final class FoundationTests: XCTestCase {
       NSURL(fileURLWithPath: "/tmp"),
       to: &dump
     )
-    #if os(Windows)
+    #if os(Windows) || os(WASI)
       XCTAssertNoDifference(
         dump,
         """
