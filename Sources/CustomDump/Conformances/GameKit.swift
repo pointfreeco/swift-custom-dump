@@ -1,4 +1,4 @@
-#if canImport(GameKit)
+#if canImport(GameKit) && compiler(<5.7.1)  // NB: Xcode 14.1 beta can't import GameKit
   import GameKit
 
   #if !os(watchOS)
