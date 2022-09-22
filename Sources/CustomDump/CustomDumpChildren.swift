@@ -1,5 +1,5 @@
-/// Implement this protocol to include superclass nodes
-public protocol CustomDumpIncludeSuperclass {}
+/// Implement this protocol to exclude superclass nodes
+public protocol CustomDumpExcludeSuperclass {}
 
 /// Implement this protocol to ignore dumping child nodes
 ///

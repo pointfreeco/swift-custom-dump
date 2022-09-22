@@ -1,3 +1,4 @@
+import Foundation
 /// Dumps the given value's contents using its mirror to standard output.
 ///
 /// This function aims to dump the contents of a value into a nicely formatted, tree-like
@@ -262,7 +263,7 @@ public func customDump<T, TargetStream>(
         }
       }
 
-      if let superclassMirror = mirror.superclassMirror, value is CustomDumpIncludeSuperclass {
+      if let superclassMirror = mirror.superclassMirror, superclassMirror.subjectType != NSObject.self, !(value is CustomDumpExcludeSuperclass) {
         out.write("\n")
         dumpMirror(mirror: superclassMirror)
       }

@@ -723,7 +723,7 @@ final class DumpTests: XCTestCase {
       let age = 97
     }
 
-    class Doctor: Human, CustomDumpIncludeSuperclass {
+    class Doctor: Human {
       let field = "Podiatry"
     }
 
@@ -750,7 +750,7 @@ final class DumpTests: XCTestCase {
       let age = 97
     }
 
-    class Doctor: Human, CustomDumpIncludeSuperclass {
+    class Doctor: Human {
       let field = "Podiatry"
     }
 
