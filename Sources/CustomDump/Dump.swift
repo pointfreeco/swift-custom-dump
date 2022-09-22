@@ -36,6 +36,11 @@ public func customDump<T>(
   return value
 }
 
+private struct VisitedItem: Hashable {
+  let identifier: ObjectIdentifier
+  let subjectType: String
+}
+
 /// Dumps the given value's contents using its mirror to the specified output stream.
 ///
 /// - Parameters:
@@ -57,7 +62,7 @@ public func customDump<T, TargetStream>(
   maxDepth: Int = .max
 ) -> T where TargetStream: TextOutputStream {
 
-  var visitedItems: Set<ObjectIdentifier> = []
+  var visitedItems: Set<VisitedItem> = []
 
   func customDumpHelp<T, TargetStream>(
     _ value: T,
@@ -82,10 +87,27 @@ public func customDump<T, TargetStream>(
       _ transform: (inout Mirror.Child, Int) -> Void = { _, _ in }
     ) {
       out.write(prefix)
-      if !mirror.children.isEmpty {
+      var children = mirror.children
+      if value is CustomDumpIgnoreChildNodes {
+        out.write(suffix)
+        return
+      }
+      if let value = value as? CustomDumpIncludedChildNodesProvider, let nodes = type(of: value).includedNodes {
+        children = Mirror.Children(children.filter {
+          $0.label.map { nodes.contains($0) } ?? false
+        })
+      }
+      if let value = value as? CustomDumpExcludedChildNodesProvider {
+        let nodes = type(of: value).excludedNodes
+        children = Mirror.Children(children.filter {
+          $0.label.map { !nodes.contains($0) } ?? true
+        })
+      }
+
+      if !children.isEmpty {
         if mirror.isSingleValueContainer {
           var childOut = ""
-          let child = mirror.children.first!
+          let child = children.first!
           customDumpHelp(
             child.value, to: &childOut, name: child.label, indent: 0, maxDepth: maxDepth - 1
           )
@@ -104,7 +126,7 @@ public func customDump<T, TargetStream>(
           out.write("…")
         } else {
           out.write("\n")
-          var children = Array(mirror.children)
+          var children = Array(children)
           if let areInIncreasingOrder = areInIncreasingOrder {
             children.sort(by: areInIncreasingOrder)
           }
@@ -122,122 +144,131 @@ public func customDump<T, TargetStream>(
       out.write(suffix)
     }
 
-    switch (value, mirror.displayStyle) {
-    case let (value as Any.Type, _):
-      out.write("\(typeName(value)).self")
+    func dumpMirror(mirror: Mirror) {
+      switch (value, mirror.displayStyle) {
+      case let (value as Any.Type, _):
+        out.write("\(typeName(value)).self")
 
-    case let (value as CustomDumpStringConvertible, _):
-      out.write(value.customDumpDescription)
+      case let (value as CustomDumpStringConvertible, _):
+        out.write(value.customDumpDescription)
 
-    case let (value as CustomDumpRepresentable, _):
-      customDumpHelp(value.customDumpValue, to: &out, name: nil, indent: 0, maxDepth: maxDepth - 1)
+      case let (value as CustomDumpRepresentable, _):
+        customDumpHelp(value.customDumpValue, to: &out, name: nil, indent: 0, maxDepth: maxDepth - 1)
 
-    case let (value as AnyObject, .class?):
-      let item = ObjectIdentifier(value)
-      if visitedItems.contains(item) {
-        out.write("\(typeName(mirror.subjectType))(↩︎)")
-      } else {
-        visitedItems.insert(item)
-        dumpChildren(of: mirror, prefix: "\(typeName(mirror.subjectType))(", suffix: ")")
-      }
+      case let (value as AnyObject, .class?):
+        let item = VisitedItem(identifier: ObjectIdentifier(value), subjectType: typeName(mirror.subjectType))
+        if visitedItems.contains(item) {
+          out.write("\(typeName(mirror.subjectType))(↩︎)")
+        } else {
+          visitedItems.insert(item)
+          dumpChildren(of: mirror, prefix: "\(typeName(mirror.subjectType))(", suffix: ")")
+        }
 
-    case (_, .collection?):
-      dumpChildren(of: mirror, prefix: "[", suffix: "]", { $0.label = "[\($1)]" })
+      case (_, .collection?):
+        dumpChildren(of: mirror, prefix: "[", suffix: "]", { $0.label = "[\($1)]" })
 
-    case (_, .dictionary?):
-      if mirror.children.isEmpty {
-        out.write("[:]")
-      } else {
-        dumpChildren(
-          of: mirror,
-          prefix: "[", suffix: "]",
-          by: {
-            guard
-              let (lhsKey, _) = $0.value as? (key: AnyHashable, value: Any),
-              let (rhsKey, _) = $1.value as? (key: AnyHashable, value: Any)
-            else { return false }
+      case (_, .dictionary?):
+        if mirror.children.isEmpty {
+          out.write("[:]")
+        } else {
+          dumpChildren(
+            of: mirror,
+            prefix: "[", suffix: "]",
+            by: {
+              guard
+                let (lhsKey, _) = $0.value as? (key: AnyHashable, value: Any),
+                let (rhsKey, _) = $1.value as? (key: AnyHashable, value: Any)
+              else { return false }
 
-            return _customDump(lhsKey.base, name: nil, indent: 0, maxDepth: 1)
+              return _customDump(lhsKey.base, name: nil, indent: 0, maxDepth: 1)
               < _customDump(rhsKey.base, name: nil, indent: 0, maxDepth: 1)
-          },
-          { child, _ in
-            guard let pair = child.value as? (key: AnyHashable, value: Any) else { return }
-            let key = _customDump(pair.key.base, name: nil, indent: 0, maxDepth: maxDepth - 1)
-            child = (key, pair.value)
-          })
-      }
+            },
+            { child, _ in
+              guard let pair = child.value as? (key: AnyHashable, value: Any) else { return }
+              let key = _customDump(pair.key.base, name: nil, indent: 0, maxDepth: maxDepth - 1)
+              child = (key, pair.value)
+            })
+        }
 
-    case (_, .enum?):
-      out.write("\(typeName(mirror.subjectType)).")
-      if let child = mirror.children.first {
-        let childMirror = Mirror(customDumpReflecting: child.value)
-        let associatedValuesMirror =
+      case (_, .enum?):
+        out.write("\(typeName(mirror.subjectType)).")
+        if let child = mirror.children.first {
+          let childMirror = Mirror(customDumpReflecting: child.value)
+          let associatedValuesMirror =
           childMirror.displayStyle == .tuple
           ? childMirror
           : Mirror(value, unlabeledChildren: [child.value], displayStyle: .tuple)
+          dumpChildren(
+            of: associatedValuesMirror,
+            prefix: "\(child.label ?? "@unknown")(",
+            suffix: ")",
+            { child, _ in
+              if child.label?.first == "." {
+                child.label = nil
+              }
+            }
+          )
+        } else {
+          out.write("\(value)")
+        }
+
+      case (_, .optional?):
+        if let value = mirror.children.first?.value {
+          customDumpHelp(value, to: &out, name: nil, indent: 0, maxDepth: maxDepth)
+        } else {
+          out.write("nil")
+        }
+
+      case (_, .set?):
         dumpChildren(
-          of: associatedValuesMirror,
-          prefix: "\(child.label ?? "@unknown")(",
+          of: mirror,
+          prefix: "Set([", suffix: "])",
+          by: {
+            _customDump($0.value, name: nil, indent: 0, maxDepth: 1)
+            < _customDump($1.value, name: nil, indent: 0, maxDepth: 1)
+          })
+
+      case (_, .struct?):
+        dumpChildren(of: mirror, prefix: "\(typeName(mirror.subjectType))(", suffix: ")")
+
+      case (_, .tuple?):
+        dumpChildren(
+          of: mirror,
+          prefix: "(",
           suffix: ")",
           { child, _ in
             if child.label?.first == "." {
               child.label = nil
             }
-          }
-        )
-      } else {
-        out.write("\(value)")
-      }
+          })
 
-    case (_, .optional?):
-      if let value = mirror.children.first?.value {
-        customDumpHelp(value, to: &out, name: nil, indent: 0, maxDepth: maxDepth)
-      } else {
-        out.write("nil")
-      }
-
-    case (_, .set?):
-      dumpChildren(
-        of: mirror,
-        prefix: "Set([", suffix: "])",
-        by: {
-          _customDump($0.value, name: nil, indent: 0, maxDepth: 1)
-            < _customDump($1.value, name: nil, indent: 0, maxDepth: 1)
-        })
-
-    case (_, .struct?):
-      dumpChildren(of: mirror, prefix: "\(typeName(mirror.subjectType))(", suffix: ")")
-
-    case (_, .tuple?):
-      dumpChildren(
-        of: mirror,
-        prefix: "(",
-        suffix: ")",
-        { child, _ in
-          if child.label?.first == "." {
-            child.label = nil
-          }
-        })
-
-    default:
-      if let value = stringFromStringProtocol(value) {
-        if value.contains(where: \.isNewline) {
-          if maxDepth == 0 {
-            out.write("\"…\"")
+      default:
+        if let value = stringFromStringProtocol(value) {
+          if value.contains(where: \.isNewline) {
+            if maxDepth == 0 {
+              out.write("\"…\"")
+            } else {
+              let hashes = String(repeating: "#", count: value.hashCount)
+              out.write("\(hashes)\"\"\"")
+              out.write("\n")
+              print(value.indenting(by: name != nil ? 2 : 0), to: &out)
+              out.write(name != nil ? "  \"\"\"\(hashes)" : "\"\"\"\(hashes)")
+            }
           } else {
-            let hashes = String(repeating: "#", count: value.hashCount)
-            out.write("\(hashes)\"\"\"")
-            out.write("\n")
-            print(value.indenting(by: name != nil ? 2 : 0), to: &out)
-            out.write(name != nil ? "  \"\"\"\(hashes)" : "\"\"\"\(hashes)")
+            out.write(value.debugDescription)
           }
         } else {
-          out.write(value.debugDescription)
+          out.write("\(value)")
         }
-      } else {
-        out.write("\(value)")
+      }
+
+      if let superclassMirror = mirror.superclassMirror, value is CustomDumpIncludeSuperclass {
+        out.write("\n")
+        dumpMirror(mirror: superclassMirror)
       }
     }
+
+    dumpMirror(mirror: mirror)
 
     target.write((name.map { "\($0): " } ?? "").appending(out).indenting(by: indent))
   }

@@ -715,6 +715,136 @@ final class DumpTests: XCTestCase {
     )
   }
 
+  func testSuperclass() {
+    var dump = ""
+    class Human {
+      let name = "John"
+      let email = "john@me.com"
+      let age = 97
+    }
+
+    class Doctor: Human, CustomDumpIncludeSuperclass {
+      let field = "Podiatry"
+    }
+
+    customDump(Doctor(), to: &dump)
+
+    XCTAssertNoDifference(
+      dump,
+      """
+      DumpTests.Doctor(field: "Podiatry")
+      DumpTests.Human(
+        name: "John",
+        email: "john@me.com",
+        age: 97
+      )
+      """
+    )
+  }
+
+  func testLayersOfInheritance() {
+    var dump = ""
+    class Human {
+      let name = "John"
+      let email = "john@me.com"
+      let age = 97
+    }
+
+    class Doctor: Human, CustomDumpIncludeSuperclass {
+      let field = "Podiatry"
+    }
+
+    class Surgeon: Doctor {
+      let skillLevel = "Expert"
+    }
+
+    customDump(Surgeon(), to: &dump)
+
+    XCTAssertNoDifference(
+      dump,
+      """
+      DumpTests.Surgeon(skillLevel: "Expert")
+      DumpTests.Doctor(field: "Podiatry")
+      DumpTests.Human(
+        name: "John",
+        email: "john@me.com",
+        age: 97
+      )
+      """
+    )
+  }
+
+  func testIncludedNodes() {
+    var dump = ""
+    class Human: CustomDumpIncludedChildNodesProvider {
+      static var includedNodes: [String]? {
+        [
+          "name",
+          "email",
+        ]
+      }
+      let name = "John"
+      let email = "john@me.com"
+      let age = 97
+    }
+
+    customDump(Human(), to: &dump)
+
+    XCTAssertNoDifference(
+      dump,
+      """
+      DumpTests.Human(
+        name: "John",
+        email: "john@me.com"
+      )
+      """
+    )
+  }
+
+  func testExcludedNodes() {
+    var dump = ""
+    class Human: CustomDumpExcludedChildNodesProvider {
+      static var excludedNodes: [String] {
+        [
+          "name",
+        ]
+      }
+      let name = "John"
+      let email = "john@me.com"
+      let age = 97
+    }
+
+    customDump(Human(), to: &dump)
+
+    XCTAssertNoDifference(
+      dump,
+      """
+      DumpTests.Human(
+        email: "john@me.com",
+        age: 97
+      )
+      """
+    )
+  }
+
+  func testIgnoreChildNodes() {
+    var dump = ""
+    class Human: CustomDumpIgnoreChildNodes {
+      let name = "John"
+      let email = "john@me.com"
+      let age = 97
+    }
+
+    customDump(Human(), to: &dump)
+
+    XCTAssertNoDifference(
+      dump,
+      """
+      DumpTests.Human()
+      """
+    )
+  }
+
   #if canImport(CoreGraphics)
     func testCoreGraphics() {
       var dump = ""
