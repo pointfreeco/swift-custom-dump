@@ -1,4 +1,3 @@
-import Foundation
 /// Dumps the given value's contents using its mirror to standard output.
 ///
 /// This function aims to dump the contents of a value into a nicely formatted, tree-like
@@ -37,11 +36,6 @@ public func customDump<T>(
   return value
 }
 
-private struct VisitedItem: Hashable {
-  let identifier: ObjectIdentifier
-  let subjectType: String
-}
-
 /// Dumps the given value's contents using its mirror to the specified output stream.
 ///
 /// - Parameters:
@@ -63,7 +57,7 @@ public func customDump<T, TargetStream>(
   maxDepth: Int = .max
 ) -> T where TargetStream: TextOutputStream {
 
-  var visitedItems: Set<VisitedItem> = []
+  var visitedItems: Set<ObjectIdentifier> = []
 
   func customDumpHelp<T, TargetStream>(
     _ value: T,
@@ -157,7 +151,7 @@ public func customDump<T, TargetStream>(
       customDumpHelp(value.customDumpValue, to: &out, name: nil, indent: 0, maxDepth: maxDepth - 1)
 
     case let (value as AnyObject, .class?):
-      let item = VisitedItem(identifier: ObjectIdentifier(value), subjectType: typeName(mirror.subjectType))
+      let item = ObjectIdentifier(value)
       if visitedItems.contains(item) {
         out.write("\(typeName(mirror.subjectType))(↩︎)")
       } else {
