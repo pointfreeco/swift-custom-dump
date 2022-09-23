@@ -732,11 +732,11 @@ final class DumpTests: XCTestCase {
     XCTAssertNoDifference(
       dump,
       """
-      DumpTests.Doctor(field: "Podiatry")
-      DumpTests.Human(
+      DumpTests.Doctor(
         name: "John",
         email: "john@me.com",
-        age: 97
+        age: 97,
+        field: "Podiatry"
       )
       """
     )
@@ -763,12 +763,86 @@ final class DumpTests: XCTestCase {
     XCTAssertNoDifference(
       dump,
       """
-      DumpTests.Surgeon(skillLevel: "Expert")
-      DumpTests.Doctor(field: "Podiatry")
-      DumpTests.Human(
+      DumpTests.Surgeon(
         name: "John",
         email: "john@me.com",
-        age: 97
+        age: 97,
+        field: "Podiatry",
+        skillLevel: "Expert"
+      )
+      """
+    )
+  }
+
+  func testRecursion() {
+    class Human {
+      let name: String
+
+      init(name: String) {
+        self.name = name
+      }
+    }
+
+    class Child: Human {
+      weak var parent: Parent?
+    }
+
+    class Parent: Human {
+      let children: [Human]
+
+      init(name: String, children: [Child]) {
+        self.children = children
+        super.init(name: name)
+
+        children.forEach {
+          $0.parent = self
+        }
+      }
+    }
+
+    let subject = Parent(name: "Arthur", children: [
+      Child(name: "Virginia"),
+      Child(name: "Ronald"),
+      Child(name: "Fred"),
+      Child(name: "George"),
+      Child(name: "Percy"),
+      Child(name: "Charles"),
+    ])
+
+    var dump = ""
+    customDump(subject, to: &dump)
+
+    XCTAssertNoDifference(
+      dump,
+      """
+      DumpTests.Parent(
+        name: "Arthur",
+        children: [
+          [0]: DumpTests.Child(
+            name: "Virginia",
+            parent: DumpTests.Parent(↩︎)
+          ),
+          [1]: DumpTests.Child(
+            name: "Ronald",
+            parent: DumpTests.Parent(↩︎)
+          ),
+          [2]: DumpTests.Child(
+            name: "Fred",
+            parent: DumpTests.Parent(↩︎)
+          ),
+          [3]: DumpTests.Child(
+            name: "George",
+            parent: DumpTests.Parent(↩︎)
+          ),
+          [4]: DumpTests.Child(
+            name: "Percy",
+            parent: DumpTests.Parent(↩︎)
+          ),
+          [5]: DumpTests.Child(
+            name: "Charles",
+            parent: DumpTests.Parent(↩︎)
+          )
+        ]
       )
       """
     )
@@ -840,7 +914,7 @@ final class DumpTests: XCTestCase {
     XCTAssertNoDifference(
       dump,
       """
-      DumpTests.Human()
+      DumpTests.Human(...)
       """
     )
   }

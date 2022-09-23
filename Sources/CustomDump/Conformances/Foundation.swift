@@ -325,23 +325,3 @@ extension UUID: CustomDumpStringConvertible {
     "UUID(\(self.uuidString))"
   }
 }
-
-extension KeyPath: CustomDumpExcludeSuperclass {}
-extension CFNumber: CustomDumpExcludeSuperclass {}
-extension NSNumber: CustomDumpExcludeSuperclass {}
-extension NSMutableAttributedString: CustomDumpExcludeSuperclass {}
-extension NSCalendar: CustomDumpExcludeSuperclass {}
-extension NSCountedSet: CustomDumpExcludeSuperclass {}
-#if !os(WASI)
-extension NSData: CustomDumpExcludeSuperclass {}
-extension NSDate: CustomDumpExcludeSuperclass {}
-extension NSNotification: CustomDumpExcludeSuperclass {}
-extension NSTimeZone: CustomDumpExcludeSuperclass {}
-extension NSURLRequest: CustomDumpExcludeSuperclass {}
-#endif
-extension NSDictionary: CustomDumpExcludeSuperclass {}
-extension NSString: CustomDumpExcludeSuperclass {}
-extension NSLocale: CustomDumpExcludeSuperclass {}
-#if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
-extension NSExpression: CustomDumpExcludeSuperclass {}
-#endif
