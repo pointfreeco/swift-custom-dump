@@ -189,7 +189,7 @@ public func customDump<T, TargetStream>(
             else { return false }
 
             return _customDump(lhsKey.base, name: nil, indent: 0, maxDepth: 1)
-            < _customDump(rhsKey.base, name: nil, indent: 0, maxDepth: 1)
+              < _customDump(rhsKey.base, name: nil, indent: 0, maxDepth: 1)
           },
           { child, _ in
             guard let pair = child.value as? (key: AnyHashable, value: Any) else { return }
@@ -203,9 +203,9 @@ public func customDump<T, TargetStream>(
       if let child = mirror.children.first {
         let childMirror = Mirror(customDumpReflecting: child.value)
         let associatedValuesMirror =
-        childMirror.displayStyle == .tuple
-        ? childMirror
-        : Mirror(value, unlabeledChildren: [child.value], displayStyle: .tuple)
+          childMirror.displayStyle == .tuple
+          ? childMirror
+          : Mirror(value, unlabeledChildren: [child.value], displayStyle: .tuple)
         dumpChildren(
           of: associatedValuesMirror,
           prefix: "\(child.label ?? "@unknown")(",
@@ -233,7 +233,7 @@ public func customDump<T, TargetStream>(
         prefix: "Set([", suffix: "])",
         by: {
           _customDump($0.value, name: nil, indent: 0, maxDepth: 1)
-          < _customDump($1.value, name: nil, indent: 0, maxDepth: 1)
+            < _customDump($1.value, name: nil, indent: 0, maxDepth: 1)
         })
 
     case (_, .struct?):
