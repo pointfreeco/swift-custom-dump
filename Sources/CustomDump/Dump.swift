@@ -82,10 +82,28 @@ public func customDump<T, TargetStream>(
       _ transform: (inout Mirror.Child, Int) -> Void = { _, _ in }
     ) {
       out.write(prefix)
-      if !mirror.children.isEmpty {
+      var children = mirror.children
+      if value is CustomDumpIgnoreChildNodes {
+        out.write("...")
+        out.write(suffix)
+        return
+      }
+      if let value = value as? CustomDumpIncludedChildNodesProvider, let nodes = type(of: value).includedNodes {
+        children = Mirror.Children(children.filter {
+          $0.label.map { nodes.contains($0) } ?? false
+        })
+      }
+      if let value = value as? CustomDumpExcludedChildNodesProvider {
+        let nodes = type(of: value).excludedNodes
+        children = Mirror.Children(children.filter {
+          $0.label.map { !nodes.contains($0) } ?? true
+        })
+      }
+
+      if !children.isEmpty {
         if mirror.isSingleValueContainer {
           var childOut = ""
-          let child = mirror.children.first!
+          let child = children.first!
           customDumpHelp(
             child.value, to: &childOut, name: child.label, indent: 0, maxDepth: maxDepth - 1
           )
@@ -104,7 +122,7 @@ public func customDump<T, TargetStream>(
           out.write("…")
         } else {
           out.write("\n")
-          var children = Array(mirror.children)
+          var children = Array(children)
           if let areInIncreasingOrder = areInIncreasingOrder {
             children.sort(by: areInIncreasingOrder)
           }
@@ -140,10 +158,12 @@ public func customDump<T, TargetStream>(
         visitedItems.insert(item)
         var children = Array(mirror.children)
 
-        var superclassMirror = mirror.superclassMirror
-        while let mirror = superclassMirror {
-          children.insert(contentsOf: mirror.children, at: 0)
-          superclassMirror = mirror.superclassMirror
+        if !(value is CustomDumpExcludeSuperclass) {
+          var superclassMirror = mirror.superclassMirror
+          while let mirror = superclassMirror {
+            children.insert(contentsOf: mirror.children, at: 0)
+            superclassMirror = mirror.superclassMirror
+          }
         }
         dumpChildren(
           of: Mirror(value, children: children),
