@@ -82,23 +82,7 @@ public func customDump<T, TargetStream>(
       _ transform: (inout Mirror.Child, Int) -> Void = { _, _ in }
     ) {
       out.write(prefix)
-      var children = mirror.children
-      if value is CustomDumpIgnoreChildNodes {
-        out.write("...")
-        out.write(suffix)
-        return
-      }
-      if let value = value as? CustomDumpIncludedChildNodesProvider, let nodes = type(of: value).includedNodes {
-        children = Mirror.Children(children.filter {
-          $0.label.map { nodes.contains($0) } ?? false
-        })
-      }
-      if let value = value as? CustomDumpExcludedChildNodesProvider {
-        let nodes = type(of: value).excludedNodes
-        children = Mirror.Children(children.filter {
-          $0.label.map { !nodes.contains($0) } ?? true
-        })
-      }
+      let children = mirror.children
 
       if !children.isEmpty {
         if mirror.isSingleValueContainer {
@@ -158,12 +142,10 @@ public func customDump<T, TargetStream>(
         visitedItems.insert(item)
         var children = Array(mirror.children)
 
-        if !(value is CustomDumpExcludeSuperclass) {
-          var superclassMirror = mirror.superclassMirror
-          while let mirror = superclassMirror {
-            children.insert(contentsOf: mirror.children, at: 0)
-            superclassMirror = mirror.superclassMirror
-          }
+        var superclassMirror = mirror.superclassMirror
+        while let mirror = superclassMirror {
+          children.insert(contentsOf: mirror.children, at: 0)
+          superclassMirror = mirror.superclassMirror
         }
         dumpChildren(
           of: Mirror(value, children: children),
