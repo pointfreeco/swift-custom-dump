@@ -36,6 +36,11 @@ public func customDump<T>(
   return value
 }
 
+private struct UniqueOccurance: Hashable {
+  let typeName: String
+  let objectId: ObjectIdentifier
+}
+
 /// Dumps the given value's contents using its mirror to the specified output stream.
 ///
 /// - Parameters:
@@ -57,6 +62,7 @@ public func customDump<T, TargetStream>(
   maxDepth: Int = .max
 ) -> T where TargetStream: TextOutputStream {
 
+  var idPerOccurance: [UniqueOccurance: Int] = [:]
   var visitedItems: Set<ObjectIdentifier> = []
 
   func customDumpHelp<T, TargetStream>(
@@ -134,8 +140,11 @@ public func customDump<T, TargetStream>(
 
     case let (value as AnyObject, .class?):
       let item = ObjectIdentifier(value)
+      let id = idPerOccurance[.init(typeName: typeName(mirror.subjectType), objectId: item), default: idPerOccurance.count]
+      idPerOccurance[.init(typeName: typeName(mirror.subjectType), objectId: item)] = id
+      let idString = id > 0 ? "<\(id)>" : ""
       if visitedItems.contains(item) {
-        out.write("\(typeName(mirror.subjectType))(↩︎)")
+        out.write("\(typeName(mirror.subjectType))\(idString)(↩︎)")
       } else {
         visitedItems.insert(item)
         var children = Array(mirror.children)
@@ -147,7 +156,7 @@ public func customDump<T, TargetStream>(
         }
         dumpChildren(
           of: Mirror(value, children: children),
-          prefix: "\(typeName(mirror.subjectType))(",
+          prefix: "\(typeName(mirror.subjectType))\(idString)(",
           suffix: ")"
         )
       }

@@ -871,22 +871,22 @@ final class DumpTests: XCTestCase {
 
     XCTAssertNoDifference(
       dump,
-      """
-      [
-        [0]: DumpTests.Human(
-          name: "John",
-          email: "john@me.com",
-          age: 97
-        ),
-        [1]: DumpTests.Human(↩︎),
-        [2]: DumpTests.Human(
-          name: "John",
-          email: "john@me.com",
-          age: 97
-        ),
-        [3]: DumpTests.Human(↩︎)
-      ]
-      """
+       """
+       [
+         [0]: DumpTests.Human(
+           name: "John",
+           email: "john@me.com",
+           age: 97
+         ),
+         [1]: DumpTests.Human(↩︎),
+         [2]: DumpTests.Human<1>(
+           name: "John",
+           email: "john@me.com",
+           age: 97
+         ),
+         [3]: DumpTests.Human<1>(↩︎)
+       ]
+       """
     )
   }
 
