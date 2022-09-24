@@ -82,12 +82,10 @@ public func customDump<T, TargetStream>(
       _ transform: (inout Mirror.Child, Int) -> Void = { _, _ in }
     ) {
       out.write(prefix)
-      let children = mirror.children
-
-      if !children.isEmpty {
+      if !mirror.children.isEmpty {
         if mirror.isSingleValueContainer {
           var childOut = ""
-          let child = children.first!
+          let child = mirror.children.first!
           customDumpHelp(
             child.value, to: &childOut, name: child.label, indent: 0, maxDepth: maxDepth - 1
           )
@@ -106,7 +104,7 @@ public func customDump<T, TargetStream>(
           out.write("…")
         } else {
           out.write("\n")
-          var children = Array(children)
+          var children = Array(mirror.children)
           if let areInIncreasingOrder = areInIncreasingOrder {
             children.sort(by: areInIncreasingOrder)
           }
