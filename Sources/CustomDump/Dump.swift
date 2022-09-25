@@ -36,11 +36,6 @@ public func customDump<T>(
   return value
 }
 
-private struct UniqueOccurance: Hashable {
-  let typeName: String
-  let objectId: ObjectIdentifier
-}
-
 /// Dumps the given value's contents using its mirror to the specified output stream.
 ///
 /// - Parameters:
