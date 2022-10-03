@@ -824,23 +824,23 @@ final class DumpTests: XCTestCase {
             name: "Virginia",
             parent: DumpTests.Parent(↩︎)
           ),
-          [1]: DumpTests.Child(
+          [1]: DumpTests.Child<2>(
             name: "Ronald",
             parent: DumpTests.Parent(↩︎)
           ),
-          [2]: DumpTests.Child(
+          [2]: DumpTests.Child<3>(
             name: "Fred",
             parent: DumpTests.Parent(↩︎)
           ),
-          [3]: DumpTests.Child(
+          [3]: DumpTests.Child<4>(
             name: "George",
             parent: DumpTests.Parent(↩︎)
           ),
-          [4]: DumpTests.Child(
+          [4]: DumpTests.Child<5>(
             name: "Percy",
             parent: DumpTests.Parent(↩︎)
           ),
-          [5]: DumpTests.Child(
+          [5]: DumpTests.Child<6>(
             name: "Charles",
             parent: DumpTests.Parent(↩︎)
           )
@@ -900,6 +900,7 @@ final class DumpTests: XCTestCase {
          [4]: DumpTests.Human<2>(↩︎),
          [5]: DumpTests.Human<2>(↩︎),
          [6]: DumpTests.User(
+           name: "John",
            email: "john@me.com",
            age: 97,
            human: DumpTests.Human(↩︎)
@@ -907,6 +908,7 @@ final class DumpTests: XCTestCase {
          [7]: DumpTests.User(↩︎),
          [8]: DumpTests.User(↩︎),
          [9]: DumpTests.User<2>(
+           name: "John",
            email: "john@me.com",
            age: 97,
            human: DumpTests.Human<2>(↩︎)

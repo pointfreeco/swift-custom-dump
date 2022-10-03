@@ -160,7 +160,7 @@ public func customDump<T, TargetStream>(
         }
         dumpChildren(
           of: Mirror(value, children: children),
-          prefix: "\(typeName(mirror.subjectType))\(idString)(",
+          prefix: "\(typeName(mirror.subjectType))\(id)(",
           suffix: ")"
         )
       }
