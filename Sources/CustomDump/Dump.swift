@@ -57,6 +57,8 @@ public func customDump<T, TargetStream>(
   maxDepth: Int = .max
 ) -> T where TargetStream: TextOutputStream {
 
+  var idPerItem: [ObjectIdentifier: UInt] = [:]
+  var occurencePerType: [String: UInt] = [:]
   var visitedItems: Set<ObjectIdentifier> = []
 
   func customDumpHelp<T, TargetStream>(
@@ -134,10 +136,21 @@ public func customDump<T, TargetStream>(
 
     case let (value as AnyObject, .class?):
       let item = ObjectIdentifier(value)
+      var occurence = occurencePerType[typeName(mirror.subjectType), default: 0] {
+        didSet { occurencePerType[typeName(mirror.subjectType)] = occurence }
+      }
+
+      var id: String {
+        let id = idPerItem[item, default: occurence]
+        idPerItem[item] = id
+
+        return id > 1 ? "#\(id)" : ""
+      }
       if visitedItems.contains(item) {
-        out.write("\(typeName(mirror.subjectType))(↩︎)")
+        out.write("\(typeName(mirror.subjectType))\(id)(↩︎)")
       } else {
         visitedItems.insert(item)
+        occurence += 1
         var children = Array(mirror.children)
 
         var superclassMirror = mirror.superclassMirror
@@ -147,7 +160,7 @@ public func customDump<T, TargetStream>(
         }
         dumpChildren(
           of: Mirror(value, children: children),
-          prefix: "\(typeName(mirror.subjectType))(",
+          prefix: "\(typeName(mirror.subjectType))\(id)(",
           suffix: ")"
         )
       }

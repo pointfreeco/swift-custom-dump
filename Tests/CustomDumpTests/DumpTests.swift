@@ -824,23 +824,23 @@ final class DumpTests: XCTestCase {
             name: "Virginia",
             parent: DumpTests.Parent(↩︎)
           ),
-          [1]: DumpTests.Child(
+          [1]: DumpTests.Child#2(
             name: "Ronald",
             parent: DumpTests.Parent(↩︎)
           ),
-          [2]: DumpTests.Child(
+          [2]: DumpTests.Child#3(
             name: "Fred",
             parent: DumpTests.Parent(↩︎)
           ),
-          [3]: DumpTests.Child(
+          [3]: DumpTests.Child#4(
             name: "George",
             parent: DumpTests.Parent(↩︎)
           ),
-          [4]: DumpTests.Child(
+          [4]: DumpTests.Child#5(
             name: "Percy",
             parent: DumpTests.Parent(↩︎)
           ),
-          [5]: DumpTests.Child(
+          [5]: DumpTests.Child#6(
             name: "Charles",
             parent: DumpTests.Parent(↩︎)
           )
@@ -853,40 +853,70 @@ final class DumpTests: XCTestCase {
   func testRepeatition() {
     class Human {
       let name = "John"
+    }
+
+    class User: Human {
       let email = "john@me.com"
       let age = 97
+
+      let human: Human
+
+      init(human: Human) {
+        self.human = human
+      }
     }
 
     let human = Human()
     let human2 = Human()
 
+    let user = User(human: human)
+    let user2 = User(human: human2)
+
     var dump = ""
     customDump(
-      [
-        human,
-        human,
-        human2,
-        human2,
-      ], to: &dump)
+    [
+      human,
+      human,
+      human,
+      human2,
+      human2,
+      human2,
+      user,
+      user,
+      user,
+      user2,
+      user2,
+      user2,
+    ], to: &dump)
 
     XCTAssertNoDifference(
       dump,
-      """
-      [
-        [0]: DumpTests.Human(
-          name: "John",
-          email: "john@me.com",
-          age: 97
-        ),
-        [1]: DumpTests.Human(↩︎),
-        [2]: DumpTests.Human(
-          name: "John",
-          email: "john@me.com",
-          age: 97
-        ),
-        [3]: DumpTests.Human(↩︎)
-      ]
-      """
+       """
+       [
+         [0]: DumpTests.Human(name: "John"),
+         [1]: DumpTests.Human(↩︎),
+         [2]: DumpTests.Human(↩︎),
+         [3]: DumpTests.Human#2(name: "John"),
+         [4]: DumpTests.Human#2(↩︎),
+         [5]: DumpTests.Human#2(↩︎),
+         [6]: DumpTests.User(
+           name: "John",
+           email: "john@me.com",
+           age: 97,
+           human: DumpTests.Human(↩︎)
+         ),
+         [7]: DumpTests.User(↩︎),
+         [8]: DumpTests.User(↩︎),
+         [9]: DumpTests.User#2(
+           name: "John",
+           email: "john@me.com",
+           age: 97,
+           human: DumpTests.Human#2(↩︎)
+         ),
+         [10]: DumpTests.User#2(↩︎),
+         [11]: DumpTests.User#2(↩︎)
+       ]
+       """
     )
   }
 
