@@ -800,14 +800,16 @@ final class DumpTests: XCTestCase {
       }
     }
 
-    let subject = Parent(name: "Arthur", children: [
-      Child(name: "Virginia"),
-      Child(name: "Ronald"),
-      Child(name: "Fred"),
-      Child(name: "George"),
-      Child(name: "Percy"),
-      Child(name: "Charles"),
-    ])
+    let subject = Parent(
+      name: "Arthur",
+      children: [
+        Child(name: "Virginia"),
+        Child(name: "Ronald"),
+        Child(name: "Fred"),
+        Child(name: "George"),
+        Child(name: "Percy"),
+        Child(name: "Charles"),
+      ])
 
     var dump = ""
     customDump(subject, to: &dump)
@@ -859,12 +861,13 @@ final class DumpTests: XCTestCase {
     let human2 = Human()
 
     var dump = ""
-    customDump([
-      human,
-      human,
-      human2,
-      human2,
-    ], to: &dump)
+    customDump(
+      [
+        human,
+        human,
+        human2,
+        human2,
+      ], to: &dump)
 
     XCTAssertNoDifference(
       dump,
