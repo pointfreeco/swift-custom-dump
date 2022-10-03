@@ -874,49 +874,49 @@ final class DumpTests: XCTestCase {
 
     var dump = ""
     customDump(
-    [
-      human,
-      human,
-      human,
-      human2,
-      human2,
-      human2,
-      user,
-      user,
-      user,
-      user2,
-      user2,
-      user2,
-    ], to: &dump)
+      [
+        human,
+        human,
+        human,
+        human2,
+        human2,
+        human2,
+        user,
+        user,
+        user,
+        user2,
+        user2,
+        user2,
+      ], to: &dump)
 
     XCTAssertNoDifference(
       dump,
-       """
-       [
-         [0]: DumpTests.Human(name: "John"),
-         [1]: DumpTests.Human(↩︎),
-         [2]: DumpTests.Human(↩︎),
-         [3]: DumpTests.Human#2(name: "John"),
-         [4]: DumpTests.Human#2(↩︎),
-         [5]: DumpTests.Human#2(↩︎),
-         [6]: DumpTests.User(
-           name: "John",
-           email: "john@me.com",
-           age: 97,
-           human: DumpTests.Human(↩︎)
-         ),
-         [7]: DumpTests.User(↩︎),
-         [8]: DumpTests.User(↩︎),
-         [9]: DumpTests.User#2(
-           name: "John",
-           email: "john@me.com",
-           age: 97,
-           human: DumpTests.Human#2(↩︎)
-         ),
-         [10]: DumpTests.User#2(↩︎),
-         [11]: DumpTests.User#2(↩︎)
-       ]
-       """
+      """
+      [
+        [0]: DumpTests.Human(name: "John"),
+        [1]: DumpTests.Human(↩︎),
+        [2]: DumpTests.Human(↩︎),
+        [3]: DumpTests.Human#2(name: "John"),
+        [4]: DumpTests.Human#2(↩︎),
+        [5]: DumpTests.Human#2(↩︎),
+        [6]: DumpTests.User(
+          name: "John",
+          email: "john@me.com",
+          age: 97,
+          human: DumpTests.Human(↩︎)
+        ),
+        [7]: DumpTests.User(↩︎),
+        [8]: DumpTests.User(↩︎),
+        [9]: DumpTests.User#2(
+          name: "John",
+          email: "john@me.com",
+          age: 97,
+          human: DumpTests.Human#2(↩︎)
+        ),
+        [10]: DumpTests.User#2(↩︎),
+        [11]: DumpTests.User#2(↩︎)
+      ]
+      """
     )
   }
 
