@@ -824,23 +824,23 @@ final class DumpTests: XCTestCase {
             name: "Virginia",
             parent: DumpTests.Parent(↩︎)
           ),
-          [1]: DumpTests.Child<2>(
+          [1]: DumpTests.Child#2(
             name: "Ronald",
             parent: DumpTests.Parent(↩︎)
           ),
-          [2]: DumpTests.Child<3>(
+          [2]: DumpTests.Child#3(
             name: "Fred",
             parent: DumpTests.Parent(↩︎)
           ),
-          [3]: DumpTests.Child<4>(
+          [3]: DumpTests.Child#4(
             name: "George",
             parent: DumpTests.Parent(↩︎)
           ),
-          [4]: DumpTests.Child<5>(
+          [4]: DumpTests.Child#5(
             name: "Percy",
             parent: DumpTests.Parent(↩︎)
           ),
-          [5]: DumpTests.Child<6>(
+          [5]: DumpTests.Child#6(
             name: "Charles",
             parent: DumpTests.Parent(↩︎)
           )
@@ -896,9 +896,9 @@ final class DumpTests: XCTestCase {
          [0]: DumpTests.Human(name: "John"),
          [1]: DumpTests.Human(↩︎),
          [2]: DumpTests.Human(↩︎),
-         [3]: DumpTests.Human<2>(name: "John"),
-         [4]: DumpTests.Human<2>(↩︎),
-         [5]: DumpTests.Human<2>(↩︎),
+         [3]: DumpTests.Human#2(name: "John"),
+         [4]: DumpTests.Human#2(↩︎),
+         [5]: DumpTests.Human#2(↩︎),
          [6]: DumpTests.User(
            name: "John",
            email: "john@me.com",
@@ -907,14 +907,14 @@ final class DumpTests: XCTestCase {
          ),
          [7]: DumpTests.User(↩︎),
          [8]: DumpTests.User(↩︎),
-         [9]: DumpTests.User<2>(
+         [9]: DumpTests.User#2(
            name: "John",
            email: "john@me.com",
            age: 97,
-           human: DumpTests.Human<2>(↩︎)
+           human: DumpTests.Human#2(↩︎)
          ),
-         [10]: DumpTests.User<2>(↩︎),
-         [11]: DumpTests.User<2>(↩︎)
+         [10]: DumpTests.User#2(↩︎),
+         [11]: DumpTests.User#2(↩︎)
        ]
        """
     )

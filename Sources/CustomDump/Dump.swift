@@ -144,7 +144,7 @@ public func customDump<T, TargetStream>(
         let id = idPerItem[item, default: occurence]
         idPerItem[item] = id
 
-        return id > 1 ? "<\(id)>" : ""
+        return id > 1 ? "#\(id)" : ""
       }
       if visitedItems.contains(item) {
         out.write("\(typeName(mirror.subjectType))\(id)(↩︎)")
