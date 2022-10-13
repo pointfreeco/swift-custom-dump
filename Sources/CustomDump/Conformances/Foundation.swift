@@ -325,3 +325,9 @@ extension UUID: CustomDumpStringConvertible {
     "UUID(\(self.uuidString))"
   }
 }
+
+extension AnyHashable: CustomDumpRepresentable {
+  public var customDumpValue: Any {
+    base
+  }
+}
