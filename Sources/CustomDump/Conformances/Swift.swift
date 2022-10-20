@@ -7,7 +7,7 @@ extension Character: CustomDumpRepresentable {
 extension ObjectIdentifier: CustomDumpStringConvertible {
   public var customDumpDescription: String {
     self.debugDescription
-      .replacingOccurrences(of: "0x0*", with: "0x", options: .regularExpression)
+      .replacingOccurrences(of: ":?\\s*0x[\\da-f]+(\\s*)", with: "$1", options: .regularExpression)
   }
 }
 

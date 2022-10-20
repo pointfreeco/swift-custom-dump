@@ -17,6 +17,23 @@ final class SwiftTests: XCTestCase {
     )
   }
 
+  func testObjectIdentifier() {
+    let user = UserClass(id: 1, name: "")
+    let objectIdentifier = ObjectIdentifier(user)
+
+    var dump = ""
+    customDump(
+      objectIdentifier,
+      to: &dump
+    )
+    XCTAssertNoDifference(
+      dump,
+      """
+      ObjectIdentifier()
+      """
+    )
+  }
+
   func testStaticString() {
     let string: StaticString = "hello world!"
     var dump = ""
