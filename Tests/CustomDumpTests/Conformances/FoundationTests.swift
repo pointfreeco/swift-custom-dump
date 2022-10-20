@@ -661,4 +661,22 @@ final class FoundationTests: XCTestCase {
       """
     )
   }
+
+  func testAnyHashable() {
+    let user: AnyHashable = HashableUser(id: 1, name: "James")
+    var dump = ""
+    customDump(
+      user,
+      to: &dump
+    )
+    XCTAssertNoDifference(
+      dump,
+      """
+      HashableUser(
+        id: 1,
+        name: "James"
+      )
+      """
+    )
+  }
 }
