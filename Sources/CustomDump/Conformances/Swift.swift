@@ -22,3 +22,9 @@ extension UnicodeScalar: CustomDumpRepresentable {
     String(self)
   }
 }
+
+extension AnyHashable: CustomDumpRepresentable {
+  public var customDumpValue: Any {
+    base
+  }
+}
