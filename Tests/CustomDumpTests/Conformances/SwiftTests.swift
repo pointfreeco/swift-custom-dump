@@ -27,7 +27,8 @@ final class SwiftTests: XCTestCase {
       to: &dump
     )
     XCTAssertNoDifference(
-      dump.replacingOccurrences(of: ":?\\s*0x[\\da-f]+(\\s*)", with: "$1", options: .regularExpression),
+      dump.replacingOccurrences(
+        of: ":?\\s*0x[\\da-f]+(\\s*)", with: "$1", options: .regularExpression),
       """
       ObjectIdentifier()
       """
