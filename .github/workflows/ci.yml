@@ -60,14 +60,14 @@ jobs:
         with:
           shell-action: carton test --environment node
 
-  windows:
-    name: Windows
-    runs-on: windows-latest
-    steps:
-      - uses: compnerd/gha-setup-swift@main
-        with:
-          branch: swift-5.7-release
-          tag: 5.7.1-RELEASE
-
-      - uses: actions/checkout@v3
-      - run: swift test && swift build --configuration release
+  #windows:
+  #  name: Windows
+  #  runs-on: windows-latest
+  #  steps:
+  #    - uses: compnerd/gha-setup-swift@main
+  #      with:
+  #        branch: swift-5.7-release
+  #        tag: 5.7.1-RELEASE
+  #
+  #    - uses: actions/checkout@v3
+  #    - run: swift test && swift build --configuration release
