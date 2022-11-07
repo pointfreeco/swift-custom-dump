@@ -802,7 +802,7 @@
       instantiateKeyPathBuffer(root, leaf, $0)
     }
 
-    let heapObj = UnsafeRawPointer(Unmanaged.passUnretained(instance).toOpaque())
+    let heapObj = UnsafeRawPointer(Unmanaged.passRetained(instance).autorelease().toOpaque())
     let keyPath = unsafeBitCast(heapObj, to: AnyKeyPath.self)
     return keyPath
   }
