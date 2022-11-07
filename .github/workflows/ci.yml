@@ -18,7 +18,7 @@ jobs:
         xcode:
           - '13.3.1'
           - '13.4.1'
-          - '14.0'
+          - '14.0.1'
           - '14.1'
     steps:
       - uses: actions/checkout@v3
