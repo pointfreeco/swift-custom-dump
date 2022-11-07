@@ -16,7 +16,7 @@ test-linux:
 		-v "$(PWD):$(PWD)" \
 		-w "$(PWD)" \
 		swift:$(SWIFT_VERSION) \
-		bash -c 'apt install build-essential -y --no-install-recommends && make test-swift SWIFT_VERSION=$(SWIFT_VERSION)'
+		bash -c 'apt-get update && apt-get -y install make && make test-swift SWIFT_VERSION=$(SWIFT_VERSION)'
 
 test-swift:
 	swift test $(SWIFT_BUILD_ARGS) $(SWIFT_TEST_ARGS)
