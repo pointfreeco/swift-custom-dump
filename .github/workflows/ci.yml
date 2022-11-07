@@ -18,9 +18,10 @@ jobs:
         xcode:
           - '13.3.1'
           - '13.4.1'
-          - '14.0'
+          - '14.0.1'
+          - '14.1'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Select Xcode ${{ matrix.xcode }}
         run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
       - name: Print Swift version
@@ -38,9 +39,9 @@ jobs:
         swift:
           - 5.5
           - 5.6
-          #- 5.7
+          - 5.7
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Run tests
         run: make test-linux SWIFT_VERSION=${{ matrix.swift }}
 
@@ -50,12 +51,12 @@ jobs:
     strategy:
       matrix:
         include:
-          - { toolchain: wasm-5.6.0-RELEASE }
+          - { toolchain: wasm-5.7.1-RELEASE }
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: echo "${{ matrix.toolchain }}" > .swift-version
-      - uses: swiftwasm/swiftwasm-action@v5.6
+      - uses: swiftwasm/swiftwasm-action@v5.7
         with:
           shell-action: carton test --environment node
 
@@ -65,8 +66,8 @@ jobs:
   #  steps:
   #    - uses: compnerd/gha-setup-swift@main
   #      with:
-  #        branch: swift-5.5-release
-  #        tag: 5.5-RELEASE
+  #        branch: swift-5.7-release
+  #        tag: 5.7.1-RELEASE
   #
-  #    - uses: actions/checkout@v2
+  #    - uses: actions/checkout@v3
   #    - run: swift test && swift build --configuration release

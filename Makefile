@@ -16,18 +16,18 @@ test-linux:
 		-v "$(PWD):$(PWD)" \
 		-w "$(PWD)" \
 		swift:$(SWIFT_VERSION) \
-		bash -c 'make test-swift SWIFT_VERSION=$(SWIFT_VERSION)'
+		bash -c 'apt-get update && apt-get -y install make && make test-swift SWIFT_VERSION=$(SWIFT_VERSION)'
 
 test-swift:
 	swift test $(SWIFT_BUILD_ARGS) $(SWIFT_TEST_ARGS)
-	swift build --configuration release $(SWIFT_BUILD_ARGS)
+	swift test --configuration release $(SWIFT_BUILD_ARGS) $(SWIFT_TEST_ARGS)
 
 test-platforms:
 	xcodebuild test \
 		-workspace CustomDump.xcworkspace \
 		-scheme CustomDump \
 		-destination platform="$(PLATFORM_IOS)"
-	xcodebuild \
+	xcodebuild test \
 		-workspace CustomDump.xcworkspace \
 		-scheme CustomDump \
 		-configuration Release \
@@ -47,7 +47,7 @@ test-platforms:
 		-workspace CustomDump.xcworkspace \
 		-scheme CustomDump \
 		-destination platform="$(PLATFORM_MAC_CATALYST)"
-	xcodebuild \
+	xcodebuild test \
 		-workspace CustomDump.xcworkspace \
 		-scheme CustomDump \
 		-configuration Release \
@@ -57,7 +57,7 @@ test-platforms:
 		-workspace CustomDump.xcworkspace \
 		-scheme CustomDump \
 		-destination platform="$(PLATFORM_TVOS)"
-	xcodebuild \
+	xcodebuild test \
 		-workspace CustomDump.xcworkspace \
 		-scheme CustomDump \
 		-configuration Release \
