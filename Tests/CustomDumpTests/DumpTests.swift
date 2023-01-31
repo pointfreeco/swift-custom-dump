@@ -242,6 +242,20 @@ final class DumpTests: XCTestCase {
       )
       """
     )
+
+    dump = ""
+    customDump(Nested.nest(.fizz(0.9, buzz: "2")), to: &dump)
+    XCTAssertNoDifference(
+      dump,
+      """
+      Nested.nest(
+        .fizz(
+          0.9,
+          buzz: "2"
+        )
+      )
+      """
+    )
   }
 
   func testOptional() {
@@ -608,7 +622,7 @@ final class DumpTests: XCTestCase {
       dump,
       """
       Result.success(
-        Result.success(42)
+        .success(42)
       )
       """
     )

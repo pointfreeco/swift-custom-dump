@@ -136,7 +136,7 @@ final class FoundationTests: XCTestCase {
       dump,
       """
       Calendar(
-        identifier: Calendar.Identifier.gregorian,
+        identifier: .gregorian,
         locale: Locale(),
         timeZone: TimeZone(
           identifier: "GMT",
