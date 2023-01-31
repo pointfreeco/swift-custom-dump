@@ -41,6 +41,10 @@ enum Enum {
   case fu(bar: Int)
 }
 
+enum Nested {
+  case nest(Enum)
+}
+
 enum Namespaced {
   class Class {
     var x: Int
