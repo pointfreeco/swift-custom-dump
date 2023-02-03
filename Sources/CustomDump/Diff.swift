@@ -533,7 +533,10 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
               .split(separator: "\n", omittingEmptySubsequences: false)
               .map(Line.init(rawValue:))
         )
-        let hashes = String(repeating: "#", count: max(lhs.hashCount, rhs.hashCount))
+        let hashes = String(
+          repeating: "#",
+          count: max(lhs.hashCount(isMultiline: true), rhs.hashCount(isMultiline: true))
+        )
         diffChildren(
           lhsMirror,
           rhsMirror,

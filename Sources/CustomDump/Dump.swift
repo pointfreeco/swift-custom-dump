@@ -276,12 +276,15 @@ func _customDump<T, TargetStream>(
           if maxDepth == 0 {
             out.write("\"…\"")
           } else {
-            let hashes = String(repeating: "#", count: value.hashCount)
+            let hashes = String(repeating: "#", count: value.hashCount(isMultiline: true))
             out.write("\(hashes)\"\"\"")
             out.write("\n")
             print(value.indenting(by: name != nil ? 2 : 0), to: &out)
             out.write(name != nil ? "  \"\"\"\(hashes)" : "\"\"\"\(hashes)")
           }
+        } else if value.contains("\"") {
+          let hashes = String(repeating: "#", count: max(value.hashCount(isMultiline: false), 1))
+          out.write("\(hashes)\"\(value)\"\(hashes)")
         } else {
           out.write(value.debugDescription)
         }

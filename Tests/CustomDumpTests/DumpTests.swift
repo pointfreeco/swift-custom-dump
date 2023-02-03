@@ -412,6 +412,29 @@ final class DumpTests: XCTestCase {
     )
   }
 
+  func testString() {
+    var dump = ""
+    customDump("Hello!", to: &dump)
+    XCTAssertNoDifference(
+      dump,
+      #""Hello!""#
+    )
+
+    dump = ""
+    customDump(#"Hello, "world!""#, to: &dump)
+    XCTAssertNoDifference(
+      dump,
+      ##"#"Hello, "world!""#"##
+    )
+
+    dump = ""
+    customDump(####"This has a "### in it"####, to: &dump)
+    XCTAssertNoDifference(
+      dump,
+      #####"####"This has a "### in it"####"#####
+    )
+  }
+
   func testMultilineString() {
     var dump = ""
     customDump("Hello,\nWorld!", to: &dump)
