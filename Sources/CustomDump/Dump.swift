@@ -282,7 +282,7 @@ func _customDump<T, TargetStream>(
             print(value.indenting(by: name != nil ? 2 : 0), to: &out)
             out.write(name != nil ? "  \"\"\"\(hashes)" : "\"\"\"\(hashes)")
           }
-        } else if value.contains("\"") {
+        } else if value.contains("\"") || value.contains("\\") {
           let hashes = String(repeating: "#", count: max(value.hashCount(isMultiline: false), 1))
           out.write("\(hashes)\"\(value)\"\(hashes)")
         } else {

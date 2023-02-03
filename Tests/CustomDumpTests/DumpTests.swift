@@ -433,6 +433,27 @@ final class DumpTests: XCTestCase {
       dump,
       #####"####"This has a "### in it"####"#####
     )
+
+    dump = ""
+    customDump("This has a \\ in it", to: &dump)
+    XCTAssertNoDifference(
+      dump,
+      ##"#"This has a \ in it"#"##
+    )
+
+    dump = ""
+    customDump("This has no special characters in it", to: &dump)
+    XCTAssertNoDifference(
+      dump,
+      "\"This has no special characters in it\""
+    )
+
+    dump = ""
+    customDump("This has a \t in it", to: &dump)
+    XCTAssertNoDifference(
+      dump,
+      "\"This has a \\t in it\""
+    )
   }
 
   func testMultilineString() {
