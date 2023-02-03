@@ -10,13 +10,15 @@ extension String {
     return "\(prefix)\(self.replacingOccurrences(of: "\n", with: "\n\(prefix)"))"
   }
 
-  var hashCount: Int {
+  func hashCount(isMultiline: Bool) -> Int {
+    let (quote, offset) = isMultiline ? ("\"\"\"", 2) : ("\"", 0)
     var substring = self[...]
     var hashCount = 0
-    while let range = substring.range(of: "([#]*\"\"\"|\"\"\"[#]*)", options: .regularExpression) {
-      let count = substring.distance(from: range.lowerBound, to: range.upperBound) - 2
+    let pattern = "(\(quote)[#]*)"
+    while let range = substring.range(of: pattern, options: .regularExpression) {
+      let count = substring.distance(from: range.lowerBound, to: range.upperBound) - offset
       hashCount = max(count, hashCount)
-      substring.removeSubrange(..<range.upperBound)
+      substring = substring[range.upperBound...]
     }
     return hashCount
   }

@@ -23,6 +23,10 @@ func isMirrorEqual(_ lhs: Any, _ rhs: Any) -> Bool {
     lhsMirror.subjectType == rhsMirror.subjectType,
     lhsMirror.children.count == rhsMirror.children.count
   else { return false }
+  guard !lhsMirror.children.isEmpty, !rhsMirror.children.isEmpty
+  else {
+    return String(describing: lhs) == String(describing: rhs)
+  }
   for (lhsChild, rhsChild) in zip(lhsMirror.children, rhsMirror.children) {
     guard
       lhsChild.label == rhsChild.label,

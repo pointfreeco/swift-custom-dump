@@ -22,6 +22,7 @@
           Mirror(reflecting: self).children.first?.value as Any,
           name: nil,
           indent: 2,
+          isRoot: false,
           maxDepth: .max
         )
         return """

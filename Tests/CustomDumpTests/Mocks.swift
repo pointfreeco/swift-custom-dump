@@ -39,10 +39,12 @@ enum Enum {
   case baz(fizz: Double, buzz: String)
   case fizz(Double, buzz: String)
   case fu(bar: Int)
+  case buzz
 }
 
 enum Nested {
   case nest(Enum)
+  case largerNest(Int, Enum)
 }
 
 enum Namespaced {
