@@ -18,7 +18,7 @@ extension String {
     while let range = substring.range(of: pattern, options: .regularExpression) {
       let count = substring.distance(from: range.lowerBound, to: range.upperBound) - offset
       hashCount = max(count, hashCount)
-      substring.removeSubrange(..<range.upperBound)
+      substring = substring[range.upperBound...]
     }
     return hashCount
   }
