@@ -56,7 +56,18 @@ public func customDump<T, TargetStream>(
   indent: Int = 0,
   maxDepth: Int = .max
 ) -> T where TargetStream: TextOutputStream {
+  _customDump(value, to: &target, name: name, indent: indent, isRoot: true, maxDepth: maxDepth)
+}
 
+@discardableResult
+func _customDump<T, TargetStream>(
+  _ value: T,
+  to target: inout TargetStream,
+  name: String?,
+  indent: Int,
+  isRoot: Bool,
+  maxDepth: Int
+) -> T where TargetStream: TextOutputStream {
   var idPerItem: [ObjectIdentifier: UInt] = [:]
   var occurrencePerType: [String: UInt] = [:]
   var visitedItems: Set<ObjectIdentifier> = []
@@ -195,12 +206,14 @@ public func customDump<T, TargetStream>(
               let (rhsKey, _) = $1.value as? (key: AnyHashable, value: Any)
             else { return false }
 
-            return _customDump(lhsKey.base, name: nil, indent: 0, maxDepth: 1)
-              < _customDump(rhsKey.base, name: nil, indent: 0, maxDepth: 1)
+            return _customDump(lhsKey.base, name: nil, indent: 0, isRoot: false, maxDepth: 1)
+              < _customDump(rhsKey.base, name: nil, indent: 0, isRoot: false, maxDepth: 1)
           },
           { child, _ in
             guard let pair = child.value as? (key: AnyHashable, value: Any) else { return }
-            let key = _customDump(pair.key.base, name: nil, indent: 0, maxDepth: maxDepth - 1)
+            let key = _customDump(
+              pair.key.base, name: nil, indent: 0, isRoot: false, maxDepth: maxDepth - 1
+            )
             child = (key, pair.value)
           })
       }
@@ -239,8 +252,8 @@ public func customDump<T, TargetStream>(
         of: mirror,
         prefix: "Set([", suffix: "])",
         by: {
-          _customDump($0.value, name: nil, indent: 0, maxDepth: 1)
-            < _customDump($1.value, name: nil, indent: 0, maxDepth: 1)
+          _customDump($0.value, name: nil, indent: 0, isRoot: false, maxDepth: 1)
+            < _customDump($1.value, name: nil, indent: 0, isRoot: false, maxDepth: 1)
         })
 
     case (_, .struct?):
@@ -280,12 +293,14 @@ public func customDump<T, TargetStream>(
     target.write((name.map { "\($0): " } ?? "").appending(out).indenting(by: indent))
   }
 
-  customDumpHelp(value, to: &target, name: name, indent: indent, isRoot: true, maxDepth: maxDepth)
+  customDumpHelp(
+    value, to: &target, name: name, indent: indent, isRoot: isRoot, maxDepth: maxDepth
+  )
   return value
 }
 
-func _customDump(_ value: Any, name: String?, indent: Int, maxDepth: Int) -> String {
+func _customDump(_ value: Any, name: String?, indent: Int, isRoot: Bool, maxDepth: Int) -> String {
   var out = ""
-  customDump(value, to: &out, name: name, indent: indent, maxDepth: maxDepth)
+  _customDump(value, to: &out, name: name, indent: indent, isRoot: isRoot, maxDepth: maxDepth)
   return out
 }

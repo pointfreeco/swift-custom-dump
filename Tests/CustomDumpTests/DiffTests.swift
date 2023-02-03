@@ -298,6 +298,58 @@ final class DiffTests: XCTestCase {
         )
       """
     )
+
+    XCTAssertNoDifference(
+      diff(
+        Nested.nest(.fizz(42, buzz: "Blob")),
+        Nested.nest(.fizz(42, buzz: "Glob"))
+      ),
+      """
+        Nested.nest(
+          .fizz(
+            42.0,
+      -     buzz: "Blob"
+      +     buzz: "Glob"
+          )
+        )
+      """
+    )
+
+    XCTAssertNoDifference(
+      diff(
+        Enum.foo,
+        Enum.buzz
+      ),
+      """
+      - Enum.foo
+      + Enum.buzz
+      """
+    )
+
+    XCTAssertNoDifference(
+      diff(
+        Nested.nest(.foo),
+        Nested.nest(.buzz)
+      ),
+      """
+      - Nested.nest(.foo)
+      + Nested.nest(.buzz)
+      """
+    )
+
+    XCTAssertNoDifference(
+      diff(
+        Nested.largerNest(1, .foo),
+        Nested.largerNest(1, .buzz)
+      ),
+      """
+        Nested.largerNest(
+          1,
+      -   .foo
+      +   .buzz
+        )
+      """
+    )
   }
 
   func testOptional() {
