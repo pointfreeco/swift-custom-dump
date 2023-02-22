@@ -1,6 +1,11 @@
 #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
   extension AnyKeyPath: CustomDumpStringConvertible {
     public var customDumpDescription: String {
+      #if swift(>=5.8)
+        if #available(macOS 13.3, iOS 16.4, watchOS 9.4, tvOS 16.4, *) {
+          return self.debugDescription
+        }
+      #endif
       guard let name = keyPathToName[self] else {
         func reflectName() -> String {
           var namedKeyPaths = Reflection.allNamedKeyPaths(forUnderlyingTypeOf: Self.rootType)

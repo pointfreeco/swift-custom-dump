@@ -577,43 +577,112 @@ final class DumpTests: XCTestCase {
     func testKeyPath() {
       var dump = ""
 
-      // Run twice to exercise cached lookup
-      for _ in 1...2 {
-        dump = ""
-        customDump(\UserClass.name, to: &dump)
-        XCTAssertNoDifference(
-          dump,
-          #"""
-          \UserClass.name
-          """#
-        )
+      @propertyWrapper
+      struct Wrapped<Value> {
+        var wrappedValue: Value
+        var projectedValue: Self { self }
+      }
 
-        dump = ""
-        customDump(\Pair.driver.name, to: &dump)
-        XCTAssertNoDifference(
-          dump,
-          #"""
-          \Pair.driver.name
-          """#
-        )
+      struct Item {
+        @Wrapped var isInStock = true
+      }
 
-        dump = ""
-        customDump(\User.name.count, to: &dump)
-        XCTAssertNoDifference(
-          dump,
-          #"""
-          KeyPath<User, Int>
-          """#
-        )
+      if #available(macOS 13.3, iOS 16.4, watchOS 9.4, tvOS 16.4, *) {
+        // Run twice to exercise cached lookup
+        for _ in 1...2 {
+          dump = ""
+          customDump(\UserClass.name, to: &dump)
+          XCTAssertNoDifference(
+            dump,
+            #"""
+            \UserClass.name
+            """#
+          )
 
-        dump = ""
-        customDump(\(x: Double, y: Double).x, to: &dump)
-        XCTAssertNoDifference(
-          dump,
-          #"""
-          WritableKeyPath<(x: Double, y: Double), Double>
-          """#
-        )
+          dump = ""
+          customDump(\Pair.driver.name, to: &dump)
+          XCTAssertNoDifference(
+            dump,
+            #"""
+            \Pair.driver.name
+            """#
+          )
+
+          dump = ""
+          customDump(\User.name.count, to: &dump)
+          XCTAssertNoDifference(
+            dump,
+            #"""
+            \User.name.count
+            """#
+          )
+
+          dump = ""
+          customDump(\(x: Double, y: Double).x, to: &dump)
+          XCTAssertNoDifference(
+            dump,
+            #"""
+            \(x: Double, y: Double).x
+            """#
+          )
+
+          dump = ""
+          customDump(\Item.$isInStock, to: &dump)
+          XCTAssertNoDifference(
+            dump,
+            #"""
+            \Item.$isInStock
+            """#
+          )
+        }
+      } else {
+        // Run twice to exercise cached lookup
+        for _ in 1...2 {
+          dump = ""
+          customDump(\UserClass.name, to: &dump)
+          XCTAssertNoDifference(
+            dump,
+            #"""
+            \UserClass.name
+            """#
+          )
+
+          dump = ""
+          customDump(\Pair.driver.name, to: &dump)
+          XCTAssertNoDifference(
+            dump,
+            #"""
+            \Pair.driver.name
+            """#
+          )
+
+          dump = ""
+          customDump(\User.name.count, to: &dump)
+          XCTAssertNoDifference(
+            dump,
+            #"""
+            KeyPath<User, Int>
+            """#
+          )
+
+          dump = ""
+          customDump(\(x: Double, y: Double).x, to: &dump)
+          XCTAssertNoDifference(
+            dump,
+            #"""
+            WritableKeyPath<(x: Double, y: Double), Double>
+            """#
+          )
+
+          dump = ""
+          customDump(\Item.$isInStock, to: &dump)
+          XCTAssertNoDifference(
+            dump,
+            #"""
+            KeyPath<Item, Wrapped<Bool>>
+            """#
+          )
+        }
       }
     }
   #endif
