@@ -1,11 +1,11 @@
-#if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
-  extension AnyKeyPath: CustomDumpStringConvertible {
-    public var customDumpDescription: String {
-      #if swift(>=5.8)
-        if #available(macOS 13.3, iOS 16.4, watchOS 9.4, tvOS 16.4, *) {
-          return self.debugDescription
-        }
-      #endif
+extension AnyKeyPath: CustomDumpStringConvertible {
+  public var customDumpDescription: String {
+    #if swift(>=5.8)
+      if #available(macOS 13.3, iOS 16.4, watchOS 9.4, tvOS 16.4, *) {
+        return self.debugDescription
+      }
+    #endif
+    #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
       guard let name = keyPathToName[self] else {
         func reflectName() -> String {
           var namedKeyPaths = Reflection.allNamedKeyPaths(forUnderlyingTypeOf: Self.rootType)
@@ -29,9 +29,13 @@
         return name
       }
       return name
-    }
+    #else
+      return "\(typeName(Self.self))<\(typeName(Self.rootType)), \(typeName(Self.valueType))>"
+    #endif
   }
+}
 
+#if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
   private var keyPathToName: [AnyKeyPath: String] = [:]
 
   // The source code below was extracted from the "KeyPath Reflection" branch of Apple's
