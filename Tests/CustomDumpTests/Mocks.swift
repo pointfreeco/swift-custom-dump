@@ -129,3 +129,13 @@ struct Redacted<RawValue>: CustomDumpStringConvertible {
 
 struct User: Equatable, Identifiable { var id: Int, name: String }
 struct HashableUser: Equatable, Identifiable, Hashable { var id: Int, name: String }
+
+@propertyWrapper
+struct Wrapped<Value> {
+  var wrappedValue: Value
+  var projectedValue: Self { self }
+}
+
+struct Item {
+  @Wrapped var isInStock = true
+}

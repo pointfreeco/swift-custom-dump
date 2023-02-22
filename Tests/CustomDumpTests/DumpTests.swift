@@ -576,16 +576,6 @@ final class DumpTests: XCTestCase {
   func testKeyPath() {
     var dump = ""
 
-    @propertyWrapper
-    struct Wrapped<Value> {
-      var wrappedValue: Value
-      var projectedValue: Self { self }
-    }
-
-    struct Item {
-      @Wrapped var isInStock = true
-    }
-
     #if swift(>=5.8)
       if #available(macOS 13.3, iOS 16.4, watchOS 9.4, tvOS 16.4, *) {
         dump = ""
