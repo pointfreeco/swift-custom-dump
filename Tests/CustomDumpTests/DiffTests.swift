@@ -957,7 +957,7 @@ final class DiffTests: XCTestCase {
       diff(
         [
           "value": 29.99 as Float
-        ],
+        ] as [String: Any],
         [
           "value": 29.99 as Double
         ]
