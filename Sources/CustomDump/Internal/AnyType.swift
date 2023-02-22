@@ -5,7 +5,7 @@ func typeName(
 ) -> String {
   var name = _typeName(type, qualified: qualified)
     .replacingOccurrences(
-      of: #"\b\w+\.([^\b]+)"#,
+      of: #"\w+\.(\w+)"#,
       with: "$1",
       options: .regularExpression
     )
