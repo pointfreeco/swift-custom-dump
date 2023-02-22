@@ -573,10 +573,59 @@ final class DumpTests: XCTestCase {
     )
   }
 
-  #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
-    func testKeyPath() {
-      var dump = ""
+  func testKeyPath() {
+    var dump = ""
 
+    #if swift(>=5.8)
+      if #available(macOS 13.3, iOS 16.4, watchOS 9.4, tvOS 16.4, *) {
+        dump = ""
+        customDump(\UserClass.name, to: &dump)
+        XCTAssertNoDifference(
+          dump,
+          #"""
+          \UserClass.name
+          """#
+        )
+
+        dump = ""
+        customDump(\Pair.driver.name, to: &dump)
+        XCTAssertNoDifference(
+          dump,
+          #"""
+          \Pair.driver.name
+          """#
+        )
+
+        dump = ""
+        customDump(\User.name.count, to: &dump)
+        XCTAssertNoDifference(
+          dump,
+          #"""
+          \User.name.count
+          """#
+        )
+
+        dump = ""
+        customDump(\(x: Double, y: Double).x, to: &dump)
+        XCTAssertNoDifference(
+          dump,
+          #"""
+          \(x: Double, y: Double).x
+          """#
+        )
+
+        dump = ""
+        customDump(\Item.$isInStock, to: &dump)
+        XCTAssertNoDifference(
+          dump,
+          #"""
+          \Item.$isInStock
+          """#
+        )
+        return
+      }
+    #endif
+    #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
       // Run twice to exercise cached lookup
       for _ in 1...2 {
         dump = ""
@@ -614,9 +663,63 @@ final class DumpTests: XCTestCase {
           WritableKeyPath<(x: Double, y: Double), Double>
           """#
         )
+
+        dump = ""
+        customDump(\Item.$isInStock, to: &dump)
+        XCTAssertNoDifference(
+          dump,
+          #"""
+          KeyPath<Item, Wrapped<Bool>>
+          """#
+        )
       }
-    }
-  #endif
+    #else
+      dump = ""
+      customDump(\UserClass.name, to: &dump)
+      XCTAssertNoDifference(
+        dump,
+        #"""
+        KeyPath<UserClass, String>
+        """#
+      )
+
+      dump = ""
+      customDump(\Pair.driver.name, to: &dump)
+      XCTAssertNoDifference(
+        dump,
+        #"""
+        KeyPath<Pair, String>
+        """#
+      )
+
+      dump = ""
+      customDump(\User.name.count, to: &dump)
+      XCTAssertNoDifference(
+        dump,
+        #"""
+        KeyPath<User, Int>
+        """#
+      )
+
+      dump = ""
+      customDump(\(x: Double, y: Double).x, to: &dump)
+      XCTAssertNoDifference(
+        dump,
+        #"""
+        WritableKeyPath<(x: Double, y: Double), Double>
+        """#
+      )
+
+      dump = ""
+      customDump(\Item.$isInStock, to: &dump)
+      XCTAssertNoDifference(
+        dump,
+        #"""
+        KeyPath<Item, Wrapped<Bool>>
+        """#
+      )
+    #endif
+  }
 
   func testNamespacedTypes() {
     var dump = ""
