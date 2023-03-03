@@ -50,7 +50,6 @@ public func XCTAssertNoDifference<T>(
   do {
     let expression1 = try expression1()
     let expression2 = try expression2()
-    let message = message()
     guard expression1 != expression2 else { return }
     let format = DiffFormat.proportional
     guard let difference = diff(expression1, expression2, format: format)
@@ -75,6 +74,7 @@ public func XCTAssertNoDifference<T>(
 
       (First: \(format.first), Second: \(format.second))
       """
+    let message = message()
     XCTFail(
       "\(failure)\(message.isEmpty ? "" : " - \(message)")",
       file: file,
