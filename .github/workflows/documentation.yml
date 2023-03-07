@@ -5,6 +5,10 @@ on:
       - published
   workflow_dispatch:
 
+concurrency:
+  group: documentation-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
