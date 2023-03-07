@@ -10,7 +10,7 @@ extension AnyKeyPath: CustomDumpStringConvertible {
     #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
       keyPathToNameLock.lock()
       defer { keyPathToNameLock.unlock() }
-    
+
       guard let name = keyPathToName[self] else {
         func reflectName() -> String {
           var namedKeyPaths = Reflection.allNamedKeyPaths(forUnderlyingTypeOf: Self.rootType)
