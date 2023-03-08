@@ -35,7 +35,11 @@ extension AnyKeyPath: CustomDumpStringConvertible {
       }
       return name
     #else
-      return typeName(Self.self, genericsAbbreviated: false)
+      return """
+        \(typeName(Self.self))<\
+        \(typeName(Self.rootType)), \
+        \(typeName(Self.valueType,genericsAbbreviated: false))>
+        """
     #endif
   }
 }
