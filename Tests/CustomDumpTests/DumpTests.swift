@@ -24,6 +24,27 @@ final class DumpTests: XCTestCase {
       Foo.Bar.self
       """
     )
+
+    struct Feature {
+      struct State {}
+    }
+    dump = ""
+    customDump(Feature.State.self, to: &dump)
+    XCTAssertNoDifference(
+      dump,
+      """
+      DumpTests.Feature.State.self
+      """
+    )
+
+    dump = ""
+    customDump((x: Double, y: Double).self, to: &dump)
+    XCTAssertNoDifference(
+      dump,
+      """
+      (x: Double, y: Double).self
+      """
+    )
   }
 
   func testClass() {

@@ -5,13 +5,13 @@ func typeName(
 ) -> String {
   var name = _typeName(type, qualified: qualified)
     .replacingOccurrences(
-      of: #"\w+\.(\w+)"#,
-      with: "$1",
+      of: #"\(unknown context at \$[[:xdigit:]]+\)\."#,
+      with: "",
       options: .regularExpression
     )
     .replacingOccurrences(
-      of: #"\(unknown context at \$[[:xdigit:]]+\)\."#,
-      with: "",
+      of: #"\w+\.([\w.]+)"#,
+      with: "$1",
       options: .regularExpression
     )
   if genericsAbbreviated {
