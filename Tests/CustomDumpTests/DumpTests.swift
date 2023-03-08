@@ -36,6 +36,15 @@ final class DumpTests: XCTestCase {
       DumpTests.Feature.State.self
       """
     )
+
+    dump = ""
+    customDump((x: Double, y: Double).self, to: &dump)
+    XCTAssertNoDifference(
+      dump,
+      """
+      (x: Double, y: Double).self
+      """
+    )
   }
 
   func testClass() {
