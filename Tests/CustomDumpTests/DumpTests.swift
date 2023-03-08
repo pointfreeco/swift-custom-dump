@@ -45,6 +45,87 @@ final class DumpTests: XCTestCase {
       (x: Double, y: Double).self
       """
     )
+
+    dump = ""
+    customDump(Double?.self, to: &dump)
+    XCTAssertNoDifference(
+      dump,
+      """
+      Double?.self
+      """
+    )
+
+    dump = ""
+    customDump([Int].self, to: &dump)
+    XCTAssertNoDifference(
+      dump,
+      """
+      [Int].self
+      """
+    )
+
+    dump = ""
+    customDump([String: Int].self, to: &dump)
+    XCTAssertNoDifference(
+      dump,
+      """
+      [String: Int].self
+      """
+    )
+
+    dump = ""
+    customDump([[Double: Double?]].self, to: &dump)
+    XCTAssertNoDifference(
+      dump,
+      """
+      [[Double: Double?]].self
+      """
+    )
+
+    dump = ""
+    customDump([[Double: Double]?].self, to: &dump)
+    XCTAssertNoDifference(
+      dump,
+      """
+      [[Double: Double]?].self
+      """
+    )
+
+    dump = ""
+    customDump([[Double: [Double]]]?.self, to: &dump)
+    XCTAssertNoDifference(
+      dump,
+      """
+      [[Double: [Double]]]?.self
+      """
+    )
+
+    dump = ""
+    customDump([[[Double: Double]]]?.self, to: &dump)
+    XCTAssertNoDifference(
+      dump,
+      """
+      [[[Double: Double]]]?.self
+      """
+    )
+
+    dump = ""
+    customDump([Double: [Double?]].self, to: &dump)
+    XCTAssertNoDifference(
+      dump,
+      """
+      [Double: [Double?]].self
+      """
+    )
+
+    dump = ""
+    customDump([Double: [Double]?].self, to: &dump)
+    XCTAssertNoDifference(
+      dump,
+      """
+      [Double: [Double]?].self
+      """
+    )
   }
 
   func testClass() {
