@@ -90,14 +90,14 @@ final class DumpTests: XCTestCase {
     )
 
     XCTAssertNoDifference(
-      String(customDumping: [[Double: [Double?]]]?.self),
+      String(customDumping: [Double: [Double?]].self),
       """
       [Double: [Double?]].self
       """
     )
 
     XCTAssertNoDifference(
-      String(customDumping: [Double: [Double]?]?.self),
+      String(customDumping: [Double: [Double]?].self),
       """
       [Double: [Double]?].self
       """
