@@ -16,10 +16,8 @@ import XCTest
 @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
 final class DumpTests: XCTestCase {
   func testAnyType() {
-    var dump = ""
-    customDump(Foo.Bar.self, to: &dump)
     XCTAssertNoDifference(
-      dump,
+      String(customDumping: Foo.Bar.self),
       """
       Foo.Bar.self
       """
@@ -28,100 +26,78 @@ final class DumpTests: XCTestCase {
     struct Feature {
       struct State {}
     }
-    dump = ""
-    customDump(Feature.State.self, to: &dump)
     XCTAssertNoDifference(
-      dump,
+      String(customDumping: Feature.State.self),
       """
       DumpTests.Feature.State.self
       """
     )
 
-    dump = ""
-    customDump((x: Double, y: Double).self, to: &dump)
     XCTAssertNoDifference(
-      dump,
+      String(customDumping: (x: Double, y: Double).self),
       """
       (x: Double, y: Double).self
       """
     )
 
-    dump = ""
-    customDump(Double?.self, to: &dump)
     XCTAssertNoDifference(
-      dump,
+      String(customDumping: Double?.self),
       """
       Double?.self
       """
     )
 
-    dump = ""
-    customDump([Int].self, to: &dump)
     XCTAssertNoDifference(
-      dump,
+      String(customDumping: [Int].self),
       """
       [Int].self
       """
     )
 
-    dump = ""
-    customDump([String: Int].self, to: &dump)
     XCTAssertNoDifference(
-      dump,
+      String(customDumping: [String: Int].self),
       """
       [String: Int].self
       """
     )
 
-    dump = ""
-    customDump([[Double: Double?]].self, to: &dump)
     XCTAssertNoDifference(
-      dump,
+      String(customDumping: [[Double: Double?]].self),
       """
       [[Double: Double?]].self
       """
     )
 
-    dump = ""
-    customDump([[Double: Double]?].self, to: &dump)
     XCTAssertNoDifference(
-      dump,
+      String(customDumping: [[Double: Double]?].self),
       """
       [[Double: Double]?].self
       """
     )
 
-    dump = ""
-    customDump([[Double: [Double]]]?.self, to: &dump)
     XCTAssertNoDifference(
-      dump,
+      String(customDumping: [[Double: [Double]]]?.self),
       """
       [[Double: [Double]]]?.self
       """
     )
 
-    dump = ""
-    customDump([[[Double: Double]]]?.self, to: &dump)
     XCTAssertNoDifference(
-      dump,
+      String(customDumping: [[[Double: Double]]]?.self),
       """
       [[[Double: Double]]]?.self
       """
     )
 
-    dump = ""
-    customDump([Double: [Double?]].self, to: &dump)
     XCTAssertNoDifference(
-      dump,
+      String(customDumping: [[Double: [Double?]]]?.self),
       """
       [Double: [Double?]].self
       """
     )
 
-    dump = ""
-    customDump([Double: [Double]?].self, to: &dump)
     XCTAssertNoDifference(
-      dump,
+      String(customDumping: [Double: [Double]?]?.self),
       """
       [Double: [Double]?].self
       """
