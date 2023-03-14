@@ -36,6 +36,15 @@ public func customDump<T>(
   return value
 }
 
+extension String {
+  /// Creates a string dumping the given value.
+  public init<Subject>(customDumping subject: Subject) {
+    var dump = ""
+    customDump(subject, to: &dump)
+    self = dump
+  }
+}
+
 /// Dumps the given value's contents using its mirror to the specified output stream.
 ///
 /// - Parameters:
