@@ -391,18 +391,18 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
           return lhs.key == rhs.key
         },
         areInIncreasingOrder: T.self is _UnorderedCollection.Type
-        ? {
-          guard
-            let lhs = $0.value as? (key: AnyHashable, value: Any),
-            let rhs = $1.value as? (key: AnyHashable, value: Any)
-          else {
-            return _customDump($0.value, name: nil, indent: 0, isRoot: false, maxDepth: 1)
-            < _customDump($1.value, name: nil, indent: 0, isRoot: false, maxDepth: 1)
+          ? {
+            guard
+              let lhs = $0.value as? (key: AnyHashable, value: Any),
+              let rhs = $1.value as? (key: AnyHashable, value: Any)
+            else {
+              return _customDump($0.value, name: nil, indent: 0, isRoot: false, maxDepth: 1)
+                < _customDump($1.value, name: nil, indent: 0, isRoot: false, maxDepth: 1)
+            }
+            return _customDump(lhs.key.base, name: nil, indent: 0, isRoot: false, maxDepth: 1)
+              < _customDump(rhs.key.base, name: nil, indent: 0, isRoot: false, maxDepth: 1)
           }
-          return _customDump(lhs.key.base, name: nil, indent: 0, isRoot: false, maxDepth: 1)
-          < _customDump(rhs.key.base, name: nil, indent: 0, isRoot: false, maxDepth: 1)
-        }
-        : nil
+          : nil
       ) { child, _ in
         guard let pair = child.value as? (key: AnyHashable, value: Any) else { return }
         child = (
@@ -482,11 +482,11 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
           isIdentityEqual($0.value, $1.value) || isMirrorEqual($0.value, $1.value)
         },
         areInIncreasingOrder: T.self is _UnorderedCollection.Type
-        ? {
-          _customDump($0.value, name: nil, indent: 0, isRoot: false, maxDepth: 1)
-            < _customDump($1.value, name: nil, indent: 0, isRoot: false, maxDepth: 1)
-        }
-        : nil
+          ? {
+            _customDump($0.value, name: nil, indent: 0, isRoot: false, maxDepth: 1)
+              < _customDump($1.value, name: nil, indent: 0, isRoot: false, maxDepth: 1)
+          }
+          : nil
       )
 
     case (_, .struct?, _, .struct?):
