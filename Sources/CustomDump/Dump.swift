@@ -209,7 +209,8 @@ func _customDump<T, TargetStream>(
         dumpChildren(
           of: mirror,
           prefix: "[", suffix: "]",
-          by: {
+          by: T.self is _UnorderedCollection.Type
+          ? {
             guard
               let (lhsKey, _) = $0.value as? (key: AnyHashable, value: Any),
               let (rhsKey, _) = $1.value as? (key: AnyHashable, value: Any)
@@ -217,7 +218,8 @@ func _customDump<T, TargetStream>(
 
             return _customDump(lhsKey.base, name: nil, indent: 0, isRoot: false, maxDepth: 1)
               < _customDump(rhsKey.base, name: nil, indent: 0, isRoot: false, maxDepth: 1)
-          },
+          }
+          : nil,
           { child, _ in
             guard let pair = child.value as? (key: AnyHashable, value: Any) else { return }
             let key = _customDump(
@@ -260,10 +262,13 @@ func _customDump<T, TargetStream>(
       dumpChildren(
         of: mirror,
         prefix: "Set([", suffix: "])",
-        by: {
+        by: T.self is _UnorderedCollection.Type
+        ? {
           _customDump($0.value, name: nil, indent: 0, isRoot: false, maxDepth: 1)
             < _customDump($1.value, name: nil, indent: 0, isRoot: false, maxDepth: 1)
-        })
+        }
+        : nil
+      )
 
     case (_, .struct?):
       dumpChildren(of: mirror, prefix: "\(typeName(mirror.subjectType))(", suffix: ")")

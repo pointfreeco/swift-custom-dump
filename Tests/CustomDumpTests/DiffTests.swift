@@ -239,6 +239,100 @@ final class DiffTests: XCTestCase {
         ]
       """
     )
+
+    XCTAssertNoDifference(
+      diff(
+        OrderedDictionary(pairs: [
+          1: User(
+            id: 1,
+            name: "Blob"
+          ),
+          2: User(
+            id: 2,
+            name: "Blob, Jr."
+          ),
+        ]),
+        OrderedDictionary(pairs: [
+          1: User(
+            id: 1,
+            name: "Blob"
+          ),
+          2: User(
+            id: 2,
+            name: "Blob, Sr."
+          ),
+          3: User(
+            id: 3,
+            name: "Dr. Blob"
+          ),
+        ])
+      ),
+      """
+        [
+          1: User(…),
+          2: User(
+            id: 2,
+      -     name: "Blob, Jr."
+      +     name: "Blob, Sr."
+          ),
+      +   3: User(
+      +     id: 3,
+      +     name: "Dr. Blob"
+      +   )
+        ]
+      """
+    )
+
+    XCTAssertNoDifference(
+      diff(
+        OrderedDictionary(pairs: [
+          0: User(
+            id: 0,
+            name: "Original Blob"
+          ),
+          1: User(
+            id: 1,
+            name: "Blob"
+          ),
+          2: User(
+            id: 2,
+            name: "Blob, Jr."
+          ),
+        ]),
+        OrderedDictionary(pairs: [
+          0: User(
+            id: 0,
+            name: "Original Blob"
+          ),
+          1: User(
+            id: 1,
+            name: "Blob"
+          ),
+          2: User(
+            id: 2,
+            name: "Blob, Sr."
+          ),
+          3: User(
+            id: 3,
+            name: "Dr. Blob"
+          ),
+        ])
+      ),
+      """
+        [
+          … (2 unchanged),
+          2: User(
+            id: 2,
+      -     name: "Blob, Jr."
+      +     name: "Blob, Sr."
+          ),
+      +   3: User(
+      +     id: 3,
+      +     name: "Dr. Blob"
+      +   )
+        ]
+      """
+    )
   }
 
   func testDictionaryCollapsing() {

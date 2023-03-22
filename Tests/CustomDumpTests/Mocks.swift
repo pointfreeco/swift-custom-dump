@@ -139,3 +139,11 @@ struct Wrapped<Value> {
 struct Item {
   @Wrapped var isInStock = true
 }
+
+struct OrderedDictionary<Key, Value>: CustomReflectable {
+  var pairs: KeyValuePairs<Key, Value>
+
+  var customMirror: Mirror {
+    Mirror(self.pairs, unlabeledChildren: self.pairs, displayStyle: .dictionary)
+  }
+}

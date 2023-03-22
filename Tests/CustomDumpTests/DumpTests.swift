@@ -267,6 +267,37 @@ final class DumpTests: XCTestCase {
       ]
       """
     )
+
+    dump = ""
+    customDump(
+      OrderedDictionary(pairs: [
+        2: User(
+          id: 2,
+          name: "Blob, Jr."
+        ),
+        1: User(
+          id: 1,
+          name: "Blob"
+        ),
+      ] as KeyValuePairs),
+      to: &dump
+    )
+    XCTAssertNoDifference(
+      dump,
+      """
+      [
+        2: User(
+          id: 2,
+          name: "Blob, Jr."
+        ),
+        1: User(
+          id: 1,
+          name: "Blob"
+        )
+      ]
+      """
+    )
+
   }
 
   func testEnum() {
