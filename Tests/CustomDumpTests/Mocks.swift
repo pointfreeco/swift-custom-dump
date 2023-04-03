@@ -130,10 +130,15 @@ struct Redacted<RawValue>: CustomDumpStringConvertible {
 struct User: Equatable, Identifiable { var id: Int, name: String }
 struct HashableUser: Equatable, Identifiable, Hashable { var id: Int, name: String }
 
+@dynamicMemberLookup
 @propertyWrapper
 struct Wrapped<Value> {
   var wrappedValue: Value
   var projectedValue: Self { self }
+
+  subscript<NewValue>(dynamicMember keyPath: KeyPath<Value, NewValue>) -> NewValue {
+    self.wrappedValue[keyPath: keyPath]
+  }
 }
 
 struct Item {

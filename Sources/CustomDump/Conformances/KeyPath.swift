@@ -2,11 +2,14 @@ import Foundation
 
 extension AnyKeyPath: CustomDumpStringConvertible {
   public var customDumpDescription: String {
-    #if swift(>=5.8)
-      if #available(macOS 13.3, iOS 16.4, watchOS 9.4, tvOS 16.4, *) {
-        return self.debugDescription
-      }
-    #endif
+    // NB: We can't currently rely on SE-0369 due to this crasher:
+    // https://github.com/apple/swift/issues/64865
+    //
+    // #if swift(>=5.8)
+    //   if #available(macOS 13.3, iOS 16.4, watchOS 9.4, tvOS 16.4, *) {
+    //     return self.debugDescription
+    //   }
+    // #endif
     #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
       keyPathToNameLock.lock()
       defer { keyPathToNameLock.unlock() }
@@ -27,7 +30,11 @@ extension AnyKeyPath: CustomDumpStringConvertible {
               }
             }
           }
-          return String(describing: type(of: self))
+          return """
+            \(typeName(Self.self))<\
+            \(typeName(Self.rootType, genericsAbbreviated: false)), \
+            \(typeName(Self.valueType, genericsAbbreviated: false))>
+            """
         }
         let name = reflectName()
         keyPathToName[self] = name
@@ -37,8 +44,8 @@ extension AnyKeyPath: CustomDumpStringConvertible {
     #else
       return """
         \(typeName(Self.self))<\
-        \(typeName(Self.rootType)), \
-        \(typeName(Self.valueType,genericsAbbreviated: false))>
+        \(typeName(Self.rootType, genericsAbbreviated: false)), \
+        \(typeName(Self.valueType, genericsAbbreviated: false))>
         """
     #endif
   }

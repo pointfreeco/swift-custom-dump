@@ -686,55 +686,70 @@ final class DumpTests: XCTestCase {
   func testKeyPath() {
     var dump = ""
 
-    #if swift(>=5.8)
-      if #available(macOS 13.3, iOS 16.4, watchOS 9.4, tvOS 16.4, *) {
-        dump = ""
-        customDump(\UserClass.name, to: &dump)
-        XCTAssertNoDifference(
-          dump,
-          #"""
-          \UserClass.name
-          """#
-        )
-
-        dump = ""
-        customDump(\Pair.driver.name, to: &dump)
-        XCTAssertNoDifference(
-          dump,
-          #"""
-          \Pair.driver.name
-          """#
-        )
-
-        dump = ""
-        customDump(\User.name.count, to: &dump)
-        XCTAssertNoDifference(
-          dump,
-          #"""
-          \User.name.count
-          """#
-        )
-
-        dump = ""
-        customDump(\(x: Double, y: Double).x, to: &dump)
-        XCTAssertNoDifference(
-          dump,
-          #"""
-          \(x: Double, y: Double).x
-          """#
-        )
-
-        dump = ""
-        customDump(\Item.$isInStock, to: &dump)
-        XCTAssertNoDifference(
-          dump,
-          #"""
-          \Item.$isInStock
-          """#
-        )
-        return
-      }
-    #endif
+    // NB: This code path marks the expectation of relying on SE-0369's
+    // `AnyKeyPath.debugDescription`, which currently has a crash related to dynamic member lookup:
+    // https://github.com/apple/swift/issues/64865
+    //
+    // #if swift(>=5.8)
+    //   if #available(macOS 13.3, iOS 16.4, watchOS 9.4, tvOS 16.4, *) {
+    //     dump = ""
+    //     customDump(\UserClass.name, to: &dump)
+    //     XCTAssertNoDifference(
+    //       dump,
+    //       #"""
+    //       \UserClass.name
+    //       """#
+    //     )
+    //
+    //     dump = ""
+    //     customDump(\Pair.driver.name, to: &dump)
+    //     XCTAssertNoDifference(
+    //       dump,
+    //       #"""
+    //       \Pair.driver.name
+    //       """#
+    //     )
+    //
+    //     dump = ""
+    //     customDump(\User.name.count, to: &dump)
+    //     XCTAssertNoDifference(
+    //       dump,
+    //       #"""
+    //       \User.name.count
+    //       """#
+    //     )
+    //
+    //     dump = ""
+    //     customDump(\(x: Double, y: Double).x, to: &dump)
+    //     XCTAssertNoDifference(
+    //       dump,
+    //       #"""
+    //       \(x: Double, y: Double).x
+    //       """#
+    //     )
+    //
+    //     dump = ""
+    //     customDump(\Item.$isInStock, to: &dump)
+    //     XCTAssertNoDifference(
+    //       dump,
+    //       #"""
+    //       \Item.$isInStock
+    //       """#
+    //     )
+    //
+    //     // NB: This currently crashes when using Swift's `debugDescription`:
+    //     // https://github.com/apple/swift/issues/64865
+    //     dump = ""
+    //     customDump(\Wrapped<String>.count, to: &dump)
+    //     XCTAssertNoDifference(
+    //       dump,
+    //       #"""
+    //       \Wrapped.count
+    //       """#
+    //     )
+    //     return
+    //   }
+    // #endif
     #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
       // Run twice to exercise cached lookup
       for _ in 1...2 {
@@ -782,6 +797,15 @@ final class DumpTests: XCTestCase {
           KeyPath<Item, Wrapped<Bool>>
           """#
         )
+
+        dump = ""
+        customDump(\Wrapped<String>.count, to: &dump)
+        XCTAssertNoDifference(
+          dump,
+          #"""
+          KeyPath<Wrapped<String>, Int>
+          """#
+        )
       }
     #else
       dump = ""
@@ -826,6 +850,15 @@ final class DumpTests: XCTestCase {
         dump,
         #"""
         KeyPath<Item, Wrapped<Bool>>
+        """#
+      )
+
+      dump = ""
+      customDump(\Wrapped<String>.count, to: &dump)
+      XCTAssertNoDifference(
+        dump,
+        #"""
+        KeyPath<Wrapped<String>, Int>
         """#
       )
     #endif
