@@ -858,7 +858,7 @@ final class DumpTests: XCTestCase {
       XCTAssertNoDifference(
         dump,
         #"""
-        KeyPath<Wrapped<String>, Int>
+        KeyPath<Wrapped, Int>
         """#
       )
     #endif
