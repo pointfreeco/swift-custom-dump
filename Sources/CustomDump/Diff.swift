@@ -38,7 +38,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
     isRoot: Bool
   ) -> String {
     let rhsName = rhsName ?? lhsName
-    guard !isMirrorEqual(lhs, rhs) else {
+    guard lhsName != rhsName || !isMirrorEqual(lhs, rhs) else {
       return _customDump(lhs, name: rhsName, indent: indent, isRoot: isRoot, maxDepth: 0)
         .appending(separator)
         .indenting(with: format.both + " ")

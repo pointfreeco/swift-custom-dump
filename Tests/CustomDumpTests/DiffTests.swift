@@ -1064,4 +1064,47 @@ final class DiffTests: XCTestCase {
       """
     )
   }
+
+  func testCustomDictionary() {
+    struct Stack: CustomDumpReflectable {
+      var elements: [(ID, String)]
+
+      struct ID: CustomDumpStringConvertible, Hashable {
+        let rawValue: Int
+        var customDumpDescription: String {
+          "#\(self.rawValue)"
+        }
+      }
+
+      var customDumpMirror: Mirror {
+        Mirror(
+          self,
+          unlabeledChildren: self.elements,
+          displayStyle: .dictionary
+        )
+      }
+    }
+
+    XCTAssertEqual(
+      String(customDumping: Stack(elements: [(.init(rawValue: 0), "Hello")])),
+      """
+      [
+        #0: "Hello"
+      ]
+      """
+    )
+
+    XCTAssertEqual(
+      diff(
+        Stack(elements: [(.init(rawValue: 0), "Hello")]),
+        Stack(elements: [(.init(rawValue: 1), "Hello")])
+      ),
+      """
+        [
+      -   #0: "Hello"
+      +   #1: "Hello"
+        ]
+      """
+    )
+  }
 }
