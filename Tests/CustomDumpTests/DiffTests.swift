@@ -1113,9 +1113,9 @@ final class DiffTests: XCTestCase {
   }
 }
 
-fileprivate struct Stack<State: Equatable>: CustomDumpReflectable, Equatable {
+private struct Stack<State: Equatable>: CustomDumpReflectable, Equatable {
   static func == (lhs: Self, rhs: Self) -> Bool {
-    zip(lhs.elements, rhs.elements ).allSatisfy(==)
+    zip(lhs.elements, rhs.elements).allSatisfy(==)
   }
 
   var elements: [(ID, State)]
