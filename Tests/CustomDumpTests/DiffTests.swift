@@ -1066,25 +1066,6 @@ final class DiffTests: XCTestCase {
   }
 
   func testCustomDictionary() {
-    struct Stack: CustomDumpReflectable {
-      var elements: [(ID, String)]
-
-      struct ID: CustomDumpStringConvertible, Hashable {
-        let rawValue: Int
-        var customDumpDescription: String {
-          "#\(self.rawValue)"
-        }
-      }
-
-      var customDumpMirror: Mirror {
-        Mirror(
-          self,
-          unlabeledChildren: self.elements,
-          displayStyle: .dictionary
-        )
-      }
-    }
-
     XCTAssertEqual(
       String(customDumping: Stack(elements: [(.init(rawValue: 0), "Hello")])),
       """
@@ -1105,6 +1086,52 @@ final class DiffTests: XCTestCase {
       +   #1: "Hello"
         ]
       """
+    )
+
+    struct Child {
+      struct State: Equatable {}
+    }
+    struct Parent {
+      struct State: Equatable {
+        var children: Stack<Child.State>
+      }
+    }
+    XCTAssertNoDifference(
+      diff(
+        Parent.State(children: Stack(elements: [(.init(rawValue: 0), Child.State())])),
+        Parent.State(children: Stack(elements: [(.init(rawValue: 1), Child.State())]))
+      ),
+      """
+        DiffTests.Parent.State(
+          children: [
+      -     #0: DiffTests.Child.State()
+      +     #1: DiffTests.Child.State()
+          ]
+        )
+      """
+    )
+  }
+}
+
+fileprivate struct Stack<State: Equatable>: CustomDumpReflectable, Equatable {
+  static func == (lhs: Self, rhs: Self) -> Bool {
+    zip(lhs.elements, rhs.elements ).allSatisfy(==)
+  }
+
+  var elements: [(ID, State)]
+
+  struct ID: CustomDumpStringConvertible, Hashable {
+    let rawValue: Int
+    var customDumpDescription: String {
+      "#\(self.rawValue)"
+    }
+  }
+
+  var customDumpMirror: Mirror {
+    Mirror(
+      self,
+      unlabeledChildren: self.elements,
+      displayStyle: .dictionary
     )
   }
 }

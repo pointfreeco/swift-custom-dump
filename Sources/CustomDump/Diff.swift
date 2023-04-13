@@ -94,32 +94,34 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
 
       guard !isMirrorEqual(lhsChildren, rhsChildren)
       else {
+        let lhsDump = _customDump(
+          lhs,
+          name: lhsName,
+          indent: indent,
+          isRoot: false,
+          maxDepth: 0
+        )
+        let rhsDump = _customDump(
+          rhs,
+          name: rhsName,
+          indent: indent,
+          isRoot: false,
+          maxDepth: 0
+        )
+        if lhsDump == rhsDump {
+          print(
+            "// Not equal but no difference detected:"
+              .indenting(by: indent)
+              .indenting(with: format.both + " "),
+            to: &out
+          )
+        }
         print(
-          "// Not equal but no difference detected:"
-            .indenting(by: indent)
-            .indenting(with: format.both + " "),
+          lhsDump.indenting(with: format.first + " "),
           to: &out
         )
         print(
-          _customDump(
-            lhs,
-            name: lhsName,
-            indent: indent,
-            isRoot: false,
-            maxDepth: 0
-          )
-          .indenting(with: format.first + " "),
-          to: &out
-        )
-        print(
-          _customDump(
-            rhs,
-            name: rhsName,
-            indent: indent,
-            isRoot: false,
-            maxDepth: 0
-          )
-          .indenting(with: format.second + " "),
+          rhsDump.indenting(with: format.second + " "),
           terminator: "",
           to: &out
         )
