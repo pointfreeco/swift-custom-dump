@@ -1264,4 +1264,63 @@ final class DumpTests: XCTestCase {
       )
     }
   #endif
+
+  func testFoo() {
+    let stack = StackState([1, 2, 3])
+    var copy = stack
+    copy.elements[1].value = 42
+
+    XCTAssertNoDifference(
+      diff(stack, copy),
+      """
+      """
+    )
+  }
+}
+
+struct StackState<Element> {
+  struct StackElement: Identifiable {
+    let id: AnyHashable
+    var value: Element
+  }
+  fileprivate var elements: Array<StackElement>
+
+  init(elements: Array<StackElement> = []) {
+    self.elements = elements
+  }
+
+  init<S: Sequence>(_ elements: S) where S.Element == Element {
+    self.elements =
+      elements.map { StackElement(id: UUID(), value: $0) }
+  }
+
+  mutating func append(_ element: Element) {
+    self.elements.append(.init(id: UUID(), value: element))
+  }
+  mutating func append<S: Sequence>(contentsOf elements: S) where S.Element == Element {
+    self.elements.append(contentsOf: elements.map { .init(id: UUID(), value: $0) })
+  }
+  func appending<S: Sequence>(contentsOf elements: S) -> Self where S.Element == Element {
+    var result = self
+    result.append(contentsOf: elements)
+    return result
+  }
+}
+extension StackState.StackElement: Equatable {
+  static func == (lhs: Self, rhs: Self) -> Bool { lhs.id == rhs.id }
+}
+extension StackState.StackElement: Hashable where Element: Hashable {
+  func hash(into hasher: inout Hasher) {
+    hasher.combine(self.id)
+    hasher.combine(self.value)
+  }
+}
+extension StackState: Equatable where Element: Equatable {
+  static func == (lhs: Self, rhs: Self) -> Bool {
+    guard lhs.elements.count == rhs.elements.count
+    else { return false }
+    return zip(lhs.elements, rhs.elements).allSatisfy {
+      $0.id == $1.id && $0.value == $1.value
+    }
+  }
 }
