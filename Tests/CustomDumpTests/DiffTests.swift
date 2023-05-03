@@ -1111,6 +1111,31 @@ final class DiffTests: XCTestCase {
       """
     )
   }
+
+  func testCustomDumpRepresentableCollapsing() {
+    struct Results: CustomDumpRepresentable, Equatable {
+      var customDumpValue: Any {
+        [1, 2]
+      }
+    }
+    struct State: Equatable {
+      var date: Double
+      var results: Results
+    }
+    XCTAssertNoDifference(
+      diff(
+        State(date: 123456789, results: Results()),
+        State(date: 123456790, results: Results())
+      ),
+      """
+        DiffTests.State(
+      -   date: 123456789.0,
+      +   date: 123456790.0,
+          results: […]
+        )
+      """
+    )
+  }
 }
 
 private struct Stack<State: Equatable>: CustomDumpReflectable, Equatable {

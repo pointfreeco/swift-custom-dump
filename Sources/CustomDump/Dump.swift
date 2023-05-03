@@ -165,7 +165,7 @@ func _customDump<T, TargetStream>(
 
     case let (value as CustomDumpRepresentable, _):
       customDumpHelp(
-        value.customDumpValue, to: &out, name: nil, indent: 0, isRoot: false, maxDepth: maxDepth - 1
+        value.customDumpValue, to: &out, name: nil, indent: 0, isRoot: false, maxDepth: maxDepth
       )
 
     case let (value as AnyObject, .class?):
