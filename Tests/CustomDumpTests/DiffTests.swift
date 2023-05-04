@@ -1147,8 +1147,8 @@ final class DiffTests: XCTestCase {
     }
     XCTAssertNoDifference(
       diff(
-        State(date: 123456789, results: Results()),
-        State(date: 123456790, results: Results())
+        State(date: 123_456_789, results: Results()),
+        State(date: 123_456_790, results: Results())
       ),
       """
         DiffTests.State(
