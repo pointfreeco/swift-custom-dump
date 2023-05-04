@@ -118,7 +118,7 @@ func _customDump<T, TargetStream>(
             maxDepth: maxDepth - 1
           )
           if childOut.contains("\n") {
-            if maxDepth == 0 {
+            if maxDepth <= 0 {
               out.write("…")
             } else {
               out.write("\n")
@@ -128,7 +128,7 @@ func _customDump<T, TargetStream>(
           } else {
             out.write(childOut)
           }
-        } else if maxDepth == 0 {
+        } else if maxDepth <= 0 {
           out.write("…")
         } else {
           out.write("\n")
@@ -165,7 +165,7 @@ func _customDump<T, TargetStream>(
 
     case let (value as CustomDumpRepresentable, _):
       customDumpHelp(
-        value.customDumpValue, to: &out, name: nil, indent: 0, isRoot: false, maxDepth: maxDepth - 1
+        value.customDumpValue, to: &out, name: nil, indent: 0, isRoot: false, maxDepth: maxDepth
       )
 
     case let (value as AnyObject, .class?):
@@ -287,7 +287,7 @@ func _customDump<T, TargetStream>(
     default:
       if let value = stringFromStringProtocol(value) {
         if value.contains(where: \.isNewline) {
-          if maxDepth == 0 {
+          if maxDepth <= 0 {
             out.write("\"…\"")
           } else {
             let hashes = String(repeating: "#", count: value.hashCount(isMultiline: true))

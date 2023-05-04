@@ -103,11 +103,11 @@ final class DiffTests: XCTestCase {
       diff(
         User(),
         User()
-      )?.replacingOccurrences(of: "0x[[:xdigit:]]+", with: "…", options: .regularExpression),
+      )?.replacingOccurrences(of: "0x[[:xdigit:]]+", with: "0x…", options: .regularExpression),
       """
         DiffTests.User(
-      -   _: ObjectIdentifier(…),
-      +   _: ObjectIdentifier(…),
+      -   _: ObjectIdentifier(0x…),
+      +   _: ObjectIdentifier(0x…),
           id: 42,
           name: "Blob"
         )
@@ -441,6 +441,29 @@ final class DiffTests: XCTestCase {
           1,
       -   .foo
       +   .buzz
+        )
+      """
+    )
+  }
+
+  func testEnumCollapsing() {
+    enum Offset: Equatable {
+      case page(Int, perPage: Int = 10)
+    }
+    struct State: Equatable {
+      var offset: Offset
+      let result: String
+    }
+    XCTAssertNoDifference(
+      diff(
+        State(offset: .page(1), result: "Hello, world!"),
+        State(offset: .page(1), result: "Good night, moon!")
+      ),
+      """
+        DiffTests.State(
+          offset: .page(…),
+      -   result: "Hello, world!"
+      +   result: "Good night, moon!"
         )
       """
     )
@@ -1107,6 +1130,31 @@ final class DiffTests: XCTestCase {
       -     #0: DiffTests.Child.State()
       +     #1: DiffTests.Child.State()
           ]
+        )
+      """
+    )
+  }
+
+  func testCustomDumpRepresentableCollapsing() {
+    struct Results: CustomDumpRepresentable, Equatable {
+      var customDumpValue: Any {
+        [1, 2]
+      }
+    }
+    struct State: Equatable {
+      var date: Double
+      var results: Results
+    }
+    XCTAssertNoDifference(
+      diff(
+        State(date: 123456789, results: Results()),
+        State(date: 123456790, results: Results())
+      ),
+      """
+        DiffTests.State(
+      -   date: 123456789.0,
+      +   date: 123456790.0,
+          results: […]
         )
       """
     )
