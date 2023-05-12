@@ -298,7 +298,31 @@ final class DumpTests: XCTestCase {
       ]
       """
     )
+  }
 
+  func testDictionary_Nested() {
+    struct NestedDictionary {
+      let content: [String: Int]
+    }
+
+    XCTAssertNoDifference(
+      """
+      DumpTests.NestedDictionary(
+        content: [
+          "a": 5,
+          "b": 9,
+          "c": 1,
+          "d": -3,
+          "e": 12
+        ]
+      )
+      """,
+      String(
+        customDumping: NestedDictionary(
+          content: ["a": 5, "b": 9, "c": 1, "d": -3, "e": 12]
+        )
+      )
+    )
   }
 
   func testEnum() {
