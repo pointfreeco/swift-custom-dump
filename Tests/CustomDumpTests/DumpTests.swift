@@ -1178,7 +1178,7 @@ final class DumpTests: XCTestCase {
     )
   }
 
-  func testRepeatition() {
+  func testRepetition() {
     class Human {
       let name = "John"
     }
@@ -1244,6 +1244,22 @@ final class DumpTests: XCTestCase {
         [10]: DumpTests.User#2(↩︎),
         [11]: DumpTests.User#2(↩︎)
       ]
+      """
+    )
+  }
+
+  func testDuration() {
+    XCTAssertNoDifference(
+      String(customDumping: Duration.seconds(5)),
+      """
+      5 seconds
+      """
+    )
+
+    XCTAssertNoDifference(
+      String(customDumping: Duration.seconds(5) + .milliseconds(123)),
+      """
+      5 seconds, 123 milliseconds
       """
     )
   }

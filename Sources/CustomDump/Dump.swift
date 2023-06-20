@@ -81,15 +81,15 @@ func _customDump<T, TargetStream>(
   var occurrencePerType: [String: UInt] = [:]
   var visitedItems: Set<ObjectIdentifier> = []
 
-  func customDumpHelp<T, TargetStream>(
-    _ value: T,
-    to target: inout TargetStream,
+  func customDumpHelp<InnerT, InnerTargetStream>(
+    _ value: InnerT,
+    to target: inout InnerTargetStream,
     name: String?,
     indent: Int,
     isRoot: Bool,
     maxDepth: Int
-  ) where TargetStream: TextOutputStream {
-    if T.self is AnyObject.Type, withUnsafeBytes(of: value, { $0.allSatisfy { $0 == 0 } }) {
+  ) where InnerTargetStream: TextOutputStream {
+    if InnerT.self is AnyObject.Type, withUnsafeBytes(of: value, { $0.allSatisfy { $0 == 0 } }) {
       target.write((name.map { "\($0): " } ?? "").appending("(null pointer)").indenting(by: indent))
       return
     }
