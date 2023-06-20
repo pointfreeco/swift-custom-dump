@@ -1250,6 +1250,8 @@ final class DumpTests: XCTestCase {
 
   #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
     func testDuration() {
+      guard #available(macOS 13, iOS 16, watchOS 9, tvOS 16, *) else { return }
+
       XCTAssertNoDifference(
         String(customDumping: Duration.seconds(5)),
         """
