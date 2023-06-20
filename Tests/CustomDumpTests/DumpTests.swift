@@ -1248,7 +1248,7 @@ final class DumpTests: XCTestCase {
     )
   }
 
-  #if (swift(>=5.7) && (os(iOS) || os(tvOS) || os(watchOS))) || (swift(>=5.7.1) && os(macOS))
+  #if (swift(>=5.7) && !targetEnvironment(macCatalyst) && (os(iOS) || os(tvOS) || os(watchOS))) || (swift(>=5.7.1) && os(macOS))
     func testDuration() {
       guard #available(macOS 13, iOS 16, watchOS 9, tvOS 16, *) else { return }
 
