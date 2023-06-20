@@ -6,16 +6,18 @@ extension Character: CustomDumpRepresentable {
   }
 }
 
-#if (swift(>=5.7) && !os(macOS)) || swift(>=5.7.1)
+#if (swift(>=5.7) && (os(iOS) || os(tvOS) || os(watchOS))) || (os(macOS) && swift(>=5.7.1))
   @available(macOS 13, iOS 16, watchOS 9, tvOS 16, *)
   extension Duration: CustomDumpStringConvertible {
     public var customDumpDescription: String {
-      self.formatted(
-        .units(
-          allowed: [.days, .hours, .minutes, .seconds, .milliseconds, .microseconds, .nanoseconds],
-          width: .wide
+      #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
+        self.formatted(
+          .units(
+            allowed: [.days, .hours, .minutes, .seconds, .milliseconds, .microseconds, .nanoseconds],
+            width: .wide
+          )
         )
-      )
+      #endif
     }
   }
 #endif

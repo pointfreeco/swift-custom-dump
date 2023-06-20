@@ -14,7 +14,25 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  macos:
+  macos-13:
+    name: macOS (Xcode ${{ matrix.xcode }})
+    runs-on: macOS-13
+    strategy:
+      matrix:
+        xcode:
+          - '14.3.1'
+    steps:
+      - uses: actions/checkout@v3
+      - name: Select Xcode ${{ matrix.xcode }}
+        run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
+      - name: Print Swift version
+        run: swift --version
+      - name: Run tests (Swift)
+        run: make test-swift
+      - name: Run tests (platforms)
+        run: make test-platforms
+
+  macos-12:
     name: macOS (Xcode ${{ matrix.xcode }})
     runs-on: macOS-12
     strategy:
