@@ -62,23 +62,18 @@ jobs:
           - 5.5
           - 5.6
           - 5.7
+          - 5.8
     steps:
       - uses: actions/checkout@v3
       - name: Run tests
         run: make test-linux SWIFT_VERSION=${{ matrix.swift }}
 
   wasm:
-    name: SwiftWASM
+    name: SwiftWasm
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - { toolchain: wasm-5.7.1-RELEASE }
-
     steps:
       - uses: actions/checkout@v3
-      - run: echo "${{ matrix.toolchain }}" > .swift-version
-      - uses: swiftwasm/swiftwasm-action@v5.7
+      - uses: swiftwasm/swiftwasm-action@v5.8
         with:
           shell-action: carton test --environment node
 
