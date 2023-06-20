@@ -1178,7 +1178,7 @@ final class DumpTests: XCTestCase {
     )
   }
 
-  func testRepeatition() {
+  func testRepetition() {
     class Human {
       let name = "John"
     }
@@ -1247,6 +1247,26 @@ final class DumpTests: XCTestCase {
       """
     )
   }
+
+  #if (swift(>=5.7) && !targetEnvironment(macCatalyst) && (os(iOS) || os(tvOS) || os(watchOS))) || (swift(>=5.7.1) && os(macOS))
+    func testDuration() {
+      guard #available(macOS 13, iOS 16, watchOS 9, tvOS 16, *) else { return }
+
+      XCTAssertNoDifference(
+        String(customDumping: Duration.seconds(5)),
+        """
+        5 seconds
+        """
+      )
+
+      XCTAssertNoDifference(
+        String(customDumping: Duration.seconds(5) + .milliseconds(123)),
+        """
+        5 seconds, 123 milliseconds
+        """
+      )
+    }
+  #endif
 
   #if canImport(CoreGraphics)
     func testCoreGraphics() {

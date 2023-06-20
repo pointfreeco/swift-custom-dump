@@ -14,8 +14,26 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  macos:
-    name: macOS (Xcode ${{ matrix.xcode }})
+  macos-13:
+    name: macOS 13 (Xcode ${{ matrix.xcode }})
+    runs-on: macOS-13
+    strategy:
+      matrix:
+        xcode:
+          - '14.3.1'
+    steps:
+      - uses: actions/checkout@v3
+      - name: Select Xcode ${{ matrix.xcode }}
+        run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
+      - name: Print Swift version
+        run: swift --version
+      - name: Run tests (Swift)
+        run: make test-swift
+      - name: Run tests (platforms)
+        run: make test-platforms
+
+  macos-12:
+    name: macOS 12 (Xcode ${{ matrix.xcode }})
     runs-on: macOS-12
     strategy:
       matrix:
@@ -44,23 +62,18 @@ jobs:
           - 5.5
           - 5.6
           - 5.7
+          - 5.8
     steps:
       - uses: actions/checkout@v3
       - name: Run tests
         run: make test-linux SWIFT_VERSION=${{ matrix.swift }}
 
   wasm:
-    name: SwiftWASM
+    name: SwiftWasm
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - { toolchain: wasm-5.7.1-RELEASE }
-
     steps:
       - uses: actions/checkout@v3
-      - run: echo "${{ matrix.toolchain }}" > .swift-version
-      - uses: swiftwasm/swiftwasm-action@v5.7
+      - uses: swiftwasm/swiftwasm-action@v5.8
         with:
           shell-action: carton test --environment node
 
