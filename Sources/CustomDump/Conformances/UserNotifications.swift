@@ -29,7 +29,7 @@
           switch self.rawValue {
           case .alert:
             return "UNAuthorizationOptions.alert"
-          #if (os(iOS) || os(watchOS)) && (swift(<5.9) || !canImport(Vision))
+          #if (os(iOS) || os(watchOS)) && (swift(<5.9) || !canImport(CompositorServices))
             case .announcement:
               return "UNAuthorizationOptions.announcement"
           #endif
