@@ -81,7 +81,7 @@
     @available(iOS 7, macOS 10.15, *)
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
-    #if swift(>=5.9)
+    #if canImport(CompositorServices)
       @available(xrOS, unavailable)
     #endif
     extension CLProximity: CustomDumpStringConvertible {
@@ -105,7 +105,7 @@
   @available(iOS 7, macOS 10, *)
   @available(tvOS, unavailable)
   @available(watchOS, unavailable)
-  #if swift(>=5.9)
+  #if canImport(CompositorServices)
     @available(xrOS, unavailable)
   #endif
   extension CLRegionState: CustomDumpStringConvertible {

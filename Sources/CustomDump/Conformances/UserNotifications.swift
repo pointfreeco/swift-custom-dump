@@ -29,7 +29,7 @@
           switch self.rawValue {
           case .alert:
             return "UNAuthorizationOptions.alert"
-          #if (os(iOS) || os(watchOS)) && (swift(<5.9) || !os(xrOS))
+          #if (os(iOS) || os(watchOS)) && (swift(<5.9) || !canImport(Vision))
             case .announcement:
               return "UNAuthorizationOptions.announcement"
           #endif
@@ -56,7 +56,7 @@
       var allCases: [UNAuthorizationOptions] = [
         .alert
       ]
-      #if (os(iOS) || os(watchOS)) && (swift(<5.9) || !os(xrOS))
+      #if (os(iOS) || os(watchOS)) && (swift(<5.9) || !canImport(CompositorServices))
         allCases.append(.announcement)
       #endif
       allCases.append(contentsOf: [
@@ -132,7 +132,7 @@
       struct Option: CustomDumpStringConvertible {
         var rawValue: UNNotificationPresentationOptions
         var customDumpDescription: String {
-          #if swift(<5.9) || !os(xrOS)
+          #if swift(<5.9) || !canImport(CompositorServices)
             if self.rawValue == .alert {
               return "UNNotificationPresentationOptions.alert"
             }
@@ -179,7 +179,7 @@
     //
     //     defaults write com.apple.dt.XCBuild EnableSwiftBuildSystemIntegration 1
     private func appendBannerList(_ allCases: inout [UNNotificationPresentationOptions]) {
-      #if swift(<5.9) || !os(xrOS)
+      #if swift(<5.9) || !canImport(CompositorServices)
         allCases.append(.alert)
       #endif
       allCases.append(.badge)
