@@ -29,7 +29,7 @@
           switch self.rawValue {
           case .alert:
             return "UNAuthorizationOptions.alert"
-          #if os(iOS) || os(watchOS)
+          #if (os(iOS) || os(watchOS)) && (swift(<5.9) || !canImport(CompositorServices))
             case .announcement:
               return "UNAuthorizationOptions.announcement"
           #endif
@@ -56,7 +56,7 @@
       var allCases: [UNAuthorizationOptions] = [
         .alert
       ]
-      #if os(iOS) || os(watchOS)
+      #if (os(iOS) || os(watchOS)) && (swift(<5.9) || !canImport(CompositorServices))
         allCases.append(.announcement)
       #endif
       allCases.append(contentsOf: [
@@ -132,28 +132,30 @@
       struct Option: CustomDumpStringConvertible {
         var rawValue: UNNotificationPresentationOptions
         var customDumpDescription: String {
-          if self.rawValue == .alert {
-            return "UNNotificationPresentationOptions.alert"
-          } else if self.rawValue == .badge {
+          #if swift(<5.9) || !canImport(CompositorServices)
+            if self.rawValue == .alert {
+              return "UNNotificationPresentationOptions.alert"
+            }
+          #endif
+          if self.rawValue == .badge {
             return "UNNotificationPresentationOptions.badge"
-          } else if #available(iOS 14, macOS 11, tvOS 14, watchOS 7, *), self.rawValue == .banner {
-            return "UNNotificationPresentationOptions.banner"
-          } else if #available(iOS 14, macOS 11, tvOS 14, watchOS 7, *), self.rawValue == .list {
-            return "UNNotificationPresentationOptions.list"
-          } else if self.rawValue == .sound {
-            return "UNNotificationPresentationOptions.sound"
-          } else {
-            return "UNNotificationPresentationOptions(rawValue: \(self.rawValue))"
           }
+          if #available(iOS 14, macOS 11, tvOS 14, watchOS 7, *), self.rawValue == .banner {
+            return "UNNotificationPresentationOptions.banner"
+          }
+          if #available(iOS 14, macOS 11, tvOS 14, watchOS 7, *), self.rawValue == .list {
+            return "UNNotificationPresentationOptions.list"
+          }
+          if self.rawValue == .sound {
+            return "UNNotificationPresentationOptions.sound"
+          }
+          return "UNNotificationPresentationOptions(rawValue: \(self.rawValue))"
         }
       }
 
       var options = self
       var children: [Option] = []
-      var allCases: [UNNotificationPresentationOptions] = [
-        .alert,
-        .badge,
-      ]
+      var allCases: [UNNotificationPresentationOptions] = []
       appendBannerList(&allCases)
       allCases.append(.sound)
       for option in allCases {
@@ -177,6 +179,10 @@
     //
     //     defaults write com.apple.dt.XCBuild EnableSwiftBuildSystemIntegration 1
     private func appendBannerList(_ allCases: inout [UNNotificationPresentationOptions]) {
+      #if swift(<5.9) || !canImport(CompositorServices)
+        allCases.append(.alert)
+      #endif
+      allCases.append(.badge)
       if #available(iOS 14, macOS 11, tvOS 14, watchOS 7, *) {
         allCases.append(contentsOf: [.banner, .list])
       }
