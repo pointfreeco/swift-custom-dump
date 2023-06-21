@@ -81,6 +81,9 @@
     @available(iOS 7, macOS 10.15, *)
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
+    #if compiler(>=5.9)
+      @available(xrOS, unavailable)
+    #endif
     extension CLProximity: CustomDumpStringConvertible {
       public var customDumpDescription: String {
         switch self {
@@ -102,6 +105,9 @@
   @available(iOS 7, macOS 10, *)
   @available(tvOS, unavailable)
   @available(watchOS, unavailable)
+  #if swift(>=5.9)
+    @available(xrOS, unavailable)
+  #endif
   extension CLRegionState: CustomDumpStringConvertible {
     public var customDumpDescription: String {
       switch self {
