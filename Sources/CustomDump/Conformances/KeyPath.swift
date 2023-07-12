@@ -2,14 +2,12 @@ import Foundation
 
 extension AnyKeyPath: CustomDumpStringConvertible {
   public var customDumpDescription: String {
-    // NB: We can't currently rely on SE-0369 due to this crasher:
-    // https://github.com/apple/swift/issues/64865
-    //
-    // #if swift(>=5.8)
-    //   if #available(macOS 13.3, iOS 16.4, watchOS 9.4, tvOS 16.4, *) {
-    //     return self.debugDescription
-    //   }
-    // #endif
+    // NB: We gate this to 5.9+ due to this crasher: https://github.com/apple/swift/issues/64865
+    #if swift(>=5.9)
+      if #available(macOS 13.3, iOS 16.4, watchOS 9.4, tvOS 16.4, *) {
+        return self.debugDescription
+      }
+    #endif
     #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
       keyPathToNameLock.lock()
       defer { keyPathToNameLock.unlock() }
