@@ -55,10 +55,10 @@ public func XCTAssertDifference<T>(
 // TODO: Somehow share logic between above and below without `reasync`.
 @available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
 public func XCTAssertDifference<T>(
-  _ expression: @autoclosure () throws -> T,
-  _ message: @autoclosure () -> String = "",
-  operation: () async throws -> Void = {},
-  changes updateExpectingResult: (inout T) throws -> Void,
+  _ expression: @autoclosure @Sendable () throws -> T,
+  _ message: @autoclosure @Sendable () -> String = "",
+  operation: @Sendable () async throws -> Void = {},
+  changes updateExpectingResult: @Sendable (inout T) throws -> Void,
   file: StaticString = #filePath,
   line: UInt = #line
 ) async where T: Equatable {
