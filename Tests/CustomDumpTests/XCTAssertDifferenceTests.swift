@@ -18,9 +18,6 @@ class XCTAssertDifferencesTests: XCTestCase {
 
   func testXCTAssertDifference_NonExhaustive() {
     let user = User(id: 42, name: "Blob")
-    func increment<Value>(_ root: inout Value, at keyPath: WritableKeyPath<Value, Int>) {
-      root[keyPath: keyPath] += 1
-    }
 
     XCTAssertDifference(user) {
       $0.id = 42
