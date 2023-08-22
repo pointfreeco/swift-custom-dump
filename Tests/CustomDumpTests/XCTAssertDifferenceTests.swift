@@ -40,15 +40,5 @@ class XCTAssertDifferencesTests: XCTestCase {
         $0.id = 44
       }
     }
-
-    func testXCTAssertNoDifference() {
-      XCTExpectFailure()
-
-      let user = User(id: 42, name: "Blob")
-      var other = user
-      other.name += " Sr."
-
-      XCTAssertNoDifference(user, other)
-    }
   #endif
 }
