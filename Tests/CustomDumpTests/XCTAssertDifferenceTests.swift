@@ -25,7 +25,7 @@ class XCTAssertDifferencesTests: XCTestCase {
     }
   }
 
-  #if compiler(>=5.4) && (os(iOS) || os(macOS) || os(tvOS) || os(watchOS))
+  #if DEBUG && compiler(>=5.4) && (os(iOS) || os(macOS) || os(tvOS) || os(watchOS))
     func testXCTAssertDifference_Failure() {
       var user = User(id: 42, name: "Blob")
       func increment<Value>(_ root: inout Value, at keyPath: WritableKeyPath<Value, Int>) {
