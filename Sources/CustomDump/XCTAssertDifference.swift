@@ -84,7 +84,7 @@ public func XCTAssertDifference<T>(
       XCTAssertDifference failed: …
 
       \(difference.indenting(by: 2))
-      
+
       (Expected: \(format.first), Actual: \(format.second))
       """
     XCTFail(
