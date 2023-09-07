@@ -77,14 +77,20 @@ jobs:
         with:
           shell-action: carton test --environment node
 
-  #windows:
-  #  name: Windows
-  #  runs-on: windows-latest
-  #  steps:
-  #    - uses: compnerd/gha-setup-swift@main
-  #      with:
-  #        branch: swift-5.7-release
-  #        tag: 5.7.1-RELEASE
-  #
-  #    - uses: actions/checkout@v3
-  #    - run: swift test && swift build --configuration release
+  windows:
+    name: Windows
+    strategy:
+      matrix:
+        os: [windows-latest]
+        config: ['debug', 'release']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: compnerd/gha-setup-swift@main
+        with:
+          branch: swift-5.8.1-release
+          tag: 5.8.1-RELEASE
+      - uses: actions/checkout@v3
+      - name: Build All Configurations
+        run: swift build -c ${{ matrix.config }}
+      - name: Run tests
+        run: swift test
