@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CustomDump - XCTAssertDifference(_:_:operation:changes:file:line:)</title>
+    <link rel="stylesheet" type="text/css" href="/swift-custom-dump/all.css" media="all" />
+</head>
+<body>
+    <header>
+        <a href="/swift-custom-dump/">
+            <strong>
+                CustomDump
+            </strong>
+            <span>Documentation</span>
+        </a>
+    </header>
+
+    <!--
+    <form class="search">
+        <input type="search" placeholder="Search" />
+    </form>
+    -->
+
+    <nav>
+        <div class="wrapper">
+            <h2>On This Page</h2>
+            <ol/>
+        </div>
+    </nav>
+
+    <main>
+        <article>
+            <h1>
+<small>Function</small>
+<span class="name">XCTAssert​Difference(_:​_:​operation:​changes:​file:​line:​)</span>
+</h1>
+
+<div class="declaration">
+<pre class="highlight"><code><html><body><span class="attribute">@</span><span class="attribute">available</span>(<span class="keyword">iOS</span> <span class="number literal">13</span>, <span class="keyword">macOS</span> <span class="number literal">10.15</span>, <span class="keyword">tvOS</span> <span class="number literal">13</span>, <span class="keyword">watchOS</span> <span class="number literal">6</span>, *)
+<span class="keyword">public</span> <span class="keyword">func</span> <span class="function">XCTAssertDifference</span>&lt;<span class="variable">T</span>&gt;(
+  <span class="keyword">_</span> <span class="variable">expression</span>: <span class="attribute">@</span><span class="attribute">autoclosure</span> () <span class="keyword">throws</span> -&gt; <span class="type">T</span>,
+  <span class="keyword">_</span> <span class="variable">message</span>: <span class="attribute">@</span><span class="attribute">autoclosure</span> () -&gt; <span class="type">String</span> = <span class="string literal">"</span><span class="string literal"/><span class="string literal">"</span>,
+  <span class="variable">operation</span>: () <span class="keyword">throws</span> -&gt; <span class="type">Void</span> = {},
+  <span class="variable">changes</span> <span class="variable">updateExpectingResult</span>: (<span class="keyword">inout</span> <span class="type">T</span>) <span class="keyword">throws</span> -&gt; <span class="type">Void</span>,
+  <span class="variable">file</span>: <span class="type">StaticString</span> = <span class="keyword">#filePath</span>,
+  <span class="variable">line</span>: <span class="type">UInt</span> = <span class="keyword">#line</span>
+) <span class="keyword">where</span> <span class="type">T</span>: <span class="type">Equatable</span>  </body></html></code></pre>
+</div>
+<div class="summary" role="doc-abstract">
+    <p>Asserts that a value has a set of changes.</p>
+
+</div>
+<div class="discussion">
+    <p>This function evaluates a given expression before and after a given operation and then compares
+the results. The comparison is done by invoking the <code>changes</code> closure with a mutable version of
+the initial value, and then asserting that the modifications made match the final value using
+<code>XCTAssertNoDifference</code>.</p>
+
+<p>For example, given a very simple counter structure, we can write a test against its incrementing
+functionality:
+`</p>
+
+<html><body><pre class="highlight"><code><span class="keyword">struct</span> <span class="type">Counter</span> {
+  <span class="keyword">var</span> <span class="variable">count</span> = <span class="number literal">0</span>
+  <span class="keyword">var</span> <span class="variable">isOdd</span> = <span class="keyword">false</span>
+  <span class="attribute">mutating</span> <span class="keyword">func</span> <span class="function">increment</span>() {
+    <span class="keyword">self</span>.<span class="variable">count</span> += <span class="number literal">1</span>
+    <span class="keyword">self</span>.<span class="variable">isOdd</span>.<span class="variable">toggle</span>()
+  }
+}
+
+<span class="keyword">var</span> <span class="variable">counter</span> = <span class="variable">Counter</span>()
+<span class="variable">XCTAssertDifference</span>(<span class="variable">counter</span>) {
+  <span class="variable">counter</span>.<span class="variable">increment</span>()
+} <span class="variable">changes</span>: {
+  <span class="variable">$0</span>.<span class="variable">count</span> = <span class="number literal">1</span>
+  <span class="variable">$0</span>.<span class="variable">isOdd</span> = <span class="keyword">true</span>
+}
+</code></pre></body></html>
+<p>If the <code>changes</code> does not exhaustively describe all changed fields, the assertion will fail.</p>
+
+<p>By omitting the operation you can write a &quot;non-exhaustive&quot; assertion against a value by
+describing just the fields you want to assert against in the <code>changes</code> closure:</p>
+
+<html><body><pre class="highlight"><code><span class="variable">counter</span>.<span class="variable">increment</span>()
+<span class="variable">XCTAssertDifference</span>(<span class="variable">counter</span>) {
+  <span class="variable">$0</span>.<span class="variable">count</span> = <span class="number literal">1</span>
+  <span class="comment">// Don't need to further describe how `isOdd` has changed</span>
+}
+</code></pre></body></html>
+</div>
+<h4>Parameters</h4>
+
+<table class="parameters">
+  <thead hidden>
+  <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr>
+    <th>expression</th>
+    <td><code class="type">@autoclosure () throws -&gt; T</code></td>
+    <td><p>An expression that is evaluated before and after <code>operation</code>, and then compared.</p>
+</td>
+</tr>
+<tr>
+    <th>message</th>
+    <td><code class="type">@autoclosure () -&gt; String</code></td>
+    <td><p>An optional description of a failure.</p>
+</td>
+</tr>
+<tr>
+    <th>operation</th>
+    <td><code class="type">() throws -&gt; Void</code></td>
+    <td><p>An optional operation that is performed in between an initial and final evaluation of <code>operation</code>. By omitting this operation, you can write a &quot;non-exhaustive&quot; assertion against an already-changed value by describing just the fields you want to assert against in the <code>changes</code> closure.</p>
+</td>
+</tr>
+<tr>
+    <th>update​Expecting​Result</th>
+    <td><code class="type">(inout T) throws -&gt; Void</code></td>
+    <td><p>A closure that asserts how the expression changed by supplying a mutable version of the initial value. This value must be modified to match the final value.</p>
+</td>
+</tr>
+  </tbody>
+</table>
+        </article>
+    </main>
+
+    <footer>
+        <p>
+    Generated on <time datetime="2023-09-19T04:54:54+0000">September 19, 2023</time> using <a href="https://github.com/SwiftDocOrg/swift-doc">swift-doc</a> <span class="version">1.0.0-rc.1</span>.
+</p>
+    </footer>
+</body>
+</html>
