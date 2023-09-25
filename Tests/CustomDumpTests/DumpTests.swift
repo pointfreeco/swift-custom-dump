@@ -1301,4 +1301,32 @@ final class DumpTests: XCTestCase {
       )
     }
   #endif
+
+  func testObservationRegistrarFiltered() {
+    struct ObservationRegistrar {}
+    class Object {
+      let name = "Blob Sr."
+      let _$observationRegistrar = ObservationRegistrar()
+    }
+    XCTAssertNoDifference(
+      String(customDumping: Object()),
+      """
+      DumpTests.Object(
+        name: "Blob Sr."
+      )
+      """
+    )
+    struct Value {
+      let name = "Blob Jr."
+      let _$observationRegistrar = ObservationRegistrar()
+    }
+    XCTAssertNoDifference(
+      String(customDumping: Value()),
+      """
+      DumpTests.Value(
+        name: "Blob Jr."
+      )
+      """
+    )
+  }
 }

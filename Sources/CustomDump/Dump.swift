@@ -101,8 +101,9 @@ func _customDump<T, TargetStream>(
       of mirror: Mirror,
       prefix: String,
       suffix: String,
+      filter isIncluded: (Mirror.Child) -> Bool = { _ in true },
       by areInIncreasingOrder: ((Mirror.Child, Mirror.Child) -> Bool)? = nil,
-      _ transform: (inout Mirror.Child, Int) -> Void = { _, _ in }
+      map transform: (inout Mirror.Child, Int) -> Void = { _, _ in }
     ) {
       out.write(prefix)
       if !mirror.children.isEmpty {
@@ -133,6 +134,7 @@ func _customDump<T, TargetStream>(
         } else {
           out.write("\n")
           var children = Array(mirror.children)
+          children.removeAll(where: { !isIncluded($0) })
           if let areInIncreasingOrder = areInIncreasingOrder {
             children.sort(by: areInIncreasingOrder)
           }
@@ -195,12 +197,13 @@ func _customDump<T, TargetStream>(
         dumpChildren(
           of: Mirror(value, children: children),
           prefix: "\(typeName(mirror.subjectType))\(id)(",
-          suffix: ")"
+          suffix: ")",
+          filter: { $0.label.map { !$0.hasPrefix("_$") } ?? true }
         )
       }
 
     case (_, .collection?):
-      dumpChildren(of: mirror, prefix: "[", suffix: "]", { $0.label = "[\($1)]" })
+      dumpChildren(of: mirror, prefix: "[", suffix: "]", map: { $0.label = "[\($1)]" })
 
     case (_, .dictionary?):
       if mirror.children.isEmpty {
@@ -220,13 +223,14 @@ func _customDump<T, TargetStream>(
                 < _customDump(rhsKey.base, name: nil, indent: 0, isRoot: false, maxDepth: 1)
             }
             : nil,
-          { child, _ in
+          map: { child, _ in
             guard let pair = child.value as? (key: AnyHashable, value: Any) else { return }
             let key = _customDump(
               pair.key.base, name: nil, indent: 0, isRoot: false, maxDepth: maxDepth - 1
             )
             child = (key, pair.value)
-          })
+          }
+        )
       }
 
     case (_, .enum?):
@@ -241,7 +245,7 @@ func _customDump<T, TargetStream>(
           of: associatedValuesMirror,
           prefix: "\(child.label ?? "@unknown")(",
           suffix: ")",
-          { child, _ in
+          map: { child, _ in
             if child.label?.first == "." {
               child.label = nil
             }
@@ -271,18 +275,24 @@ func _customDump<T, TargetStream>(
       )
 
     case (_, .struct?):
-      dumpChildren(of: mirror, prefix: "\(typeName(mirror.subjectType))(", suffix: ")")
+      dumpChildren(
+        of: mirror,
+        prefix: "\(typeName(mirror.subjectType))(",
+        suffix: ")",
+        filter: { $0.label.map { !$0.hasPrefix("_$") } ?? true }
+      )
 
     case (_, .tuple?):
       dumpChildren(
         of: mirror,
         prefix: "(",
         suffix: ")",
-        { child, _ in
+        map: { child, _ in
           if child.label?.first == "." {
             child.label = nil
           }
-        })
+        }
+      )
 
     default:
       if let value = stringFromStringProtocol(value) {
