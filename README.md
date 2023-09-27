@@ -10,6 +10,7 @@ A collection of tools for debugging, diffing, and testing your application's dat
       * [`customDump`](#customdump)
       * [`diff`](#diff)
       * [`XCTAssertNoDifference`](#xctassertnodifference)
+      * [`XCTAssertDifference`](#xctassertdifference)
   * [Customization](#customization)
       * [`CustomDumpStringConvertible`](#customdumpstringconvertible)
       * [`CustomDumpReflectable`](#customdumpreflectable)
@@ -282,6 +283,43 @@ XCTAssertNoDifference failed: …
     )
 
 (First: −, Second: +)
+```
+
+### `XCTAssertDifference`
+
+This function provides the inverse of `XCTAssertNoDifference`: it asserts that a value has a set of changes by evaluating a given expression before and after a given operation and then comparing the results.
+
+For example, given a very simple counter structure, we can write a test against its incrementing functionality:
+
+```swift
+struct Counter {
+  var count = 0
+  var isOdd = false
+  mutating func increment() {
+    self.count += 1
+    self.isOdd.toggle()
+  }
+}
+
+var counter = Counter()
+XCTAssertDifference(counter) {
+  counter.increment()
+} changes: {
+  $0.count = 1
+  $0.isOdd = true
+}
+```
+
+If the `changes` does not exhaustively describe all changed fields, the assertion will fail.
+
+By omitting the operation you can write a "non-exhaustive" assertion against a value by describing just the fields you want to assert against in the `changes` closure:
+
+```swift
+counter.increment()
+XCTAssertDifference(counter) {
+  $0.count = 1
+  // Don't need to further describe how `isOdd` has changed
+}
 ```
 
 ## Customization
