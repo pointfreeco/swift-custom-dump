@@ -1159,6 +1159,28 @@ final class DiffTests: XCTestCase {
       """
     )
   }
+
+  func testObservationRegistrarFiltered() {
+    struct ObservationRegistrar: Equatable {}
+    struct Value: Equatable {
+      var name: String
+      let _$observationRegistrar = ObservationRegistrar()
+    }
+    let blobSr = Value(name: "Blob Sr.")
+    let blobJr = Value(name: "Blob Jr.")
+    XCTAssertNoDifference(
+      diff(
+        blobSr,
+        blobJr
+      ),
+      """
+        DiffTests.Value(
+      -   name: "Blob Sr."
+      +   name: "Blob Jr."
+        )
+      """
+    )
+  }
 }
 
 private struct Stack<State: Equatable>: CustomDumpReflectable, Equatable {

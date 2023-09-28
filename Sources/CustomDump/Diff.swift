@@ -85,9 +85,10 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
       elementIndent: Int,
       elementSeparator: String,
       collapseUnchanged: Bool,
+      filter isIncluded: (Mirror.Child) -> Bool = { _ in true },
       areEquivalent: (Mirror.Child, Mirror.Child) -> Bool = { $0.label == $1.label },
       areInIncreasingOrder: ((Mirror.Child, Mirror.Child) -> Bool)? = nil,
-      _ transform: (inout Mirror.Child, Int) -> Void = { _, _ in }
+      map transform: (inout Mirror.Child, Int) -> Void = { _, _ in }
     ) {
       var lhsChildren = Array(lhsMirror.children)
       var rhsChildren = Array(rhsMirror.children)
@@ -155,6 +156,9 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         )
         return
       }
+
+      lhsChildren.removeAll(where: { !isIncluded($0) })
+      rhsChildren.removeAll(where: { !isIncluded($0) })
 
       let name = rhsName.map { "\($0): " } ?? ""
       print(
@@ -355,7 +359,8 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
           suffix: ")",
           elementIndent: 2,
           elementSeparator: ",",
-          collapseUnchanged: false
+          collapseUnchanged: false,
+          filter: { $0.label.map { !$0.hasPrefix("_$") } ?? true }
         )
       }
 
@@ -371,7 +376,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         areEquivalent: {
           isIdentityEqual($0.value, $1.value) || isMirrorEqual($0.value, $1.value)
         },
-        { $0.label = "[\($1)]" }
+        map: { $0.label = "[\($1)]" }
       )
 
     case (_, .dictionary?, _, .dictionary?):
@@ -443,7 +448,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         elementIndent: 2,
         elementSeparator: ",",
         collapseUnchanged: false,
-        { child, _ in
+        map: { child, _ in
           if child.label?.first == "." {
             child.label = nil
           }
@@ -499,7 +504,8 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         suffix: ")",
         elementIndent: 2,
         elementSeparator: ",",
-        collapseUnchanged: false
+        collapseUnchanged: false,
+        filter: { $0.label.map { !$0.hasPrefix("_$") } ?? true }
       )
 
     case (_, .tuple?, _, .tuple?):
@@ -511,7 +517,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         elementIndent: 2,
         elementSeparator: ",",
         collapseUnchanged: false,
-        { child, _ in
+        map: { child, _ in
           if child.label?.first == "." {
             child.label = nil
           }
