@@ -1329,4 +1329,29 @@ final class DumpTests: XCTestCase {
       """
     )
   }
+
+  func testExplicitFilteredPropertyPreserved() {
+    struct ObservationRegistrar {}
+    class Object: CustomDumpReflectable {
+      let name = "Blob Sr."
+      let _$observationRegistrar = ObservationRegistrar()
+
+      var customDumpMirror: Mirror {
+        Mirror(
+          self,
+          children: ["name": self.name, "_$observationRegistrar": self._$observationRegistrar],
+          displayStyle: .class
+        )
+      }
+    }
+    XCTAssertNoDifference(
+      String(customDumping: Object()),
+      """
+      DumpTests.Object(
+        name: "Blob Sr.",
+        _$observationRegistrar: DumpTests.ObservationRegistrar()
+      )
+      """
+    )
+  }
 }

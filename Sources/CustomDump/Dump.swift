@@ -198,7 +198,7 @@ func _customDump<T, TargetStream>(
           of: Mirror(value, children: children),
           prefix: "\(typeName(mirror.subjectType))\(id)(",
           suffix: ")",
-          filter: { $0.label.map { !$0.hasPrefix("_$") } ?? true }
+          filter: macroPropertyFilter(for: value)
         )
       }
 
@@ -279,7 +279,7 @@ func _customDump<T, TargetStream>(
         of: mirror,
         prefix: "\(typeName(mirror.subjectType))(",
         suffix: ")",
-        filter: { $0.label.map { !$0.hasPrefix("_$") } ?? true }
+        filter: macroPropertyFilter(for: value)
       )
 
     case (_, .tuple?):
@@ -330,4 +330,10 @@ func _customDump(_ value: Any, name: String?, indent: Int, isRoot: Bool, maxDept
   var out = ""
   _customDump(value, to: &out, name: name, indent: indent, isRoot: isRoot, maxDepth: maxDepth)
   return out
+}
+
+func macroPropertyFilter(for value: Any) -> (Mirror.Child) -> Bool {
+  value is CustomDumpReflectable
+    ? { _ in true }
+    : { $0.label.map { !$0.hasPrefix("_$") } ?? true }
 }

@@ -94,6 +94,12 @@ struct Wrapper<RawValue>: CustomDumpRepresentable {
 struct LoginState: CustomDumpReflectable {
   var email = "", password = "", token: String
 
+  init(email: String = "", password: String = "", token: String) {
+    self.email = email
+    self.password = password
+    self.token = token
+  }
+
   var customDumpMirror: Mirror {
     .init(
       self,

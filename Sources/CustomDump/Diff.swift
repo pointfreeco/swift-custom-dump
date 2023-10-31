@@ -360,7 +360,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
           elementIndent: 2,
           elementSeparator: ",",
           collapseUnchanged: false,
-          filter: { $0.label.map { !$0.hasPrefix("_$") } ?? true }
+          filter: macroPropertyFilter(for: lhs)
         )
       }
 
@@ -505,7 +505,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         elementIndent: 2,
         elementSeparator: ",",
         collapseUnchanged: false,
-        filter: { $0.label.map { !$0.hasPrefix("_$") } ?? true }
+        filter: macroPropertyFilter(for: lhs)
       )
 
     case (_, .tuple?, _, .tuple?):
