@@ -5,7 +5,7 @@ import XCTestDynamicOverlay
 /// This function evaluates a given expression before and after a given operation and then compares
 /// the results. The comparison is done by invoking the `changes` closure with a mutable version of
 /// the initial value, and then asserting that the modifications made match the final value using
-/// ``XCTAssertNoDifference``.
+/// ``XCTAssertNoDifference(_:_:_:file:line:)``.
 ///
 /// For example, given a very simple counter structure, we can write a test against its incrementing
 /// functionality:
@@ -105,7 +105,7 @@ public func XCTAssertDifference<T>(
 
 /// Asserts that a value has a set of changes.
 ///
-/// An async version of ``XCTAssertDifference(_:_:operation:changes:)``.
+/// An async version of ``XCTAssertDifference(_:_:operation:changes:file:line:)-8xfxw``.
 @available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
 public func XCTAssertDifference<T: Sendable>(
   _ expression: @autoclosure @Sendable () throws -> T,
