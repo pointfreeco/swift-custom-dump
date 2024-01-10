@@ -339,6 +339,22 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
           terminator: "",
           to: &out
         )
+      } else if lhsItem == rhsItem,
+        let (lhs, rhs) = (lhs as? any _CustomDiffObject)?._customDiffValues
+      {
+        print(
+          diffHelp(
+            lhs,
+            rhs,
+            lhsName: lhsName,
+            rhsName: rhsName,
+            separator: separator,
+            indent: indent,
+            isRoot: isRoot
+          ),
+          terminator: "",
+          to: &out
+        )
       } else {
         let showObjectIdentifiers =
           lhsItem != rhsItem
@@ -635,4 +651,8 @@ private struct Line: CustomDumpStringConvertible, Identifiable {
   var customDumpDescription: String {
     .init(self.rawValue)
   }
+}
+
+public protocol _CustomDiffObject: AnyObject {
+  var _customDiffValues: (Any, Any) { get }
 }
