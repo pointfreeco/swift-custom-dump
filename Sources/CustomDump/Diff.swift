@@ -308,6 +308,65 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
     case (is CustomDumpStringConvertible, _, is CustomDumpStringConvertible, _):
       diffEverything()
 
+    case let (lhs as _CustomDiffObject, _, rhs as _CustomDiffObject, _) where lhs === rhs:
+      let lhsItem = ObjectIdentifier(lhs)
+      let rhsItem = ObjectIdentifier(rhs)
+      let subjectType = typeName(lhsMirror.subjectType)
+      if visitedItems.contains(lhsItem) || visitedItems.contains(rhsItem) {
+        print(
+          "\(lhsName.map { "\($0): " } ?? "")\(subjectType)(↩︎)"
+            .indenting(by: indent)
+            .indenting(with: format.first + " "),
+          to: &out
+        )
+        print(
+          "\(rhsName.map { "\($0): " } ?? "")\(subjectType)(↩︎)"
+            .indenting(by: indent)
+            .indenting(with: format.second + " "),
+          terminator: "",
+          to: &out
+        )
+      } else if lhsItem == rhsItem,
+        let (lhs, rhs) = (lhs as? any _CustomDiffObject)?._customDiffValues
+      {
+        print(
+          diffHelp(
+            lhs,
+            rhs,
+            lhsName: lhsName,
+            rhsName: rhsName,
+            separator: separator,
+            indent: indent,
+            isRoot: isRoot
+          ),
+          terminator: "",
+          to: &out
+        )
+      } else {
+        let showObjectIdentifiers =
+          lhsItem != rhsItem
+          && isMirrorEqual(Array(lhsMirror.children), Array(rhsMirror.children))
+        let lhsMirror =
+          showObjectIdentifiers
+          ? Mirror(lhs, children: [("_", lhsItem)] + lhsMirror.children, displayStyle: .class)
+          : lhsMirror
+        let rhsMirror =
+          showObjectIdentifiers
+          ? Mirror(rhs, children: [("_", rhsItem)] + rhsMirror.children, displayStyle: .class)
+          : rhsMirror
+        visitedItems.insert(lhsItem)
+        diffChildren(
+          lhsMirror,
+          rhsMirror,
+          prefix: "\(subjectType)(",
+          suffix: ")",
+          elementIndent: 2,
+          elementSeparator: ",",
+          collapseUnchanged: false,
+          filter: macroPropertyFilter(for: lhs)
+        )
+      }
+
     case let (lhs as CustomDumpRepresentable, _, rhs as CustomDumpRepresentable, _):
       out.write(
         diffHelp(
