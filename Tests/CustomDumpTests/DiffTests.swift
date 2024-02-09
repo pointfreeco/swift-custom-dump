@@ -1183,40 +1183,42 @@ final class DiffTests: XCTestCase {
   }
 
   func testDiffableObject() {
-    class Foo: _CustomDiffObject, Equatable {
-      var _customDiffValues: (Any, Any) {
-        ("before", "after")
-      }
-      static func == (lhs: Foo, rhs: Foo) -> Bool {
-        false
-      }
-    }
-    let foo = Foo()
+    let obj = DiffableObject()
     XCTAssertNoDifference(
-      diff(foo, foo),
+      diff(obj, obj),
       """
       - "before"
       + "after"
       """
     )
 
-    struct Bar: Equatable {
-      var foo1: Foo
-      var foo2: Foo
-    }
-    let bar = Bar(foo1: foo, foo2: foo)
+    let bar = DiffableObjects(obj1: obj, obj2: obj)
     XCTAssertNoDifference(
       diff(bar, bar),
       """
-        DiffTests.Bar(
-      -   foo1: "before",
-      +   foo1: "after",
-      -   foo2: "before"
-      +   foo2: "after"
+        DiffableObjects(
+      -   obj1: "before",
+      +   obj1: "after",
+      -   obj2: "before"
+      +   obj2: "after"
         )
       """
     )
   }
+}
+
+private class DiffableObject: _CustomDiffObject, Equatable {
+  var _customDiffValues: (Any, Any) {
+    ("before", "after")
+  }
+  static func == (lhs: DiffableObject, rhs: DiffableObject) -> Bool {
+    false
+  }
+}
+
+private struct DiffableObjects: Equatable {
+  var obj1: DiffableObject
+  var obj2: DiffableObject
 }
 
 private struct Stack<State: Equatable>: CustomDumpReflectable, Equatable {
