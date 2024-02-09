@@ -1181,6 +1181,42 @@ final class DiffTests: XCTestCase {
       """
     )
   }
+
+  func testDiffableObject() {
+    class Foo: _CustomDiffObject, Equatable {
+      var _customDiffValues: (Any, Any) {
+        ("before", "after")
+      }
+      static func == (lhs: Foo, rhs: Foo) -> Bool {
+        false
+      }
+    }
+    let foo = Foo()
+    XCTAssertNoDifference(
+      diff(foo, foo),
+      """
+      - "before"
+      + "after"
+      """
+    )
+
+    struct Bar: Equatable {
+      var foo1: Foo
+      var foo2: Foo
+    }
+    let bar = Bar(foo1: foo, foo2: foo)
+    XCTAssertNoDifference(
+      diff(bar, bar),
+      """
+        DiffTests.Bar(
+      -   foo1: "before",
+      +   foo1: "after",
+      -   foo2: "before"
+      +   foo2: "after"
+        )
+      """
+    )
+  }
 }
 
 private struct Stack<State: Equatable>: CustomDumpReflectable, Equatable {
