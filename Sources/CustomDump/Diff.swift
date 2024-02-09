@@ -397,7 +397,8 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
           terminator: "",
           to: &out
         )
-      } else if lhsItem == rhsItem, let (lhs, rhs) = (lhs as? _CustomDiffObject)?._customDiffValues
+      } else if lhsItem == rhsItem,
+        let (lhs, rhs) = (lhs as? _CustomDiffObject)?._customDiffValues
       {
         print(
           diffHelp(
