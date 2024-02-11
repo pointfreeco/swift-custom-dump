@@ -1,0 +1,13 @@
+version: 1
+builder:
+  configs:
+  - platform: ios
+    scheme: CustomDump
+  - platform: macos-xcodebuild
+    scheme: CustomDump
+  - platform: tvos
+    scheme: CustomDump
+  - platform: watchos
+    scheme: CustomDump
+  - documentation_targets: [CustomDump]
+    swift_version: 5.9
