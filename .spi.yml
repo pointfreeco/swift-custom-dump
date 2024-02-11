@@ -11,4 +11,3 @@ builder:
     scheme: CustomDump
   - documentation_targets: [CustomDump]
     swift_version: 5.9
-
