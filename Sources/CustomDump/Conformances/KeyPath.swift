@@ -1,3 +1,4 @@
+#if swift(<5.10)
 import Foundation
 
 extension AnyKeyPath: CustomDumpStringConvertible {
@@ -856,4 +857,5 @@ extension AnyKeyPath: CustomDumpStringConvertible {
       return result
     }
   }
+#endif
 #endif
