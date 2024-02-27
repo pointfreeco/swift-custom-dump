@@ -450,7 +450,7 @@ dependencies: [
 
 ## Documentation
 
-The latest documentation for the Custom Dump APIs is available [here](https://pointfreeco.github.io/swift-custom-dump/).
+The latest documentation for the Custom Dump APIs is available [here](https://swiftpackageindex.com/pointfreeco/swift-custom-dump/documentation).
 
 ## Other libraries
 
