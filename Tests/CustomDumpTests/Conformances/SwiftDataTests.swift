@@ -1,4 +1,4 @@
-#if canImport(SwiftData)
+#if swift(>=5.9) && canImport(SwiftData)
   import CustomDump
   import SwiftData
   import XCTest
