@@ -8,7 +8,7 @@ extension AnyKeyPath: CustomDumpStringConvertible {
         return self.debugDescription
       }
     #endif
-    #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
+    #if DEBUG && (os(iOS) || os(macOS) || os(tvOS) || os(watchOS))
       keyPathToNameLock.lock()
       defer { keyPathToNameLock.unlock() }
 
@@ -49,7 +49,7 @@ extension AnyKeyPath: CustomDumpStringConvertible {
   }
 }
 
-#if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
+#if DEBUG && (os(iOS) || os(macOS) || os(tvOS) || os(watchOS))
   private var keyPathToNameLock = NSRecursiveLock()
   private var keyPathToName: [AnyKeyPath: String] = [:]
 
