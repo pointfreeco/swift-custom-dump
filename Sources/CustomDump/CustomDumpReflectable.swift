@@ -1,4 +1,4 @@
-#if canImport(SwiftData)
+#if swift(>=5.9) && canImport(SwiftData)
   import SwiftData
 #endif
 
@@ -134,7 +134,7 @@ extension Mirror {
       self = subject.customDumpMirror
       return
     }
-    #if canImport(SwiftData)
+    #if swift(>=5.9) && canImport(SwiftData)
       if #available(iOS 17, macOS 14, tvOS 17, watchOS 10, *),
         let subject = subject as? any PersistentModel
       {
