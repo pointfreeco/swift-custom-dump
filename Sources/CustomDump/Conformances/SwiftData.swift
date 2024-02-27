@@ -1,4 +1,4 @@
-#if canImport(SwiftData)
+#if swift(>=5.9) && canImport(SwiftData)
   import SwiftData
 
   @available(iOS 17, macOS 14, tvOS 17, watchOS 10, *)
