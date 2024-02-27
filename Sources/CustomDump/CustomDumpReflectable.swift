@@ -1,3 +1,7 @@
+#if canImport(SwiftData)
+  import SwiftData
+#endif
+
 /// A type that explicitly supplies its own mirror for ``customDump(_:to:name:indent:maxDepth:)``
 /// and ``diff(_:_:format:)``.
 ///
@@ -126,6 +130,21 @@ public protocol CustomDumpReflectable {
 
 extension Mirror {
   init(customDumpReflecting subject: Any) {
-    self = (subject as? CustomDumpReflectable)?.customDumpMirror ?? Mirror(reflecting: subject)
+    if let subject = subject as? CustomDumpReflectable {
+      self = subject.customDumpMirror
+      return
+    }
+    #if canImport(SwiftData)
+      if #available(iOS 17, macOS 14, tvOS 17, watchOS 10, *),
+        let subject = subject as? any PersistentModel
+      {
+        func open<T: PersistentModel>(_ model: T) -> Mirror {
+          PersistentModelDump(wrappedValue: model).customDumpMirror
+        }
+        self = open(subject)
+        return
+      }
+    #endif
+    self = Mirror(reflecting: subject)
   }
 }
