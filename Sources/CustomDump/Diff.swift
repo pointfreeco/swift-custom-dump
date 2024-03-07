@@ -308,9 +308,10 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
     case (is CustomDumpStringConvertible, _, is CustomDumpStringConvertible, _):
       diffEverything()
 
-    case let (lhs as _CustomDiffObject, _, rhs as _CustomDiffObject, _) where lhs === rhs:
-      let lhsItem = ObjectIdentifier(lhs)
-      let rhsItem = ObjectIdentifier(rhs)
+    case let (lhs as _CustomDiffObject, _, rhs as _CustomDiffObject, _)
+    where lhs._objectIdentifier == rhs._objectIdentifier:
+      let lhsItem = lhs._objectIdentifier
+      let rhsItem = rhs._objectIdentifier
       let subjectType = typeName(lhsMirror.subjectType)
       if visitedItems.contains(lhsItem) || visitedItems.contains(rhsItem) {
         print(
@@ -394,22 +395,6 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
           "\(rhsName.map { "\($0): " } ?? "")\(subjectType)(↩︎)"
             .indenting(by: indent)
             .indenting(with: format.second + " "),
-          terminator: "",
-          to: &out
-        )
-      } else if lhsItem == rhsItem,
-        let (lhs, rhs) = (lhs as? _CustomDiffObject)?._customDiffValues
-      {
-        print(
-          diffHelp(
-            lhs,
-            rhs,
-            lhsName: lhsName,
-            rhsName: rhsName,
-            separator: separator,
-            indent: indent,
-            isRoot: isRoot
-          ),
           terminator: "",
           to: &out
         )
@@ -711,6 +696,13 @@ private struct Line: CustomDumpStringConvertible, Identifiable {
   }
 }
 
-public protocol _CustomDiffObject: AnyObject {
+public protocol _CustomDiffObject {
   var _customDiffValues: (Any, Any) { get }
+  var _objectIdentifier: ObjectIdentifier { get }
+}
+
+extension _CustomDiffObject where Self: AnyObject {
+  public var _objectIdentifier: ObjectIdentifier {
+    ObjectIdentifier(self)
+  }
 }
