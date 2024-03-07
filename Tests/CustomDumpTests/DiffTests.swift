@@ -56,11 +56,14 @@ final class DiffTests: XCTestCase {
         )
       ),
       """
-        UserClass(
-          id: 42,
+      - UserClass(
+      -   id: 42,
       -   name: "Blob"
+      - )
+      + #1 UserClass(
+      +   id: 42,
       +   name: "Blob, Jr."
-        )
+      + )
       """
     )
 
@@ -71,7 +74,7 @@ final class DiffTests: XCTestCase {
       ),
       """
       - NSObject()
-      + NSObject()
+      + #1 NSObject()
       """
     )
 
@@ -81,36 +84,72 @@ final class DiffTests: XCTestCase {
         RepeatedObject(id: "b")
       ),
       """
-        RepeatedObject(
-          child: RepeatedObject.Child(
+      - RepeatedObject(
+      -   child: RepeatedObject.Child(
       -     grandchild: RepeatedObject.Grandchild(id: "a")
-      +     grandchild: RepeatedObject.Grandchild(id: "b")
-          ),
+      -   ),
       -   grandchild: RepeatedObject.Grandchild(↩︎)
-      +   grandchild: RepeatedObject.Grandchild(↩︎)
-        )
+      - )
+      + #1 RepeatedObject(
+      +   child: #1 RepeatedObject.Child(
+      +     grandchild: #1 RepeatedObject.Grandchild(id: "b")
+      +   ),
+      +   grandchild: #1 RepeatedObject.Grandchild(↩︎)
+      + )
       """
     )
   }
 
-  func testClassObjectIdentity() {
-    class User: NSObject {
-      let id = 42
-      let name = "Blob"
+  func testClass_Repeated() {
+    class User {
+      let id: Int
+      let name: String
+      init(id: Int, name: String) {
+        self.id = id
+        self.name = name
+      }
     }
+    let u1 = User(id: 1, name: "Blob")
+    let u2 = User(id: 2, name: "Blob Jr.")
+    let u3 = User(id: 3, name: "Blob Sr.")
+
+    struct Three { let u1: User, u2: User, u3: User}
 
     XCTAssertNoDifference(
       diff(
-        User(),
-        User()
-      )?.replacingOccurrences(of: "0x[[:xdigit:]]+", with: "0x…", options: .regularExpression),
+        Three(u1: u1, u2: u2, u3: u2),
+        Three(u1: u1, u2: u2, u3: u3)
+      ),
       """
-        DiffTests.User(
-      -   _: ObjectIdentifier(0x…),
-      +   _: ObjectIdentifier(0x…),
-          id: 42,
-          name: "Blob"
+        DiffTests.Three(
+          u1: DiffTests.User(…),
+          u2: #1 DiffTests.User(…),
+      -   u3: #1 DiffTests.User(↩︎)
+      +   u3: #2 DiffTests.User(
+      +     id: 3,
+      +     name: "Blob Sr."
+      +   )
         )
+      """
+    )
+
+    XCTAssertNoDifference(
+      diff(
+        [u1, u2, u2],
+        [u1, u2, u3]
+      ),
+      """
+        [
+          … (2 unchanged),
+      -   [2]: DiffTests.User(
+      -     id: 2,
+      -     name: "Blob Jr."
+      -   )
+      +   [2]: #1 DiffTests.User(
+      +     id: 3,
+      +     name: "Blob Sr."
+      +   )
+        ]
       """
     )
   }
@@ -968,7 +1007,7 @@ final class DiffTests: XCTestCase {
       ),
       """
       - Namespaced.Class(x: 0)
-      + Namespaced.Class(x: 1)
+      + #1 Namespaced.Class(x: 1)
       """
     )
 
@@ -1183,6 +1222,20 @@ final class DiffTests: XCTestCase {
   }
 
   func testDiffableObject() {
+    class DiffableObject: _CustomDiffObject, Equatable {
+      var _customDiffValues: (Any, Any) {
+        ("before", "after")
+      }
+      static func == (lhs: DiffableObject, rhs: DiffableObject) -> Bool {
+        false
+      }
+    }
+
+    struct DiffableObjects: Equatable {
+      var obj1: DiffableObject
+      var obj2: DiffableObject
+    }
+
     let obj = DiffableObject()
     XCTAssertNoDifference(
       diff(obj, obj),
@@ -1196,29 +1249,15 @@ final class DiffTests: XCTestCase {
     XCTAssertNoDifference(
       diff(bar, bar),
       """
-        DiffableObjects(
+        DiffTests.DiffableObjects(
       -   obj1: "before",
       +   obj1: "after",
-      -   obj2: "before"
-      +   obj2: "after"
+      -   obj2: #1 DiffTests.DiffableObject(↩︎)
+      +   obj2: #1 DiffTests.DiffableObject(↩︎)
         )
       """
     )
   }
-}
-
-private class DiffableObject: _CustomDiffObject, Equatable {
-  var _customDiffValues: (Any, Any) {
-    ("before", "after")
-  }
-  static func == (lhs: DiffableObject, rhs: DiffableObject) -> Bool {
-    false
-  }
-}
-
-private struct DiffableObjects: Equatable {
-  var obj1: DiffableObject
-  var obj2: DiffableObject
 }
 
 private struct Stack<State: Equatable>: CustomDumpReflectable, Equatable {

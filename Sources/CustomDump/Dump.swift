@@ -45,6 +45,12 @@ extension String {
   }
 }
 
+struct ObjectTracker {
+  var idPerItem: [ObjectIdentifier: UInt] = [:]
+  var occurrencePerType: [String: UInt] = [:]
+  var visitedItems: Set<ObjectIdentifier> = []
+}
+
 /// Dumps the given value's contents using its mirror to the specified output stream.
 ///
 /// - Parameters:
@@ -65,7 +71,16 @@ public func customDump<T, TargetStream>(
   indent: Int = 0,
   maxDepth: Int = .max
 ) -> T where TargetStream: TextOutputStream {
-  _customDump(value, to: &target, name: name, indent: indent, isRoot: true, maxDepth: maxDepth)
+  var tracker = ObjectTracker()
+  return _customDump(
+    value,
+    to: &target,
+    name: name,
+    indent: indent,
+    isRoot: true,
+    maxDepth: maxDepth,
+    tracker: &tracker
+  )
 }
 
 @discardableResult
@@ -75,12 +90,9 @@ func _customDump<T, TargetStream>(
   name: String?,
   indent: Int,
   isRoot: Bool,
-  maxDepth: Int
+  maxDepth: Int,
+  tracker: inout ObjectTracker
 ) -> T where TargetStream: TextOutputStream {
-  var idPerItem: [ObjectIdentifier: UInt] = [:]
-  var occurrencePerType: [String: UInt] = [:]
-  var visitedItems: Set<ObjectIdentifier> = []
-
   func customDumpHelp<InnerT, InnerTargetStream>(
     _ value: InnerT,
     to target: inout InnerTargetStream,
@@ -101,8 +113,9 @@ func _customDump<T, TargetStream>(
       of mirror: Mirror,
       prefix: String,
       suffix: String,
+      shouldSort: Bool,
       filter isIncluded: (Mirror.Child) -> Bool = { _ in true },
-      by areInIncreasingOrder: ((Mirror.Child, Mirror.Child) -> Bool)? = nil,
+      by areInIncreasingOrder: (Mirror.Child, Mirror.Child) -> Bool = { _, _ in false },
       map transform: (inout Mirror.Child, Int) -> Void = { _, _ in }
     ) {
       out.write(prefix)
@@ -135,7 +148,7 @@ func _customDump<T, TargetStream>(
           out.write("\n")
           var children = Array(mirror.children)
           children.removeAll(where: { !isIncluded($0) })
-          if let areInIncreasingOrder = areInIncreasingOrder {
+          if shouldSort {
             children.sort(by: areInIncreasingOrder)
           }
           for (offset, var child) in children.enumerated() {
@@ -170,22 +183,49 @@ func _customDump<T, TargetStream>(
         value.customDumpValue, to: &out, name: nil, indent: 0, isRoot: false, maxDepth: maxDepth
       )
 
-    case let (value as AnyObject, .class?):
-      let item = ObjectIdentifier(value)
-      var occurrence = occurrencePerType[typeName(mirror.subjectType), default: 0] {
-        didSet { occurrencePerType[typeName(mirror.subjectType)] = occurrence }
+    case let (value as _CustomDiffObject, _):
+      let item = value._objectIdentifier
+      let (_, value) = value._customDiffValues
+      var occurrence = tracker.occurrencePerType[typeName(mirror.subjectType), default: 1] {
+        didSet { tracker.occurrencePerType[typeName(mirror.subjectType)] = occurrence }
       }
 
       var id: String {
-        let id = idPerItem[item, default: occurrence]
-        idPerItem[item] = id
+        let id = tracker.idPerItem[item, default: occurrence]
+        tracker.idPerItem[item] = id
 
-        return id > 1 ? "#\(id)" : ""
+        return id > 0 ? "#\(id)" : ""
       }
-      if visitedItems.contains(item) {
-        out.write("\(typeName(mirror.subjectType))\(id)(↩︎)")
+      if !id.isEmpty {
+        out.write("\(id) ")
+      }
+      if tracker.visitedItems.contains(item) {
+        out.write("\(typeName(type(of: value)))(↩︎)")
       } else {
-        visitedItems.insert(item)
+        tracker.visitedItems.insert(item)
+        occurrence += 1
+        customDumpHelp(value, to: &out, name: nil, indent: 0, isRoot: false, maxDepth: maxDepth)
+      }
+
+    case let (value as AnyObject, .class?):
+      let item = ObjectIdentifier(value)
+      var occurrence = tracker.occurrencePerType[typeName(mirror.subjectType), default: 0] {
+        didSet { tracker.occurrencePerType[typeName(mirror.subjectType)] = occurrence }
+      }
+
+      var id: String {
+        let id = tracker.idPerItem[item, default: occurrence]
+        tracker.idPerItem[item] = id
+
+        return id > 0 ? "#\(id)" : ""
+      }
+      if !id.isEmpty {
+        out.write("\(id) ")
+      }
+      if tracker.visitedItems.contains(item) {
+        out.write("\(typeName(mirror.subjectType))(↩︎)")
+      } else {
+        tracker.visitedItems.insert(item)
         occurrence += 1
         var children = Array(mirror.children)
 
@@ -196,14 +236,23 @@ func _customDump<T, TargetStream>(
         }
         dumpChildren(
           of: Mirror(value, children: children),
-          prefix: "\(typeName(mirror.subjectType))\(id)(",
+          prefix: "\(typeName(mirror.subjectType))(",
           suffix: ")",
+          shouldSort: false,
           filter: macroPropertyFilter(for: value)
         )
       }
 
     case (_, .collection?):
-      dumpChildren(of: mirror, prefix: "[", suffix: "]", map: { $0.label = "[\($1)]" })
+      dumpChildren(
+        of: mirror,
+        prefix: "[",
+        suffix: "]",
+        shouldSort: false,
+        map: {
+          $0.label = "[\($1)]"
+        }
+      )
 
     case (_, .dictionary?):
       if mirror.children.isEmpty {
@@ -212,21 +261,40 @@ func _customDump<T, TargetStream>(
         dumpChildren(
           of: mirror,
           prefix: "[", suffix: "]",
-          by: mirror.subjectType is _UnorderedCollection.Type
-            ? {
-              guard
-                let (lhsKey, _) = $0.value as? (key: AnyHashable, value: Any),
-                let (rhsKey, _) = $1.value as? (key: AnyHashable, value: Any)
-              else { return false }
+          shouldSort: mirror.subjectType is _UnorderedCollection.Type,
+          by: {
+            guard
+              let (lhsKey, _) = $0.value as? (key: AnyHashable, value: Any),
+              let (rhsKey, _) = $1.value as? (key: AnyHashable, value: Any)
+            else { return false }
 
-              return _customDump(lhsKey.base, name: nil, indent: 0, isRoot: false, maxDepth: 1)
-                < _customDump(rhsKey.base, name: nil, indent: 0, isRoot: false, maxDepth: 1)
-            }
-            : nil,
+            let lhsDump = _customDump(
+              lhsKey.base,
+              name: nil,
+              indent: 0,
+              isRoot: false,
+              maxDepth: 1,
+              tracker: &tracker
+            )
+            let rhsDump = _customDump(
+              rhsKey.base,
+              name: nil,
+              indent: 0,
+              isRoot: false,
+              maxDepth: 1,
+              tracker: &tracker
+            )
+            return lhsDump < rhsDump
+          },
           map: { child, _ in
             guard let pair = child.value as? (key: AnyHashable, value: Any) else { return }
             let key = _customDump(
-              pair.key.base, name: nil, indent: 0, isRoot: false, maxDepth: maxDepth - 1
+              pair.key.base,
+              name: nil,
+              indent: 0,
+              isRoot: false,
+              maxDepth: maxDepth - 1,
+              tracker: &tracker
             )
             child = (key, pair.value)
           }
@@ -245,6 +313,7 @@ func _customDump<T, TargetStream>(
           of: associatedValuesMirror,
           prefix: "\(child.label ?? "@unknown")(",
           suffix: ")",
+          shouldSort: false,
           map: { child, _ in
             if child.label?.first == "." {
               child.label = nil
@@ -266,12 +335,26 @@ func _customDump<T, TargetStream>(
       dumpChildren(
         of: mirror,
         prefix: "Set([", suffix: "])",
-        by: mirror.subjectType is _UnorderedCollection.Type
-          ? {
-            _customDump($0.value, name: nil, indent: 0, isRoot: false, maxDepth: 1)
-              < _customDump($1.value, name: nil, indent: 0, isRoot: false, maxDepth: 1)
-          }
-          : nil
+        shouldSort: mirror.subjectType is _UnorderedCollection.Type,
+        by: {
+          let lhs = _customDump(
+            $0.value,
+            name: nil,
+            indent: 0,
+            isRoot: false,
+            maxDepth: 1,
+            tracker: &tracker
+          )
+          let rhs = _customDump(
+            $1.value,
+            name: nil,
+            indent: 0,
+            isRoot: false,
+            maxDepth: 1,
+            tracker: &tracker
+          )
+          return lhs < rhs
+        }
       )
 
     case (_, .struct?):
@@ -279,6 +362,7 @@ func _customDump<T, TargetStream>(
         of: mirror,
         prefix: "\(typeName(mirror.subjectType))(",
         suffix: ")",
+        shouldSort: false,
         filter: macroPropertyFilter(for: value)
       )
 
@@ -287,6 +371,7 @@ func _customDump<T, TargetStream>(
         of: mirror,
         prefix: "(",
         suffix: ")",
+        shouldSort: false,
         map: { child, _ in
           if child.label?.first == "." {
             child.label = nil
@@ -326,9 +411,24 @@ func _customDump<T, TargetStream>(
   return value
 }
 
-func _customDump(_ value: Any, name: String?, indent: Int, isRoot: Bool, maxDepth: Int) -> String {
+func _customDump(
+  _ value: Any,
+  name: String?,
+  indent: Int,
+  isRoot: Bool,
+  maxDepth: Int,
+  tracker: inout ObjectTracker
+) -> String {
   var out = ""
-  _customDump(value, to: &out, name: name, indent: indent, isRoot: isRoot, maxDepth: maxDepth)
+  _customDump(
+    value,
+    to: &out,
+    name: name,
+    indent: indent,
+    isRoot: isRoot,
+    maxDepth: maxDepth,
+    tracker: &tracker
+  )
   return out
 }
 
