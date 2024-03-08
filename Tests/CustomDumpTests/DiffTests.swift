@@ -1334,8 +1334,8 @@ final class DiffTests: XCTestCase {
       diff(bar, bar),
       """
         DiffTests.DiffableObjects(
-      -   obj1: #1 "before"
-      +   obj1: #1 "after"
+      -   obj1: #1 "before",
+      +   obj1: #1 "after",
       -   obj2: #1 String(↩︎)
       +   obj2: #1 String(↩︎)
         )

@@ -131,7 +131,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
           isRoot: false,
           maxDepth: 0,
           tracker: &tracker
-        )
+        ) + separator
         let rhsDump = _customDump(
           rhs,
           name: rhsName,
@@ -140,7 +140,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
           isRoot: false,
           maxDepth: 0,
           tracker: &tracker
-        )
+        ) + separator
         if lhsDump == rhsDump {
           print(
             "// Not equal but no difference detected:"
@@ -397,80 +397,6 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
       } else {
         diffEverything()
       }
-//      let subjectType = typeName(lhsMirror.subjectType)
-//      if !tracker.visitedItems.contains(lhsItem) && !tracker.visitedItems.contains(rhsItem) {
-//        if lhsItem == rhsItem {
-//          diffChildren(
-//            lhsMirror,
-//            rhsMirror,
-//            prefix: "\(subjectType)(",
-//            suffix: ")",
-//            elementIndent: 2,
-//            elementSeparator: ",",
-//            collapseUnchanged: false,
-//            filter: macroPropertyFilter(for: lhs)
-//          )
-//        } else {
-//          diffEverything()
-//        }
-//      } else {
-//        var occurrence: UInt { tracker.occurrencePerType[subjectType, default: 0] }
-//        if tracker.visitedItems.contains(lhsItem) {
-//          var lhsID: String {
-//            let id = tracker.idPerItem[lhsItem, default: occurrence]
-//            tracker.idPerItem[lhsItem] = id
-//            return id > 0 ? "#\(id) " : ""
-//          }
-//          print(
-//            "\(lhsName.map { "\($0): " } ?? "")\(lhsID)\(subjectType)(↩︎)"
-//              .indenting(by: indent)
-//              .indenting(with: format.first + " "),
-//            to: &out
-//          )
-//        } else {
-//          print(
-//            _customDump(
-//              lhs,
-//              name: lhsName,
-//              indent: indent,
-//              isRoot: isRoot,
-//              maxDepth: .max,
-//              tracker: &tracker
-//            )
-//            .indenting(with: format.first + " "),
-//            terminator: "",
-//            to: &out
-//          )
-//        }
-//        if tracker.visitedItems.contains(rhsItem) {
-//          var rhsID: String {
-//            let id = tracker.idPerItem[rhsItem, default: occurrence]
-//            tracker.idPerItem[rhsItem] = id
-//            return id > 0 ? "#\(id) " : ""
-//          }
-//          print(
-//            "\(rhsName.map { "\($0): " } ?? "")\(rhsID)\(subjectType)(↩︎)"
-//              .indenting(by: indent)
-//              .indenting(with: format.second + " "),
-//            terminator: "",
-//            to: &out
-//          )
-//        } else {
-//          print(
-//            _customDump(
-//              rhs,
-//              name: rhsName,
-//              indent: indent,
-//              isRoot: isRoot,
-//              maxDepth: .max,
-//              tracker: &tracker
-//            )
-//            .indenting(with: format.second + " "),
-//            terminator: "",
-//            to: &out
-//          )
-//        }
-//      }
 
     case let (lhs as CustomDumpRepresentable, _, rhs as CustomDumpRepresentable, _):
       out.write(
