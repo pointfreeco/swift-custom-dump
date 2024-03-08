@@ -99,8 +99,13 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
     }
 
     func diffChildren(
+      lhs: Any = lhs,
+      rhs: Any = rhs,
       _ lhsMirror: Mirror,
       _ rhsMirror: Mirror,
+      lhsName: String? = lhsName,
+      rhsName: String? = rhsName,
+      nameSuffix: String = ": ",
       prefix: String,
       suffix: String,
       elementIndent: Int,
@@ -114,8 +119,10 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
       var lhsChildren = Array(lhsMirror.children)
       var rhsChildren = Array(rhsMirror.children)
 
-      guard !isMirrorEqual(lhsChildren, rhsChildren)
-      else {
+      if isMirrorEqual(lhsChildren, rhsChildren),
+        !(lhs is _CustomDiffObject),
+        !(rhs is _CustomDiffObject)
+      {
         let lhsDump = _customDump(
           lhs,
           name: lhsName,
@@ -185,7 +192,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
       lhsChildren.removeAll(where: { !isIncluded($0) })
       rhsChildren.removeAll(where: { !isIncluded($0) })
 
-      let name = rhsName.map { "\($0): " } ?? ""
+      let name = rhsName.map { "\($0)\(nameSuffix)" } ?? ""
       print(
         name
           .appending(prefix)
@@ -336,52 +343,130 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
     case (is CustomDumpStringConvertible, _, is CustomDumpStringConvertible, _):
       diffEverything()
 
-    case let (lhs as _CustomDiffObject, _, rhs as _CustomDiffObject, _)
-    where lhs._objectIdentifier == rhs._objectIdentifier:
-      let item = lhs._objectIdentifier
-      let name = typeName(lhsMirror.subjectType)
-      var occurrence = tracker.occurrencePerType[name, default: 1] {
-        didSet { tracker.occurrencePerType[name] = occurrence }
-      }
-      var id: String {
-        let id = tracker.idPerItem[item, default: occurrence]
-        tracker.idPerItem[item] = id
-
-        return id > 0 ? "#\(id)" : ""
-      }
-      let subjectType = "\(id) \(name)"
-      if tracker.visitedItems.contains(item) {
-        print(
-          "\(lhsName.map { "\($0): " } ?? "")\(subjectType)(↩︎)"
-            .indenting(by: indent)
-            .indenting(with: format.first + " "),
-          to: &out
-        )
-        print(
-          "\(rhsName.map { "\($0): " } ?? "")\(subjectType)(↩︎)"
-            .indenting(by: indent)
-            .indenting(with: format.second + " "),
-          terminator: "",
-          to: &out
-        )
-      } else {
-        tracker.visitedItems.insert(item)
-        occurrence += 1
+    case let (lhs as _CustomDiffObject, _, rhs as _CustomDiffObject, _):
+      let lhsItem = lhs._objectIdentifier
+      let rhsItem = rhs._objectIdentifier
+      if lhsItem == rhsItem {
         let (lhs, rhs) = lhs._customDiffValues
-        print(
-          diffHelp(
-            lhs,
-            rhs,
-            lhsName: lhsName,
-            rhsName: rhsName,
-            separator: separator,
-            indent: indent,
-            isRoot: isRoot
-          ),
-          terminator: "",
-          to: &out
-        )
+        let subjectType = typeName(type(of: lhs))
+        var occurrence = tracker.occurrencePerType[subjectType, default: 1] {
+          didSet { tracker.occurrencePerType[subjectType] = occurrence }
+        }
+        var id: UInt {
+          let id = tracker.idPerItem[lhsItem, default: occurrence]
+          tracker.idPerItem[lhsItem] = id
+          return id
+        }
+        if tracker.visitedItems.contains(lhsItem) {
+          print(
+            "\(lhsName.map { "\($0): " } ?? "")#\(id) \(subjectType)(↩︎)\(separator)"
+              .indenting(by: indent)
+              .indenting(with: format.first + " "),
+            to: &out
+          )
+          print(
+            "\(rhsName.map { "\($0): " } ?? "")#\(id) \(subjectType)(↩︎)\(separator)"
+              .indenting(by: indent)
+              .indenting(with: format.second + " "),
+            terminator: "",
+            to: &out
+          )
+        } else {
+          diffChildren(
+            lhs: lhs,
+            rhs: rhs,
+            Mirror(customDumpReflecting: lhs),
+            Mirror(customDumpReflecting: rhs),
+            lhsName: "#\(id)",
+            rhsName: "#\(id)",
+            nameSuffix: " ",
+            prefix: "\(subjectType)(",
+            suffix: ")",
+            elementIndent: 2,
+            elementSeparator: ",",
+            collapseUnchanged: false,
+            filter: macroPropertyFilter(for: lhs)
+          )
+          tracker.visitedItems.insert(lhsItem)
+          occurrence += 1
+        }
+      } else {
+        diffEverything()
       }
+//      let subjectType = typeName(lhsMirror.subjectType)
+//      if !tracker.visitedItems.contains(lhsItem) && !tracker.visitedItems.contains(rhsItem) {
+//        if lhsItem == rhsItem {
+//          diffChildren(
+//            lhsMirror,
+//            rhsMirror,
+//            prefix: "\(subjectType)(",
+//            suffix: ")",
+//            elementIndent: 2,
+//            elementSeparator: ",",
+//            collapseUnchanged: false,
+//            filter: macroPropertyFilter(for: lhs)
+//          )
+//        } else {
+//          diffEverything()
+//        }
+//      } else {
+//        var occurrence: UInt { tracker.occurrencePerType[subjectType, default: 0] }
+//        if tracker.visitedItems.contains(lhsItem) {
+//          var lhsID: String {
+//            let id = tracker.idPerItem[lhsItem, default: occurrence]
+//            tracker.idPerItem[lhsItem] = id
+//            return id > 0 ? "#\(id) " : ""
+//          }
+//          print(
+//            "\(lhsName.map { "\($0): " } ?? "")\(lhsID)\(subjectType)(↩︎)"
+//              .indenting(by: indent)
+//              .indenting(with: format.first + " "),
+//            to: &out
+//          )
+//        } else {
+//          print(
+//            _customDump(
+//              lhs,
+//              name: lhsName,
+//              indent: indent,
+//              isRoot: isRoot,
+//              maxDepth: .max,
+//              tracker: &tracker
+//            )
+//            .indenting(with: format.first + " "),
+//            terminator: "",
+//            to: &out
+//          )
+//        }
+//        if tracker.visitedItems.contains(rhsItem) {
+//          var rhsID: String {
+//            let id = tracker.idPerItem[rhsItem, default: occurrence]
+//            tracker.idPerItem[rhsItem] = id
+//            return id > 0 ? "#\(id) " : ""
+//          }
+//          print(
+//            "\(rhsName.map { "\($0): " } ?? "")\(rhsID)\(subjectType)(↩︎)"
+//              .indenting(by: indent)
+//              .indenting(with: format.second + " "),
+//            terminator: "",
+//            to: &out
+//          )
+//        } else {
+//          print(
+//            _customDump(
+//              rhs,
+//              name: rhsName,
+//              indent: indent,
+//              isRoot: isRoot,
+//              maxDepth: .max,
+//              tracker: &tracker
+//            )
+//            .indenting(with: format.second + " "),
+//            terminator: "",
+//            to: &out
+//          )
+//        }
+//      }
 
     case let (lhs as CustomDumpRepresentable, _, rhs as CustomDumpRepresentable, _):
       out.write(

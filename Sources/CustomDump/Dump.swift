@@ -178,16 +178,12 @@ func _customDump<T, TargetStream>(
     case let (value as CustomDumpStringConvertible, _):
       out.write(value.customDumpDescription)
 
-    case let (value as CustomDumpRepresentable, _):
-      customDumpHelp(
-        value.customDumpValue, to: &out, name: nil, indent: 0, isRoot: false, maxDepth: maxDepth
-      )
-
     case let (value as _CustomDiffObject, _):
       let item = value._objectIdentifier
       let (_, value) = value._customDiffValues
-      var occurrence = tracker.occurrencePerType[typeName(mirror.subjectType), default: 1] {
-        didSet { tracker.occurrencePerType[typeName(mirror.subjectType)] = occurrence }
+      let subjectType = typeName(type(of: value))
+      var occurrence = tracker.occurrencePerType[subjectType, default: 1] {
+        didSet { tracker.occurrencePerType[subjectType] = occurrence }
       }
 
       var id: String {
@@ -200,12 +196,17 @@ func _customDump<T, TargetStream>(
         out.write("\(id) ")
       }
       if tracker.visitedItems.contains(item) {
-        out.write("\(typeName(type(of: value)))(↩︎)")
+        out.write("\(subjectType)(↩︎)")
       } else {
         tracker.visitedItems.insert(item)
         occurrence += 1
         customDumpHelp(value, to: &out, name: nil, indent: 0, isRoot: false, maxDepth: maxDepth)
       }
+
+    case let (value as CustomDumpRepresentable, _):
+      customDumpHelp(
+        value.customDumpValue, to: &out, name: nil, indent: 0, isRoot: false, maxDepth: maxDepth
+      )
 
     case let (value as AnyObject, .class?):
       let item = ObjectIdentifier(value)

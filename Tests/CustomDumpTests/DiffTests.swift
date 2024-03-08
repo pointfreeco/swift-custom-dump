@@ -1222,6 +1222,67 @@ final class DiffTests: XCTestCase {
   }
 
   func testDiffableObject() {
+    struct User: Equatable {
+      let id = 1
+      var name = "Blob"
+    }
+    class Shared: _CustomDiffObject, Equatable {
+      var _customDiffValues: (Any, Any) {
+        (User(), User(name: "Blob, Jr"))
+      }
+      static func == (lhs: Shared, rhs: Shared) -> Bool {
+        false
+      }
+    }
+
+    let obj = Shared()
+    XCTAssertNoDifference(
+      diff(obj, obj),
+      """
+        #1 DiffTests.User(
+          id: 1,
+      -   name: "Blob"
+      +   name: "Blob, Jr"
+        )
+      """
+    )
+
+    XCTAssertNoDifference(
+      diff(Shared(), Shared()),
+      """
+      - #1 DiffTests.User(
+      -   id: 1,
+      -   name: "Blob, Jr"
+      - )
+      + #2 DiffTests.User(
+      +   id: 1,
+      +   name: "Blob, Jr"
+      + )
+      """
+    )
+
+    XCTAssertNoDifference(
+      diff([obj, obj, obj], [obj, obj, Shared()]),
+      """
+        [
+          #1 DiffTests.User(
+            id: 1,
+      -     name: "Blob"
+      +     name: "Blob, Jr"
+          ),
+      -   [1]: #1 DiffTests.User(↩︎),
+      +   [1]: #1 DiffTests.User(↩︎),
+      -   [2]: #1 DiffTests.User(↩︎)
+      +   [2]: #2 DiffTests.User(
+      +     id: 1,
+      +     name: "Blob, Jr"
+      +   )
+        ]
+      """
+    )
+  }
+
+  func testDiffableObject_Advanced() {
     class DiffableObject: _CustomDiffObject, Equatable {
       var _customDiffValues: (Any, Any) {
         ("before", "after")
@@ -1240,8 +1301,8 @@ final class DiffTests: XCTestCase {
     XCTAssertNoDifference(
       diff(obj, obj),
       """
-      - "before"
-      + "after"
+      - #1: "before"
+      + #1: "after"
       """
     )
 
@@ -1250,10 +1311,10 @@ final class DiffTests: XCTestCase {
       diff(bar, bar),
       """
         DiffTests.DiffableObjects(
-      -   obj1: "before",
-      +   obj1: "after",
-      -   obj2: #1 DiffTests.DiffableObject(↩︎)
-      +   obj2: #1 DiffTests.DiffableObject(↩︎)
+      -   #1: "before"
+      +   #1: "after"
+      -   obj2: #1 String(↩︎)
+      +   obj2: #1 String(↩︎)
         )
       """
     )
