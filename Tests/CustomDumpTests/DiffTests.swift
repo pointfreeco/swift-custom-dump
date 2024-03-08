@@ -1242,50 +1242,50 @@ final class DiffTests: XCTestCase {
     }
 
     let obj = Shared()
-//    XCTAssertNoDifference(
-//      diff(obj, obj),
-//      """
-//        #1 DiffTests.User(
-//          id: 1,
-//      -   name: "Blob"
-//      +   name: "Blob, Jr"
-//        )
-//      """
-//    )
-//
-//    XCTAssertNoDifference(
-//      diff(Shared(), Shared()),
-//      """
-//      - #1 DiffTests.User(
-//      -   id: 1,
-//      -   name: "Blob, Jr"
-//      - )
-//      + #2 DiffTests.User(
-//      +   id: 1,
-//      +   name: "Blob, Jr"
-//      + )
-//      """
-//    )
+    XCTAssertNoDifference(
+      diff(obj, obj),
+      """
+        #1 DiffTests.User(
+          id: 1,
+      -   name: "Blob"
+      +   name: "Blob, Jr"
+        )
+      """
+    )
 
-//    XCTAssertNoDifference(
-//      diff([obj, obj, obj], [obj, obj, Shared()]),
-//      """
-//        [
-//          [0]: #1 DiffTests.User(
-//            id: 1,
-//      -     name: "Blob"
-//      +     name: "Blob, Jr"
-//          ),
-//      -   [1]: #1 DiffTests.User(↩︎),
-//      +   [1]: #1 DiffTests.User(↩︎),
-//      -   [2]: #1 DiffTests.User(↩︎)
-//      +   [2]: #2 DiffTests.User(
-//      +     id: 1,
-//      +     name: "Blob, Jr"
-//      +   )
-//        ]
-//      """
-//    )
+    XCTAssertNoDifference(
+      diff(Shared(), Shared()),
+      """
+      - #1 DiffTests.User(
+      -   id: 1,
+      -   name: "Blob, Jr"
+      - )
+      + #2 DiffTests.User(
+      +   id: 1,
+      +   name: "Blob, Jr"
+      + )
+      """
+    )
+
+    XCTAssertNoDifference(
+      diff([obj, obj, obj], [obj, obj, Shared()]),
+      """
+        [
+          [0]: #1 DiffTests.User(
+            id: 1,
+      -     name: "Blob"
+      +     name: "Blob, Jr"
+          ),
+      -   [1]: #1 DiffTests.User(↩︎),
+      +   [1]: #1 DiffTests.User(↩︎),
+      -   [2]: #1 DiffTests.User(↩︎)
+      +   [2]: #2 DiffTests.User(
+      +     id: 1,
+      +     name: "Blob, Jr"
+      +   )
+        ]
+      """
+    )
 
     struct State {
       var stats: Shared
