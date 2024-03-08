@@ -1227,8 +1227,14 @@ final class DiffTests: XCTestCase {
       var name = "Blob"
     }
     class Shared: _CustomDiffObject, Equatable {
+      let before: Any
+      let after: Any
+      init(before: Any = User(), after: Any = User(name: "Blob, Jr")) {
+        self.before = before
+        self.after = after
+      }
       var _customDiffValues: (Any, Any) {
-        (User(), User(name: "Blob, Jr"))
+        (self.before, self.after)
       }
       static func == (lhs: Shared, rhs: Shared) -> Bool {
         false
@@ -1236,48 +1242,65 @@ final class DiffTests: XCTestCase {
     }
 
     let obj = Shared()
+//    XCTAssertNoDifference(
+//      diff(obj, obj),
+//      """
+//        #1 DiffTests.User(
+//          id: 1,
+//      -   name: "Blob"
+//      +   name: "Blob, Jr"
+//        )
+//      """
+//    )
+//
+//    XCTAssertNoDifference(
+//      diff(Shared(), Shared()),
+//      """
+//      - #1 DiffTests.User(
+//      -   id: 1,
+//      -   name: "Blob, Jr"
+//      - )
+//      + #2 DiffTests.User(
+//      +   id: 1,
+//      +   name: "Blob, Jr"
+//      + )
+//      """
+//    )
+
+//    XCTAssertNoDifference(
+//      diff([obj, obj, obj], [obj, obj, Shared()]),
+//      """
+//        [
+//          [0]: #1 DiffTests.User(
+//            id: 1,
+//      -     name: "Blob"
+//      +     name: "Blob, Jr"
+//          ),
+//      -   [1]: #1 DiffTests.User(↩︎),
+//      +   [1]: #1 DiffTests.User(↩︎),
+//      -   [2]: #1 DiffTests.User(↩︎)
+//      +   [2]: #2 DiffTests.User(
+//      +     id: 1,
+//      +     name: "Blob, Jr"
+//      +   )
+//        ]
+//      """
+//    )
+
+    struct State {
+      var stats: Shared
+    }
+    struct Stats {
+      var count = 0
+    }
+    let stats = State(stats: Shared(before: Stats(), after: Stats(count: 1)))
     XCTAssertNoDifference(
-      diff(obj, obj),
+      diff(stats, stats),
       """
-        #1 DiffTests.User(
-          id: 1,
-      -   name: "Blob"
-      +   name: "Blob, Jr"
+        DiffTests.State(
+      -   stats: #1 DiffTests.Stats(count: 0)
+      +   stats: #1 DiffTests.Stats(count: 1)
         )
-      """
-    )
-
-    XCTAssertNoDifference(
-      diff(Shared(), Shared()),
-      """
-      - #1 DiffTests.User(
-      -   id: 1,
-      -   name: "Blob, Jr"
-      - )
-      + #2 DiffTests.User(
-      +   id: 1,
-      +   name: "Blob, Jr"
-      + )
-      """
-    )
-
-    XCTAssertNoDifference(
-      diff([obj, obj, obj], [obj, obj, Shared()]),
-      """
-        [
-          #1 DiffTests.User(
-            id: 1,
-      -     name: "Blob"
-      +     name: "Blob, Jr"
-          ),
-      -   [1]: #1 DiffTests.User(↩︎),
-      +   [1]: #1 DiffTests.User(↩︎),
-      -   [2]: #1 DiffTests.User(↩︎)
-      +   [2]: #2 DiffTests.User(
-      +     id: 1,
-      +     name: "Blob, Jr"
-      +   )
-        ]
       """
     )
   }
@@ -1301,8 +1324,8 @@ final class DiffTests: XCTestCase {
     XCTAssertNoDifference(
       diff(obj, obj),
       """
-      - #1: "before"
-      + #1: "after"
+      - #1 "before"
+      + #1 "after"
       """
     )
 
@@ -1311,8 +1334,8 @@ final class DiffTests: XCTestCase {
       diff(bar, bar),
       """
         DiffTests.DiffableObjects(
-      -   #1: "before"
-      +   #1: "after"
+      -   obj1: #1 "before"
+      +   obj1: #1 "after"
       -   obj2: #1 String(↩︎)
       +   obj2: #1 String(↩︎)
         )

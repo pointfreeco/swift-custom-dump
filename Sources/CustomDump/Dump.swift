@@ -88,6 +88,7 @@ func _customDump<T, TargetStream>(
   _ value: T,
   to target: inout TargetStream,
   name: String?,
+  nameSuffix: String = ":",
   indent: Int,
   isRoot: Bool,
   maxDepth: Int,
@@ -97,12 +98,17 @@ func _customDump<T, TargetStream>(
     _ value: InnerT,
     to target: inout InnerTargetStream,
     name: String?,
+    nameSuffix: String,
     indent: Int,
     isRoot: Bool,
     maxDepth: Int
   ) where InnerTargetStream: TextOutputStream {
     if InnerT.self is AnyObject.Type, withUnsafeBytes(of: value, { $0.allSatisfy { $0 == 0 } }) {
-      target.write((name.map { "\($0): " } ?? "").appending("(null pointer)").indenting(by: indent))
+      target.write(
+        (name.map { "\($0)\(nameSuffix) " } ?? "")
+          .appending("(null pointer)")
+          .indenting(by: indent)
+      )
       return
     }
 
@@ -127,6 +133,7 @@ func _customDump<T, TargetStream>(
             child.value,
             to: &childOut,
             name: child.label,
+            nameSuffix: ":",
             indent: 0,
             isRoot: false,
             maxDepth: maxDepth - 1
@@ -157,6 +164,7 @@ func _customDump<T, TargetStream>(
               child.value,
               to: &out,
               name: child.label,
+              nameSuffix: ":",
               indent: 2,
               isRoot: false,
               maxDepth: maxDepth - 1
@@ -200,12 +208,26 @@ func _customDump<T, TargetStream>(
       } else {
         tracker.visitedItems.insert(item)
         occurrence += 1
-        customDumpHelp(value, to: &out, name: nil, indent: 0, isRoot: false, maxDepth: maxDepth)
+        customDumpHelp(
+          value,
+          to: &out,
+          name: nil,
+          nameSuffix: "",
+          indent: 0,
+          isRoot: false,
+          maxDepth: maxDepth
+        )
       }
 
     case let (value as CustomDumpRepresentable, _):
       customDumpHelp(
-        value.customDumpValue, to: &out, name: nil, indent: 0, isRoot: false, maxDepth: maxDepth
+        value.customDumpValue,
+        to: &out,
+        name: nil,
+        nameSuffix: "",
+        indent: 0,
+        isRoot: false,
+        maxDepth: maxDepth
       )
 
     case let (value as AnyObject, .class?):
@@ -327,7 +349,15 @@ func _customDump<T, TargetStream>(
 
     case (_, .optional?):
       if let value = mirror.children.first?.value {
-        customDumpHelp(value, to: &out, name: nil, indent: 0, isRoot: false, maxDepth: maxDepth)
+        customDumpHelp(
+          value,
+          to: &out,
+          name: nil,
+          nameSuffix: "",
+          indent: 0,
+          isRoot: false,
+          maxDepth: maxDepth
+        )
       } else {
         out.write("nil")
       }
@@ -403,11 +433,17 @@ func _customDump<T, TargetStream>(
       }
     }
 
-    target.write((name.map { "\($0): " } ?? "").appending(out).indenting(by: indent))
+    target.write((name.map { "\($0)\(nameSuffix) " } ?? "").appending(out).indenting(by: indent))
   }
 
   customDumpHelp(
-    value, to: &target, name: name, indent: indent, isRoot: isRoot, maxDepth: maxDepth
+    value,
+    to: &target,
+    name: name,
+    nameSuffix: nameSuffix,
+    indent: indent,
+    isRoot: isRoot,
+    maxDepth: maxDepth
   )
   return value
 }
@@ -415,6 +451,7 @@ func _customDump<T, TargetStream>(
 func _customDump(
   _ value: Any,
   name: String?,
+  nameSuffix: String = ":",
   indent: Int,
   isRoot: Bool,
   maxDepth: Int,
@@ -425,6 +462,7 @@ func _customDump(
     value,
     to: &out,
     name: name,
+    nameSuffix: nameSuffix,
     indent: indent,
     isRoot: isRoot,
     maxDepth: maxDepth,

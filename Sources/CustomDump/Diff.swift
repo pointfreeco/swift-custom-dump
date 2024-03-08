@@ -105,7 +105,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
       _ rhsMirror: Mirror,
       lhsName: String? = lhsName,
       rhsName: String? = rhsName,
-      nameSuffix: String = ": ",
+      nameSuffix: String = ":",
       prefix: String,
       suffix: String,
       elementIndent: Int,
@@ -126,6 +126,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         let lhsDump = _customDump(
           lhs,
           name: lhsName,
+          nameSuffix: nameSuffix,
           indent: indent,
           isRoot: false,
           maxDepth: 0,
@@ -134,6 +135,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         let rhsDump = _customDump(
           rhs,
           name: rhsName,
+          nameSuffix: nameSuffix,
           indent: indent,
           isRoot: false,
           maxDepth: 0,
@@ -165,6 +167,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
           _customDump(
             lhs,
             name: lhsName,
+            nameSuffix: nameSuffix,
             indent: indent,
             isRoot: isRoot,
             maxDepth: .max,
@@ -177,6 +180,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
           _customDump(
             rhs,
             name: rhsName,
+            nameSuffix: nameSuffix,
             indent: indent,
             isRoot: isRoot,
             maxDepth: .max,
@@ -192,7 +196,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
       lhsChildren.removeAll(where: { !isIncluded($0) })
       rhsChildren.removeAll(where: { !isIncluded($0) })
 
-      let name = rhsName.map { "\($0)\(nameSuffix)" } ?? ""
+      let name = rhsName.map { "\($0)\(nameSuffix) " } ?? ""
       print(
         name
           .appending(prefix)
@@ -377,9 +381,9 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
             rhs: rhs,
             Mirror(customDumpReflecting: lhs),
             Mirror(customDumpReflecting: rhs),
-            lhsName: "#\(id)",
-            rhsName: "#\(id)",
-            nameSuffix: " ",
+            lhsName: "\(lhsName.map { "\($0): " } ?? "")#\(id)",
+            rhsName: "\(rhsName.map { "\($0): " } ?? "")#\(id)",
+            nameSuffix: "",
             prefix: "\(subjectType)(",
             suffix: ")",
             elementIndent: 2,
