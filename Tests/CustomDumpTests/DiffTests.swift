@@ -1306,16 +1306,13 @@ final class DiffTests: XCTestCase {
   }
 
   func testDiffableObject_Advanced() {
-    class DiffableObject: _CustomDiffObject, Equatable {
+    class DiffableObject: _CustomDiffObject {
       var _customDiffValues: (Any, Any) {
         ("before", "after")
       }
-      static func == (lhs: DiffableObject, rhs: DiffableObject) -> Bool {
-        false
-      }
     }
 
-    struct DiffableObjects: Equatable {
+    struct DiffableObjects {
       var obj1: DiffableObject
       var obj2: DiffableObject
     }

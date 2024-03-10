@@ -1360,21 +1360,18 @@ final class DumpTests: XCTestCase {
       var email: String
     }
 
-    class DiffableObject: _CustomDiffObject, Equatable {
+    class DiffableObject: _CustomDiffObject {
       var _customDiffValues: (Any, Any) {
         (Login(email: "blob@pointfree.co"), Login(email: "admin@pointfree.co"))
       }
-      static func == (lhs: DiffableObject, rhs: DiffableObject) -> Bool {
-        false
-      }
     }
 
-    struct DiffableObjects: Equatable {
+    struct DiffableObjects {
       var obj1: DiffableObject
       var obj2: DiffableObject
     }
 
-    struct DiffableObjectsParent: Equatable {
+    struct DiffableObjectsParent {
       var objs1: DiffableObjects
       var objs2: DiffableObjects
     }
@@ -1426,7 +1423,7 @@ final class DumpTests: XCTestCase {
   }
 
   func testDiffableObject_Primitive() {
-    class DiffableObject: _CustomDiffObject, Equatable {
+    class DiffableObject: _CustomDiffObject {
       var _customDiffValues: (Any, Any) {
         ("before", "after")
       }
@@ -1435,12 +1432,12 @@ final class DumpTests: XCTestCase {
       }
     }
 
-    struct DiffableObjects: Equatable {
+    struct DiffableObjects {
       var obj1: DiffableObject
       var obj2: DiffableObject
     }
 
-    struct DiffableObjectsParent: Equatable {
+    struct DiffableObjectsParent {
       var objs1: DiffableObjects
       var objs2: DiffableObjects
     }
