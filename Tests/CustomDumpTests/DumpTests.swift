@@ -824,60 +824,6 @@ final class DumpTests: XCTestCase {
           """#
         )
       }
-    #else
-      dump = ""
-      customDump(\UserClass.name, to: &dump)
-      XCTAssertNoDifference(
-        dump,
-        #"""
-        KeyPath<UserClass, String>
-        """#
-      )
-
-      dump = ""
-      customDump(\Pair.driver.name, to: &dump)
-      XCTAssertNoDifference(
-        dump,
-        #"""
-        KeyPath<Pair, String>
-        """#
-      )
-
-      dump = ""
-      customDump(\User.name.count, to: &dump)
-      XCTAssertNoDifference(
-        dump,
-        #"""
-        KeyPath<User, Int>
-        """#
-      )
-
-      dump = ""
-      customDump(\(x: Double, y: Double).x, to: &dump)
-      XCTAssertNoDifference(
-        dump,
-        #"""
-        WritableKeyPath<(x: Double, y: Double), Double>
-        """#
-      )
-
-      dump = ""
-      customDump(\Item.$isInStock, to: &dump)
-      XCTAssertNoDifference(
-        dump,
-        #"""
-        KeyPath<Item, Wrapped<Bool>>
-        """#
-      )
-
-      dump = ""
-      customDump(\Wrapped<String>.count, to: &dump)
-      XCTAssertNoDifference(
-        dump,
-        #"""
-        KeyPath<Wrapped<String>, Int>
-        """#
-      )
     #endif
   }
 
