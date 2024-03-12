@@ -76,7 +76,7 @@ jobs:
       - uses: bytecodealliance/actions/wasmtime/setup@v1
       - uses: swiftwasm/setup-swiftwasm@v1
         with:
-          swift-version: "wasm-5.8.0-RELEASE"
+          swift-version: "wasm-5.9.2-RELEASE"
       - name: Build tests
         run: swift build --triple wasm32-unknown-wasi --build-tests
       - name: Run tests
