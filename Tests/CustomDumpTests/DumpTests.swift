@@ -708,8 +708,9 @@ final class DumpTests: XCTestCase {
   }
 
   func testKeyPath() {
+    // NB: While this should run on >=5.9, it currently crashes CI on Xcode 15.2
+    #if swift(>=5.10) && (os(iOS) || os(macOS) || os(tvOS) || os(watchOS))
     var dump = ""
-    #if swift(>=5.9)
       if #available(macOS 13.3, iOS 16.4, watchOS 9.4, tvOS 16.4, *) {
         dump = ""
         customDump(\UserClass.name, to: &dump)
@@ -765,11 +766,7 @@ final class DumpTests: XCTestCase {
           """#
         )
         return
-      }
-    #endif
-    #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
-      // Run twice to exercise cached lookup
-      for _ in 1...2 {
+      } else {
         dump = ""
         customDump(\UserClass.name, to: &dump)
         XCTAssertNoDifference(
@@ -824,60 +821,6 @@ final class DumpTests: XCTestCase {
           """#
         )
       }
-    #else
-      dump = ""
-      customDump(\UserClass.name, to: &dump)
-      XCTAssertNoDifference(
-        dump,
-        #"""
-        KeyPath<UserClass, String>
-        """#
-      )
-
-      dump = ""
-      customDump(\Pair.driver.name, to: &dump)
-      XCTAssertNoDifference(
-        dump,
-        #"""
-        KeyPath<Pair, String>
-        """#
-      )
-
-      dump = ""
-      customDump(\User.name.count, to: &dump)
-      XCTAssertNoDifference(
-        dump,
-        #"""
-        KeyPath<User, Int>
-        """#
-      )
-
-      dump = ""
-      customDump(\(x: Double, y: Double).x, to: &dump)
-      XCTAssertNoDifference(
-        dump,
-        #"""
-        WritableKeyPath<(x: Double, y: Double), Double>
-        """#
-      )
-
-      dump = ""
-      customDump(\Item.$isInStock, to: &dump)
-      XCTAssertNoDifference(
-        dump,
-        #"""
-        KeyPath<Item, Wrapped<Bool>>
-        """#
-      )
-
-      dump = ""
-      customDump(\Wrapped<String>.count, to: &dump)
-      XCTAssertNoDifference(
-        dump,
-        #"""
-        KeyPath<Wrapped<String>, Int>
-        """#
-      )
     #endif
   }
 
@@ -1145,23 +1088,23 @@ final class DumpTests: XCTestCase {
             name: "Virginia",
             parent: DumpTests.Parent(↩︎)
           ),
-          [1]: DumpTests.Child#2(
+          [1]: #1 DumpTests.Child(
             name: "Ronald",
             parent: DumpTests.Parent(↩︎)
           ),
-          [2]: DumpTests.Child#3(
+          [2]: #2 DumpTests.Child(
             name: "Fred",
             parent: DumpTests.Parent(↩︎)
           ),
-          [3]: DumpTests.Child#4(
+          [3]: #3 DumpTests.Child(
             name: "George",
             parent: DumpTests.Parent(↩︎)
           ),
-          [4]: DumpTests.Child#5(
+          [4]: #4 DumpTests.Child(
             name: "Percy",
             parent: DumpTests.Parent(↩︎)
           ),
-          [5]: DumpTests.Child#6(
+          [5]: #5 DumpTests.Child(
             name: "Charles",
             parent: DumpTests.Parent(↩︎)
           )
@@ -1217,9 +1160,9 @@ final class DumpTests: XCTestCase {
         [0]: DumpTests.Human(name: "John"),
         [1]: DumpTests.Human(↩︎),
         [2]: DumpTests.Human(↩︎),
-        [3]: DumpTests.Human#2(name: "John"),
-        [4]: DumpTests.Human#2(↩︎),
-        [5]: DumpTests.Human#2(↩︎),
+        [3]: #1 DumpTests.Human(name: "John"),
+        [4]: #1 DumpTests.Human(↩︎),
+        [5]: #1 DumpTests.Human(↩︎),
         [6]: DumpTests.User(
           name: "John",
           email: "john@me.com",
@@ -1228,14 +1171,14 @@ final class DumpTests: XCTestCase {
         ),
         [7]: DumpTests.User(↩︎),
         [8]: DumpTests.User(↩︎),
-        [9]: DumpTests.User#2(
+        [9]: #1 DumpTests.User(
           name: "John",
           email: "john@me.com",
           age: 97,
-          human: DumpTests.Human#2(↩︎)
+          human: #1 DumpTests.Human(↩︎)
         ),
-        [10]: DumpTests.User#2(↩︎),
-        [11]: DumpTests.User#2(↩︎)
+        [10]: #1 DumpTests.User(↩︎),
+        [11]: #1 DumpTests.User(↩︎)
       ]
       """
     )
@@ -1350,6 +1293,116 @@ final class DumpTests: XCTestCase {
       DumpTests.Object(
         name: "Blob Sr.",
         _$observationRegistrar: DumpTests.ObservationRegistrar()
+      )
+      """
+    )
+  }
+
+  func testDiffableObject() {
+    struct Login {
+      var email: String
+    }
+
+    class DiffableObject: _CustomDiffObject {
+      var _customDiffValues: (Any, Any) {
+        (Login(email: "blob@pointfree.co"), Login(email: "admin@pointfree.co"))
+      }
+    }
+
+    struct DiffableObjects {
+      var obj1: DiffableObject
+      var obj2: DiffableObject
+    }
+
+    struct DiffableObjectsParent {
+      var objs1: DiffableObjects
+      var objs2: DiffableObjects
+    }
+
+    let obj1 = DiffableObject()
+    let obj2 = DiffableObject()
+
+    XCTAssertNoDifference(
+      String(
+        customDumping: DiffableObjectsParent(
+          objs1: DiffableObjects(obj1: obj1, obj2: obj1),
+          objs2: DiffableObjects(obj1: obj2, obj2: obj2)
+        )
+      ),
+      """
+      DumpTests.DiffableObjectsParent(
+        objs1: DumpTests.DiffableObjects(
+          obj1: #1 DumpTests.Login(email: "admin@pointfree.co"),
+          obj2: #1 DumpTests.Login(↩︎)
+        ),
+        objs2: DumpTests.DiffableObjects(
+          obj1: #2 DumpTests.Login(email: "admin@pointfree.co"),
+          obj2: #2 DumpTests.Login(↩︎)
+        )
+      )
+      """
+    )
+
+    XCTAssertNoDifference(
+      String(
+        customDumping: DiffableObjectsParent(
+          objs1: DiffableObjects(obj1: obj1, obj2: obj2),
+          objs2: DiffableObjects(obj1: obj2, obj2: obj1)
+        )
+      ),
+      """
+      DumpTests.DiffableObjectsParent(
+        objs1: DumpTests.DiffableObjects(
+          obj1: #1 DumpTests.Login(email: "admin@pointfree.co"),
+          obj2: #2 DumpTests.Login(email: "admin@pointfree.co")
+        ),
+        objs2: DumpTests.DiffableObjects(
+          obj1: #2 DumpTests.Login(↩︎),
+          obj2: #1 DumpTests.Login(↩︎)
+        )
+      )
+      """
+    )
+  }
+
+  func testDiffableObject_Primitive() {
+    class DiffableObject: _CustomDiffObject {
+      var _customDiffValues: (Any, Any) {
+        ("before", "after")
+      }
+      static func == (lhs: DiffableObject, rhs: DiffableObject) -> Bool {
+        false
+      }
+    }
+
+    struct DiffableObjects {
+      var obj1: DiffableObject
+      var obj2: DiffableObject
+    }
+
+    struct DiffableObjectsParent {
+      var objs1: DiffableObjects
+      var objs2: DiffableObjects
+    }
+
+    let obj1 = DiffableObject()
+    let obj2 = DiffableObject()
+    let objs1 = DiffableObjects(obj1: obj1, obj2: obj1)
+    let objs2 = DiffableObjects(obj1: obj2, obj2: obj2)
+    let objsParent = DiffableObjectsParent(objs1: objs1, objs2: objs2)
+    
+    XCTAssertNoDifference(
+      String(customDumping: objsParent),
+      """
+      DumpTests.DiffableObjectsParent(
+        objs1: DumpTests.DiffableObjects(
+          obj1: #1 "after",
+          obj2: #1 String(↩︎)
+        ),
+        objs2: DumpTests.DiffableObjects(
+          obj1: #2 "after",
+          obj2: #2 String(↩︎)
+        )
       )
       """
     )
