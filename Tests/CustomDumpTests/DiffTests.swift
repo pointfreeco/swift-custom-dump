@@ -1226,26 +1226,12 @@ final class DiffTests: XCTestCase {
       let id = 1
       var name = "Blob"
     }
-    class Shared: _CustomDiffObject, Equatable {
-      let before: Any
-      let after: Any
-      init(before: Any = User(), after: Any = User(name: "Blob, Jr")) {
-        self.before = before
-        self.after = after
-      }
-      var _customDiffValues: (Any, Any) {
-        (self.before, self.after)
-      }
-      static func == (lhs: Shared, rhs: Shared) -> Bool {
-        false
-      }
-    }
 
     let obj = Shared()
     XCTAssertNoDifference(
       diff(obj, obj),
       """
-        #1 DiffTests.User(
+        #1 User(
           id: 1,
       -   name: "Blob"
       +   name: "Blob, Jr"
@@ -1256,11 +1242,11 @@ final class DiffTests: XCTestCase {
     XCTAssertNoDifference(
       diff(Shared(), Shared()),
       """
-      - #1 DiffTests.User(
+      - #1 User(
       -   id: 1,
       -   name: "Blob, Jr"
       - )
-      + #2 DiffTests.User(
+      + #2 User(
       +   id: 1,
       +   name: "Blob, Jr"
       + )
@@ -1271,15 +1257,15 @@ final class DiffTests: XCTestCase {
       diff([obj, obj, obj], [obj, obj, Shared()]),
       """
         [
-          [0]: #1 DiffTests.User(
+          [0]: #1 User(
             id: 1,
       -     name: "Blob"
       +     name: "Blob, Jr"
           ),
-      -   [1]: #1 DiffTests.User(↩︎),
-      +   [1]: #1 DiffTests.User(↩︎),
-      -   [2]: #1 DiffTests.User(↩︎)
-      +   [2]: #2 DiffTests.User(
+      -   [1]: #1 User(↩︎),
+      +   [1]: #1 User(↩︎),
+      -   [2]: #1 User(↩︎)
+      +   [2]: #2 User(
       +     id: 1,
       +     name: "Blob, Jr"
       +   )
@@ -1303,6 +1289,21 @@ final class DiffTests: XCTestCase {
         )
       """
     )
+  }
+}
+
+private class Shared: _CustomDiffObject, Equatable {
+  let before: Any
+  let after: Any
+  init(before: Any = User(id: 1, name: "Blob"), after: Any = User(id: 1, name: "Blob, Jr")) {
+    self.before = before
+    self.after = after
+  }
+  var _customDiffValues: (Any, Any) {
+    (self.before, self.after)
+  }
+  static func == (lhs: Shared, rhs: Shared) -> Bool {
+    false
   }
 }
 
