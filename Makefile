@@ -2,10 +2,7 @@ PLATFORM_IOS = iOS Simulator,name=iPhone 11 Pro Max
 PLATFORM_MACOS = macOS
 PLATFORM_MAC_CATALYST = macOS,variant=Mac Catalyst
 PLATFORM_TVOS = tvOS Simulator,name=Apple TV
-SWIFT_VERSION = 5.5
-ifeq ($(SWIFT_VERSION),5.3)
-SWIFT_BUILD_ARGS = --enable-test-discovery
-endif
+SWIFT_VERSION = 5.7
 SWIFT_TEST_ARGS = --parallel
 
 test-all: test-linux test-swift test-platforms
@@ -19,8 +16,8 @@ test-linux:
 		bash -c 'apt-get update && apt-get -y install make && make test-swift SWIFT_VERSION=$(SWIFT_VERSION)'
 
 test-swift:
-	swift test $(SWIFT_BUILD_ARGS) $(SWIFT_TEST_ARGS)
-	swift test --configuration release $(SWIFT_BUILD_ARGS) $(SWIFT_TEST_ARGS)
+	swift test $(SWIFT_TEST_ARGS)
+	swift test --configuration release $(SWIFT_TEST_ARGS)
 
 test-platforms:
 	xcodebuild test \
