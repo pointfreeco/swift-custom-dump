@@ -63,9 +63,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: swiftwasm/swiftwasm-action@v5.8
+      - uses: bytecodealliance/actions/wasmtime/setup@v1
+      - uses: swiftwasm/setup-swiftwasm@v1
         with:
-          shell-action: carton test --environment node
+          swift-version: "wasm-5.9.2-RELEASE"
+      - name: Build tests
+        run: swift build --triple wasm32-unknown-wasi --build-tests
+      - name: Run tests
+        run: wasmtime .build/debug/swift-custom-dumpPackageTests.wasm
 
   windows:
     name: Windows
