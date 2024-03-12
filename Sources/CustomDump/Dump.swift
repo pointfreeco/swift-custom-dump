@@ -458,6 +458,8 @@ func _customDump(
   tracker: inout ObjectTracker
 ) -> String {
   var out = ""
+  var t = tracker
+  defer { tracker = t }
   _customDump(
     value,
     to: &out,
@@ -466,7 +468,7 @@ func _customDump(
     indent: indent,
     isRoot: isRoot,
     maxDepth: maxDepth,
-    tracker: &tracker
+    tracker: &t
   )
   return out
 }
