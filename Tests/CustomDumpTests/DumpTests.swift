@@ -708,12 +708,120 @@ final class DumpTests: XCTestCase {
   }
 
   func testKeyPath() {
-    _ = String(customDumping: \UserClass.name)
-    _ = String(customDumping: \Pair.driver.name)
-    _ = String(customDumping: \User.name.count)
-    _ = String(customDumping: \(x: Double, y: Double).x)
-    _ = String(customDumping: \Item.$isInStock)
-    _ = String(customDumping: \Wrapped<String>.count)
+    // NB: While this should run on >=5.9, it currently crashes CI on Xcode 15.2
+    #if swift(>=5.10) && (os(iOS) || os(macOS) || os(tvOS) || os(watchOS))
+    var dump = ""
+      if #available(macOS 13.3, iOS 16.4, watchOS 9.4, tvOS 16.4, *) {
+        dump = ""
+        customDump(\UserClass.name, to: &dump)
+        XCTAssertNoDifference(
+          dump,
+          #"""
+          \UserClass.name
+          """#
+        )
+
+        dump = ""
+        customDump(\Pair.driver.name, to: &dump)
+        XCTAssertNoDifference(
+          dump,
+          #"""
+          \Pair.driver.name
+          """#
+        )
+
+        dump = ""
+        customDump(\User.name.count, to: &dump)
+        XCTAssertNoDifference(
+          dump,
+          #"""
+          \User.name.count
+          """#
+        )
+
+        dump = ""
+        customDump(\(x: Double, y: Double).x, to: &dump)
+        XCTAssertNoDifference(
+          dump,
+          #"""
+          \(x: Double, y: Double).x
+          """#
+        )
+
+        dump = ""
+        customDump(\Item.$isInStock, to: &dump)
+        XCTAssertNoDifference(
+          dump,
+          #"""
+          \Item.$isInStock
+          """#
+        )
+
+        dump = ""
+        customDump(\Wrapped<String>.count, to: &dump)
+        XCTAssertNoDifference(
+          dump,
+          #"""
+          \Wrapped<String>.subscript(dynamicMember: <unknown>)
+          """#
+        )
+        return
+      } else {
+        dump = ""
+        customDump(\UserClass.name, to: &dump)
+        XCTAssertNoDifference(
+          dump,
+          #"""
+          \UserClass.name
+          """#
+        )
+
+        dump = ""
+        customDump(\Pair.driver.name, to: &dump)
+        XCTAssertNoDifference(
+          dump,
+          #"""
+          \Pair.driver.name
+          """#
+        )
+
+        dump = ""
+        customDump(\User.name.count, to: &dump)
+        XCTAssertNoDifference(
+          dump,
+          #"""
+          KeyPath<User, Int>
+          """#
+        )
+
+        dump = ""
+        customDump(\(x: Double, y: Double).x, to: &dump)
+        XCTAssertNoDifference(
+          dump,
+          #"""
+          WritableKeyPath<(x: Double, y: Double), Double>
+          """#
+        )
+
+        dump = ""
+        customDump(\Item.$isInStock, to: &dump)
+        XCTAssertNoDifference(
+          dump,
+          #"""
+          KeyPath<Item, Wrapped<Bool>>
+          """#
+        )
+
+        dump = ""
+        customDump(\Wrapped<String>.count, to: &dump)
+        XCTAssertNoDifference(
+          dump,
+          #"""
+          KeyPath<Wrapped<String>, Int>
+          """#
+        )
+      }
+    #endif
   }
 
   func testNamespacedTypes() {
