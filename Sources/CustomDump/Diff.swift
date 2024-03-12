@@ -123,24 +123,26 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         !(lhs is _CustomDiffObject),
         !(rhs is _CustomDiffObject)
       {
-        let lhsDump = _customDump(
-          lhs,
-          name: lhsName,
-          nameSuffix: nameSuffix,
-          indent: indent,
-          isRoot: false,
-          maxDepth: 0,
-          tracker: &tracker
-        ) + separator
-        let rhsDump = _customDump(
-          rhs,
-          name: rhsName,
-          nameSuffix: nameSuffix,
-          indent: indent,
-          isRoot: false,
-          maxDepth: 0,
-          tracker: &tracker
-        ) + separator
+        let lhsDump =
+          _customDump(
+            lhs,
+            name: lhsName,
+            nameSuffix: nameSuffix,
+            indent: indent,
+            isRoot: false,
+            maxDepth: 0,
+            tracker: &tracker
+          ) + separator
+        let rhsDump =
+          _customDump(
+            rhs,
+            name: rhsName,
+            nameSuffix: nameSuffix,
+            indent: indent,
+            isRoot: false,
+            maxDepth: 0,
+            tracker: &tracker
+          ) + separator
         if lhsDump == rhsDump {
           print(
             "// Not equal but no difference detected:"
@@ -525,8 +527,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         areInIncreasingOrder: lhsMirror.subjectType is _UnorderedCollection.Type
           ? {
             let (lhsValue, rhsValue): (Any, Any)
-            if
-              let lhs = $0.value as? (key: AnyHashable, value: Any),
+            if let lhs = $0.value as? (key: AnyHashable, value: Any),
               let rhs = $1.value as? (key: AnyHashable, value: Any)
             {
               lhsValue = lhs.key.base

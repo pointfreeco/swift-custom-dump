@@ -113,7 +113,7 @@ final class DiffTests: XCTestCase {
     let u2 = User(id: 2, name: "Blob Jr.")
     let u3 = User(id: 3, name: "Blob Sr.")
 
-    struct Three { let u1: User, u2: User, u3: User}
+    struct Three { let u1: User, u2: User, u3: User }
 
     XCTAssertNoDifference(
       diff(

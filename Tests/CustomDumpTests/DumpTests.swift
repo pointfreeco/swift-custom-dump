@@ -710,7 +710,7 @@ final class DumpTests: XCTestCase {
   func testKeyPath() {
     // NB: While this should run on >=5.9, it currently crashes CI on Xcode 15.2
     #if swift(>=5.10) && (os(iOS) || os(macOS) || os(tvOS) || os(watchOS))
-    var dump = ""
+      var dump = ""
       if #available(macOS 13.3, iOS 16.4, watchOS 9.4, tvOS 16.4, *) {
         dump = ""
         customDump(\UserClass.name, to: &dump)
@@ -1390,7 +1390,7 @@ final class DumpTests: XCTestCase {
     let objs1 = DiffableObjects(obj1: obj1, obj2: obj1)
     let objs2 = DiffableObjects(obj1: obj2, obj2: obj2)
     let objsParent = DiffableObjectsParent(objs1: objs1, objs2: objs2)
-    
+
     XCTAssertNoDifference(
       String(customDumping: objsParent),
       """
