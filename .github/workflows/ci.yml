@@ -14,15 +14,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  macos-13:
-    name: macOS 13 (Xcode ${{ matrix.xcode }})
+  macos-14:
+    name: macOS 14 (Xcode ${{ matrix.xcode }})
     runs-on: macOS-13
     strategy:
       matrix:
         xcode:
-          - '14.3.1'
+          - '15.2'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Select Xcode ${{ matrix.xcode }}
         run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
       - name: Print Swift version
@@ -32,18 +32,15 @@ jobs:
       - name: Run tests (platforms)
         run: make test-platforms
 
-  macos-12:
-    name: macOS 12 (Xcode ${{ matrix.xcode }})
-    runs-on: macOS-12
+  macos-13:
+    name: macOS 13 (Xcode ${{ matrix.xcode }})
+    runs-on: macOS-13
     strategy:
       matrix:
         xcode:
-          - '13.3.1'
-          - '13.4.1'
-          - '14.0.1'
-          - '14.1'
+          - '14.3.1'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Select Xcode ${{ matrix.xcode }}
         run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
       - name: Print Swift version
@@ -59,12 +56,10 @@ jobs:
     strategy:
       matrix:
         swift:
-          - 5.5
-          - 5.6
           - 5.7
           - 5.8
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Run tests
         run: make test-linux SWIFT_VERSION=${{ matrix.swift }}
 
@@ -87,15 +82,10 @@ jobs:
     steps:
       - uses: compnerd/gha-setup-swift@main
         with:
-          branch: swift-5.8.1-release
-          tag: 5.8.1-RELEASE
-      - uses: actions/checkout@v3
+          branch: swift-5.9.2-release
+          tag: 5.9.2-RELEASE
+      - uses: actions/checkout@v4
       - name: Build All Configurations
         run: swift build -c ${{ matrix.config }}
       - name: Run tests (debug only)
-        # There is an issue that exists in the 5.8.1 toolchain
-        # which fails on release configuration testing, but
-        # this issue is fixed 5.9 so we can remove the if once
-        # that is generally available.
-        if: ${{ matrix.config == 'debug' }}
         run: swift test

@@ -709,7 +709,7 @@ final class DumpTests: XCTestCase {
 
   func testKeyPath() {
     var dump = ""
-    #if swift(>=5.9)
+    #if swift(>=5.9) && (os(iOS) || os(macOS) || os(tvOS) || os(watchOS))
       if #available(macOS 13.3, iOS 16.4, watchOS 9.4, tvOS 16.4, *) {
         dump = ""
         customDump(\UserClass.name, to: &dump)
