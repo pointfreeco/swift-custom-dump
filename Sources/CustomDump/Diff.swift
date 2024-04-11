@@ -753,7 +753,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
 ///
 /// This type comes with two pre-configured formats that you will probably want to use for most
 /// situations: ``DiffFormat/default`` and ``DiffFormat/proportional``.
-public struct DiffFormat {
+public struct DiffFormat: Sendable {
   /// A string prepended to lines that only appear in the string representation of the first value,
   /// e.g. a "removal."
   public var first: String
