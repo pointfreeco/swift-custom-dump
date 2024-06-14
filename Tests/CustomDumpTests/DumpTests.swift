@@ -1184,23 +1184,25 @@ final class DumpTests: XCTestCase {
     )
   }
 
-  func testDuration() {
-    guard #available(macOS 13, iOS 16, watchOS 9, tvOS 16, *) else { return }
+  #if !os(WASI)
+    func testDuration() {
+      guard #available(macOS 13, iOS 16, watchOS 9, tvOS 16, *) else { return }
 
-    XCTAssertNoDifference(
-      String(customDumping: Duration.seconds(5)),
-      """
-      5 seconds
-      """
-    )
+      XCTAssertNoDifference(
+        String(customDumping: Duration.seconds(5)),
+        """
+        5 seconds
+        """
+      )
 
-    XCTAssertNoDifference(
-      String(customDumping: Duration.seconds(5) + .milliseconds(123)),
-      """
-      5 seconds, 123 milliseconds
-      """
-    )
-  }
+      XCTAssertNoDifference(
+        String(customDumping: Duration.seconds(5) + .milliseconds(123)),
+        """
+        5 seconds, 123 milliseconds
+        """
+      )
+    }
+  #endif
 
   #if canImport(CoreGraphics)
     func testCoreGraphics() {
