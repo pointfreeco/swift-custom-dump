@@ -6,7 +6,7 @@ extension Character: CustomDumpRepresentable {
   }
 }
 
-#if !os(WASI)
+#if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
   @available(macOS 13, iOS 16, watchOS 9, tvOS 16, *)
   extension Duration: CustomDumpStringConvertible {
     public var customDumpDescription: String {
