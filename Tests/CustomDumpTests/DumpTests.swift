@@ -708,7 +708,7 @@ final class DumpTests: XCTestCase {
   }
 
   func testKeyPath() {
-    // NB: While this should run on >=5.9, it currently crashes CI on Xcode 15.2
+    // NB: While this should run on >=5.9, it currently crashes CI on Xcode 15
     #if swift(>=5.10) && (os(iOS) || os(macOS) || os(tvOS) || os(watchOS))
       var dump = ""
       if #available(macOS 13.3, iOS 16.4, watchOS 9.4, tvOS 16.4, *) {
@@ -1184,25 +1184,23 @@ final class DumpTests: XCTestCase {
     )
   }
 
-  #if (swift(>=5.7) && !targetEnvironment(macCatalyst) && (os(iOS) || os(tvOS) || os(watchOS))) || (swift(>=5.7.1) && os(macOS))
-    func testDuration() {
-      guard #available(macOS 13, iOS 16, watchOS 9, tvOS 16, *) else { return }
+  func testDuration() {
+    guard #available(macOS 13, iOS 16, watchOS 9, tvOS 16, *) else { return }
 
-      XCTAssertNoDifference(
-        String(customDumping: Duration.seconds(5)),
-        """
-        5 seconds
-        """
-      )
+    XCTAssertNoDifference(
+      String(customDumping: Duration.seconds(5)),
+      """
+      5 seconds
+      """
+    )
 
-      XCTAssertNoDifference(
-        String(customDumping: Duration.seconds(5) + .milliseconds(123)),
-        """
-        5 seconds, 123 milliseconds
-        """
-      )
-    }
-  #endif
+    XCTAssertNoDifference(
+      String(customDumping: Duration.seconds(5) + .milliseconds(123)),
+      """
+      5 seconds, 123 milliseconds
+      """
+    )
+  }
 
   #if canImport(CoreGraphics)
     func testCoreGraphics() {
