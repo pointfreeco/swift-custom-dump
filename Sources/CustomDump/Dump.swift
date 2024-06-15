@@ -411,7 +411,7 @@ func _customDump<T, TargetStream>(
       )
 
     default:
-      if let value = stringFromStringProtocol(value) {
+      if let value = String(stringProtocol: value) {
         if value.contains(where: \.isNewline) {
           if maxDepth <= 0 {
             out.write("\"…\"")
