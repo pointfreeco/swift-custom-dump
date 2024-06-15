@@ -207,7 +207,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         to: &out
       )
 
-      if let areInIncreasingOrder = areInIncreasingOrder {
+      if let areInIncreasingOrder {
         lhsChildren.sort(by: areInIncreasingOrder)
         rhsChildren.sort(by: areInIncreasingOrder)
       }
