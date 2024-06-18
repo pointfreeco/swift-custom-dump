@@ -6,7 +6,7 @@ extension Character: CustomDumpRepresentable {
   }
 }
 
-#if (swift(>=5.7) && !targetEnvironment(macCatalyst) && (os(iOS) || os(tvOS) || os(watchOS))) || (swift(>=5.7.1) && os(macOS))
+#if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
   @available(macOS 13, iOS 16, watchOS 9, tvOS 16, *)
   extension Duration: CustomDumpStringConvertible {
     public var customDumpDescription: String {

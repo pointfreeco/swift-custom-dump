@@ -207,7 +207,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         to: &out
       )
 
-      if let areInIncreasingOrder = areInIncreasingOrder {
+      if let areInIncreasingOrder {
         lhsChildren.sort(by: areInIncreasingOrder)
         rhsChildren.sort(by: areInIncreasingOrder)
       }
@@ -692,8 +692,8 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
       )
 
     default:
-      if let lhs = stringFromStringProtocol(lhs),
-        let rhs = stringFromStringProtocol(rhs),
+      if let lhs = String(stringProtocol: lhs),
+        let rhs = String(stringProtocol: rhs),
         lhs.contains(where: \.isNewline) || rhs.contains(where: \.isNewline)
       {
         let lhsMirror = Mirror(

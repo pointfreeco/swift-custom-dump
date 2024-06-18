@@ -29,7 +29,7 @@
           switch self.rawValue {
           case .alert:
             return "UNAuthorizationOptions.alert"
-          #if (os(iOS) || os(watchOS)) && (swift(<5.9) || !canImport(CompositorServices))
+          #if os(iOS) || os(watchOS)
             case .announcement:
               return "UNAuthorizationOptions.announcement"
           #endif
@@ -56,7 +56,7 @@
       var allCases: [UNAuthorizationOptions] = [
         .alert
       ]
-      #if (os(iOS) || os(watchOS)) && (swift(<5.9) || !canImport(CompositorServices))
+      #if os(iOS) || os(watchOS)
         allCases.append(.announcement)
       #endif
       allCases.append(contentsOf: [
@@ -132,11 +132,9 @@
       struct Option: CustomDumpStringConvertible {
         var rawValue: UNNotificationPresentationOptions
         var customDumpDescription: String {
-          #if swift(<5.9) || !canImport(CompositorServices)
-            if self.rawValue == .alert {
-              return "UNNotificationPresentationOptions.alert"
-            }
-          #endif
+          if self.rawValue == .alert {
+            return "UNNotificationPresentationOptions.alert"
+          }
           if self.rawValue == .badge {
             return "UNNotificationPresentationOptions.badge"
           }
@@ -155,8 +153,10 @@
 
       var options = self
       var children: [Option] = []
-      var allCases: [UNNotificationPresentationOptions] = []
-      appendBannerList(&allCases)
+      var allCases: [UNNotificationPresentationOptions] = [.alert, .badge]
+      if #available(iOS 14, macOS 11, tvOS 14, watchOS 7, *) {
+        allCases.append(contentsOf: [.banner, .list])
+      }
       allCases.append(.sound)
       for option in allCases {
         if options.contains(option) {
@@ -173,19 +173,6 @@
         unlabeledChildren: children,
         displayStyle: .set
       )
-    }
-
-    // NB: Workaround for Xcode 13.2's new, experimental build system.
-    //
-    //     defaults write com.apple.dt.XCBuild EnableSwiftBuildSystemIntegration 1
-    private func appendBannerList(_ allCases: inout [UNNotificationPresentationOptions]) {
-      #if swift(<5.9) || !canImport(CompositorServices)
-        allCases.append(.alert)
-      #endif
-      allCases.append(.badge)
-      if #available(iOS 14, macOS 11, tvOS 14, watchOS 7, *) {
-        allCases.append(contentsOf: [.banner, .list])
-      }
     }
   }
 
