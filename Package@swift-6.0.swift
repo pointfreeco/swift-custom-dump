@@ -32,5 +32,6 @@ let package = Package(
         "CustomDump"
       ]
     ),
-  ]
+  ],
+  swiftLanguageVersions: [.v6]
 )

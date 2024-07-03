@@ -32,16 +32,11 @@ extension Calendar: CustomDumpReflectable {
 }
 
 #if !os(WASI)
+  @available(iOS 15, macOS 12, tvOS 15, watchOS 8, *)
   extension Data: CustomDumpStringConvertible {
     public var customDumpDescription: String {
-      "Data(\(Self.formatter.string(fromByteCount: .init(self.count))))"
+      "Data\(self.count.formatted(.byteCount(style: .memory)))"
     }
-
-    private static let formatter: ByteCountFormatter = {
-      let formatter = ByteCountFormatter()
-      formatter.allowedUnits = .useBytes
-      return formatter
-    }()
   }
 #endif
 
