@@ -1,16 +1,15 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "xctest-dynamic-overlay",
-        "repositoryURL": "https://github.com/pointfreeco/xctest-dynamic-overlay",
-        "state": {
-          "branch": null,
-          "revision": "23cbf2294e350076ea4dbd7d5d047c1e76b03631",
-          "version": "1.0.2"
-        }
+  "originHash" : "9ef6797863d6110cfaf0d1856dcdebbe3e8e69e925ccd5a5022357453035b5c6",
+  "pins" : [
+    {
+      "identity" : "xctest-dynamic-overlay",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/xctest-dynamic-overlay",
+      "state" : {
+        "branch" : "swift-testing",
+        "revision" : "4903760159c5a0e9fb82f1be10594d89e3cde485"
       }
-    ]
-  },
-  "version": 1
+    }
+  ],
+  "version" : 3
 }
