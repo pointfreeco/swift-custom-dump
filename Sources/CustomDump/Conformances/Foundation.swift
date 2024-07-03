@@ -32,12 +32,20 @@ extension Calendar: CustomDumpReflectable {
 }
 
 #if !os(WASI)
-  @available(iOS 15, macOS 12, tvOS 15, watchOS 8, *)
   extension Data: CustomDumpStringConvertible {
     public var customDumpDescription: String {
-      "Data\(self.count.formatted(.byteCount(style: .memory)))"
+      formatterLock.withLock {
+        "Data(\(Self.formatter.string(fromByteCount: .init(self.count))))"
+      }
     }
+
+    nonisolated(unsafe) private static let formatter: ByteCountFormatter = {
+      let formatter = ByteCountFormatter()
+      formatter.allowedUnits = .useBytes
+      return formatter
+    }()
   }
+  private let formatterLock = NSLock()
 #endif
 
 #if !os(WASI)
