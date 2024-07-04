@@ -34,15 +34,26 @@ extension Calendar: CustomDumpReflectable {
 #if !os(WASI)
   extension Data: CustomDumpStringConvertible {
     public var customDumpDescription: String {
-      "Data(\(Self.formatter.string(fromByteCount: .init(self.count))))"
+      formatterLock.lock()
+      defer { formatterLock.unlock() }
+      return "Data(\(Self.formatter.string(fromByteCount: .init(self.count))))"
     }
 
-    private static let formatter: ByteCountFormatter = {
-      let formatter = ByteCountFormatter()
-      formatter.allowedUnits = .useBytes
-      return formatter
-    }()
+    #if swift(>=5.10)
+      nonisolated(unsafe) private static let formatter: ByteCountFormatter = {
+        let formatter = ByteCountFormatter()
+        formatter.allowedUnits = .useBytes
+        return formatter
+      }()
+    #else
+      private static let formatter: ByteCountFormatter = {
+        let formatter = ByteCountFormatter()
+        formatter.allowedUnits = .useBytes
+        return formatter
+      }()
+    #endif
   }
+  private let formatterLock = NSLock()
 #endif
 
 #if !os(WASI)
