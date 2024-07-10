@@ -24,7 +24,7 @@ let package = Package(
       name: "CustomDump",
       dependencies: [
         .product(name: "IssueReporting", package: "xctest-dynamic-overlay"),
-        .product(name: "XCTestDynamicOverlay", package: "xctest-dynamic-overlay")
+        .product(name: "XCTestDynamicOverlay", package: "xctest-dynamic-overlay"),
       ],
       swiftSettings: [
         .enableExperimentalFeature("StrictConcurrency")

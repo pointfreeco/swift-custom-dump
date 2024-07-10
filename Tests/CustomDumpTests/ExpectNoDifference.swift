@@ -20,16 +20,17 @@
       otherUser.name += " Jr."
       withKnownIssue {
         expectNoDifference(user, otherUser)
-      } matching: { issue in
-        print(issue.description)
-        return issue.description == """
-          Expectation failed: expectNoDifference failed: …
+      } matching: {
+        $0.description == """
+          Expectation failed: Difference: …
+
               ExpectNoDifferenceTests.User(
                 id: UUID(DEADBEEF-DEAD-BEEF-DEAD-BEEFDEADBEEF),
             −   name: "Blob",
             +   name: "Blob Jr.",
                 bio: "Blobbed around the world."
               )
+
           (First: −, Second: +)
           """
       }

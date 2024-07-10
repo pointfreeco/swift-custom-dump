@@ -1,27 +1,57 @@
 import IssueReporting
 
-// Check that two values are equal.
+/// Asserts that two values have no difference.
 ///
-/// TODO
+/// Similar to `XCTAssertEqual`, but that function uses either `TextOutputStreamable`,
+/// `CustomStringConvertible` or `CustomDebugStringConvertible` in order to display a failure
+/// message:
+///
+/// ```swift
+/// XCTAssertEqual(user1, user2)
+/// ```
+/// ```text
+/// XCTAssertEqual failed: ("User(id: 42, name: "Blob")") is not equal to ("User(id: 42, name: "Blob, Esq.")")
+/// ```
+///
+/// `XCTAssertNoDifference` uses the output of ``diff(_:_:format:)`` to display a failure message,
+/// which helps highlight the differences between the given values:
+///
+/// ```swift
+/// XCTAssertNoDifference(user1, user2)
+/// ```
+/// ```text
+/// XCTAssertNoDifference failed: …
+///
+///     User(
+///       id: 42,
+///   -   name: "Blob"
+///   +   name: "Blob, Esq."
+///     )
+///
+/// (First: -, Second: +)
+/// ```
 ///
 /// - Parameters:
 ///   - expression1: An expression of type `T`, where `T` is `Equatable`.
 ///   - expression2: A second expression of type `T`, where `T` is `Equatable`.
 ///   - message: An optional description of a failure.
-///   - file: The file where the failure occurs. The default is the filename of the test case where
+///   - fileID: The file where the failure occurs. The default is the file ID of the test case where
 ///     you call this function.
+///   - filePath: The file where the failure occurs. The default is the file path of the test case
+///     where you call this function.
 ///   - line: The line number where the failure occurs. The default is the line number where you
 ///     call this function.
-@available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
-public func expectNoDifference<T>(
+///   - line: The column where the failure occurs. The default is the column where you call this
+///     function.
+public func expectNoDifference<T: Equatable>(
   _ expression1: @autoclosure () throws -> T,
   _ expression2: @autoclosure () throws -> T,
-  _ message: @autoclosure () -> String = "",
+  _ message: @autoclosure () -> String? = nil,
   fileID: StaticString = #fileID,
   filePath: StaticString = #filePath,
   line: UInt = #line,
   column: UInt = #column
-) where T: Equatable {
+) {
   do {
     let expression1 = try expression1()
     let expression2 = try expression2()
@@ -32,9 +62,7 @@ public func expectNoDifference<T>(
     else {
       reportIssue(
         """
-        expectNoDifference failed: An unexpected failure occurred. Please report the issue to https://github.com/pointfreeco/swift-custom-dump …
-        ("\(expression1)" is not equal to ("\(expression2)")
-        But no difference was detected.
+        ("\(expression1)" is not equal to ("\(expression2)"), but no difference was detected.
         """,
         fileID: fileID,
         filePath: filePath,
@@ -43,13 +71,14 @@ public func expectNoDifference<T>(
       )
       return
     }
-    let failure = """
-      expectNoDifference failed: …
-      \(difference.indenting(by: 2))
-      (First: \(format.first), Second: \(format.second))
-      """
     reportIssue(
-      "\(failure)\(message.isEmpty ? "" : " - \(message)")",
+      """
+      \(message?.appending(" - ") ?? "")Difference: …
+
+      \(difference.indenting(by: 2))
+
+      (First: \(format.first), Second: \(format.second))
+      """,
       fileID: fileID,
       filePath: filePath,
       line: line,
@@ -58,7 +87,7 @@ public func expectNoDifference<T>(
   } catch {
     reportIssue(
       """
-      expectNoDifference failed: threw error "\(error)"
+      Threw error "\(error)"
       """,
       fileID: fileID,
       filePath: filePath,
