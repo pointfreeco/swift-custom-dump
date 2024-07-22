@@ -86,9 +86,7 @@ public func expectNoDifference<T: Equatable>(
     )
   } catch {
     reportIssue(
-      """
-      Threw error "\(error)"
-      """,
+      error,
       fileID: fileID,
       filePath: filePath,
       line: line,

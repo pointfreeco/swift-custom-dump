@@ -96,9 +96,7 @@ public func expectDifference<T: Equatable>(
     )
   } catch {
     reportIssue(
-      """
-      Threw error "\(error)"
-      """,
+      error,
       fileID: fileID,
       filePath: filePath,
       line: line,
@@ -156,9 +154,7 @@ public func expectDifference<T: Equatable & Sendable>(
     )
   } catch {
     reportIssue(
-      """
-      Threw error "\(error)"
-      """,
+      error,
       fileID: fileID,
       filePath: filePath,
       line: line,
