@@ -1,45 +1,6 @@
 import XCTestDynamicOverlay
 
-/// Asserts that two values have no difference.
-///
-/// Similar to `XCTAssertEqual`, but that function uses either `TextOutputStreamable`,
-/// `CustomStringConvertible` or `CustomDebugStringConvertible` in order to display a failure
-/// message:
-///
-/// ```swift
-/// XCTAssertEqual(user1, user2)
-/// ```
-/// ```text
-/// XCTAssertEqual failed: ("User(id: 42, name: "Blob")") is not equal to ("User(id: 42, name: "Blob, Esq.")")
-/// ```
-///
-/// `XCTAssertNoDifference` uses the output of ``diff(_:_:format:)`` to display a failure message,
-/// which helps highlight the differences between the given values:
-///
-/// ```swift
-/// XCTAssertNoDifference(user1, user2)
-/// ```
-/// ```text
-/// XCTAssertNoDifference failed: …
-///
-///     User(
-///       id: 42,
-///   -   name: "Blob"
-///   +   name: "Blob, Esq."
-///     )
-///
-/// (First: -, Second: +)
-/// ```
-///
-/// - Parameters:
-///   - expression1: An expression of type `T`, where `T` is `Equatable`.
-///   - expression2: A second expression of type `T`, where `T` is `Equatable`.
-///   - message: An optional description of a failure.
-///   - file: The file where the failure occurs. The default is the filename of the test case where
-///     you call this function.
-///   - line: The line number where the failure occurs. The default is the line number where you
-///     call this function.
-@available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
+@available(*, deprecated, renamed: "expectNoDifference")
 public func XCTAssertNoDifference<T>(
   _ expression1: @autoclosure () throws -> T,
   _ expression2: @autoclosure () throws -> T,

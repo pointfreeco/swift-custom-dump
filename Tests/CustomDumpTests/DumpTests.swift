@@ -731,15 +731,6 @@ final class DumpTests: XCTestCase {
         )
 
         dump = ""
-        customDump(\User.name.count, to: &dump)
-        XCTAssertNoDifference(
-          dump,
-          #"""
-          \User.name.count
-          """#
-        )
-
-        dump = ""
         customDump(\(x: Double, y: Double).x, to: &dump)
         XCTAssertNoDifference(
           dump,
@@ -748,23 +739,35 @@ final class DumpTests: XCTestCase {
           """#
         )
 
-        dump = ""
-        customDump(\Item.$isInStock, to: &dump)
-        XCTAssertNoDifference(
-          dump,
-          #"""
-          \Item.$isInStock
-          """#
-        )
+        #if DEBUG
+          dump = ""
+          customDump(\User.name.count, to: &dump)
+          XCTAssertNoDifference(
+            dump,
+            #"""
+            \User.name.count
+            """#
+          )
 
-        dump = ""
-        customDump(\Wrapped<String>.count, to: &dump)
-        XCTAssertNoDifference(
-          dump,
-          #"""
-          \Wrapped<String>.subscript(dynamicMember: <unknown>)
-          """#
-        )
+          dump = ""
+          customDump(\Item.$isInStock, to: &dump)
+          XCTAssertNoDifference(
+            dump,
+            #"""
+            \Item.$isInStock
+            """#
+          )
+
+          dump = ""
+          customDump(\Wrapped<String>.count, to: &dump)
+          XCTAssertNoDifference(
+            dump,
+            #"""
+            \Wrapped<String>.subscript(dynamicMember: <unknown>)
+            """#
+          )
+        #endif
+
         return
       } else {
         dump = ""

@@ -446,11 +446,13 @@ customDump(ID(rawValue: "deadbeef")
 
 ### Test support
 
-- ``XCTAssertNoDifference(_:_:_:file:line:)``
-- ``XCTAssertDifference(_:_:operation:changes:file:line:)-8xfxw``
+- ``expectNoDifference(_:_:_:fileID:filePath:line:column:)``
+- ``expectDifference(_:_:operation:changes:fileID:filePath:line:column:)-5fu8q``
 
 ### Customizing output
 
 - ``CustomDumpStringConvertible``
 - ``CustomDumpRepresentable``
 - ``CustomDumpReflectable``
+
+### Deprecations
