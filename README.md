@@ -9,8 +9,8 @@ A collection of tools for debugging, diffing, and testing your application's dat
   * [Motivation](#motivation)
       * [`customDump`](#customdump)
       * [`diff`](#diff)
-      * [`XCTAssertNoDifference`](#xctassertnodifference)
-      * [`XCTAssertDifference`](#xctassertdifference)
+      * [`expectNoDifference`](#expectnodifference)
+      * [`expectDifference`](#expectdifference)
   * [Customization](#customization)
       * [`CustomDumpStringConvertible`](#customdumpstringconvertible)
       * [`CustomDumpReflectable`](#customdumpreflectable)
@@ -251,43 +251,45 @@ For a real world use case we modified Apple's [Landmarks](https://developer.appl
   ]
 ```
 
-### `XCTAssertNoDifference`
+### `expectNoDifference`
 
-The `XCTAssertEqual` function from `XCTest` allows you to assert that two values are equal, and if they are not the test suite will fail with a message:
+XCTest's `XCTAssertEqual` and Swift Testing's `#expect(_ == _)` both allow you to assert that two values are equal, and if they are not the test suite will fail with a message:
 
 ```swift
 var other = user
 other.name += "!"
 
 XCTAssertEqual(user, other)
+#expect(user == other)
 ```
 ```text
 XCTAssertEqual failed: ("User(favoriteNumbers: [42, 1729], id: 2, name: "Blob")") is not equal to ("User(favoriteNumbers: [42, 1729], id: 2, name: "Blob!")")
+Expectation failed: (user → User(favoriteNumbers: [42, 1729], id: 2, name: "Blob")) == (other → User(favoriteNumbers: [42, 1729], id: 2, name: "Blob!"))
 ```
 
-Unfortunately this failure message is quite difficult to visually parse and understand. It takes a few moments of hunting through the message to see that the only difference is the exclamation mark at the end of the name. The problem gets worse if the type is more complex, consisting of nested structures and large collections.
+Unfortunately these failure messages are quite difficult to visually parse and understand. It takes a few moments of hunting through the message to see that the only difference is the exclamation mark at the end of the name. The problem gets worse if the type is more complex, consisting of nested structures and large collections.
 
-This library also ships with an `XCTAssertNoDifference` function to mitigate these problems. It works like `XCTAssertEqual` except the failure message uses a nicely formatted diff to show exactly what is different between the two values:
+This library also ships with an `expectNoDifference` function to mitigate these problems. It works like `XCTAssertEqual` and `#expect(_ == _)` except the failure message uses a nicely formatted diff to show exactly what is different between the two values:
 
 ```swift
-XCTAssertNoDifference(user, other)
+expectNoDifference(user, other)
 ```
-```text
-XCTAssertNoDifference failed: …
+```diff
+expectNoDifference failed: …
 
-    User(
-      favoriteNumbers: […],
-      id: 2,
-  −   name: "Blob"
-  +   name: "Blob!"
-    )
+  User(
+    favoriteNumbers: […],
+    id: 2,
+-   name: "Blob"
++   name: "Blob!"
+  )
 
 (First: −, Second: +)
 ```
 
-### `XCTAssertDifference`
+### `expectDifference`
 
-This function provides the inverse of `XCTAssertNoDifference`: it asserts that a value has a set of changes by evaluating a given expression before and after a given operation and then comparing the results.
+This function provides the inverse of `expectNoDifference`: it asserts that a value has a set of changes by evaluating a given expression before and after a given operation and then comparing the results.
 
 For example, given a very simple counter structure, we can write a test against its incrementing functionality:
 
@@ -302,7 +304,7 @@ struct Counter {
 }
 
 var counter = Counter()
-XCTAssertDifference(counter) {
+expectDifference(counter) {
   counter.increment()
 } changes: {
   $0.count = 1
@@ -316,7 +318,7 @@ By omitting the operation you can write a "non-exhaustive" assertion against a v
 
 ```swift
 counter.increment()
-XCTAssertDifference(counter) {
+expectDifference(counter) {
   $0.count = 1
   // Don't need to further describe how `isOdd` has changed
 }
