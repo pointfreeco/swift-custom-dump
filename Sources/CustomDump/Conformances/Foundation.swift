@@ -47,12 +47,12 @@ extension Calendar: CustomDumpReflectable {
       "Date(\(Self.formatter.string(from: self)))"
     }
 
-    private static let formatter: DateFormatter = {
+    private static var formatter: DateFormatter {
       let formatter = DateFormatter()
       formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXXXX"
       formatter.timeZone = TimeZone(secondsFromGMT: 0)!
       return formatter
-    }()
+    }
   }
 #endif
 
