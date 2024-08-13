@@ -13,14 +13,14 @@ import IssueReporting
 /// XCTAssertEqual failed: ("User(id: 42, name: "Blob")") is not equal to ("User(id: 42, name: "Blob, Esq.")")
 /// ```
 ///
-/// `XCTAssertNoDifference` uses the output of ``diff(_:_:format:)`` to display a failure message,
+/// `expectNoDifference` uses the output of ``diff(_:_:format:)`` to display a failure message,
 /// which helps highlight the differences between the given values:
 ///
 /// ```swift
-/// XCTAssertNoDifference(user1, user2)
+/// expectNoDifference(user1, user2)
 /// ```
 /// ```text
-/// XCTAssertNoDifference failed: …
+/// expectNoDifference failed: …
 ///
 ///     User(
 ///       id: 42,

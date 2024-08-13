@@ -15,7 +15,7 @@ final class FoundationTests: XCTestCase {
           try? AttributedString(markdown: "Hello, **Blob**!"),
           to: &dump
         )
-        XCTAssertNoDifference(
+        expectNoDifference(
           dump,
           """
           "Hello, Blob!"
@@ -33,7 +33,7 @@ final class FoundationTests: XCTestCase {
         42 as CFNumber,
         to: &dump
       )
-      XCTAssertNoDifference(
+      expectNoDifference(
         dump,
         """
         42
@@ -49,7 +49,7 @@ final class FoundationTests: XCTestCase {
         Date(timeIntervalSince1970: 0),
         to: &dump
       )
-      XCTAssertNoDifference(
+      expectNoDifference(
         dump,
         """
         Date(1970-01-01T00:00:00.000Z)
@@ -62,7 +62,7 @@ final class FoundationTests: XCTestCase {
           NestedDate(date: Date(timeIntervalSince1970: 0)),
           to: &dump
         )
-        XCTAssertNoDifference(
+        expectNoDifference(
           dump,
           """
           NestedDate(date: Date(1970-01-01T00:00:00.000Z))
@@ -78,7 +78,7 @@ final class FoundationTests: XCTestCase {
       Decimal(string: "1.23"),
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       1.23
@@ -92,7 +92,7 @@ final class FoundationTests: XCTestCase {
       [1, 2, 3] as NSArray,
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       [
@@ -116,7 +116,7 @@ final class FoundationTests: XCTestCase {
       attributedString,
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       "Hello, Blob!"
@@ -132,7 +132,7 @@ final class FoundationTests: XCTestCase {
       calendar,
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       Calendar(
@@ -157,7 +157,7 @@ final class FoundationTests: XCTestCase {
       NSCountedSet(array: [1, 2, 2, 3, 3, 3]),
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       Set([
@@ -176,7 +176,7 @@ final class FoundationTests: XCTestCase {
         NSData(data: .init(repeating: 0, count: 4)),
         to: &dump
       )
-      XCTAssertNoDifference(
+      expectNoDifference(
         dump,
         """
         Data(4 bytes)
@@ -192,7 +192,7 @@ final class FoundationTests: XCTestCase {
         NSDate(timeIntervalSince1970: 0),
         to: &dump
       )
-      XCTAssertNoDifference(
+      expectNoDifference(
         dump,
         """
         Date(1970-01-01T00:00:00.000Z)
@@ -207,7 +207,7 @@ final class FoundationTests: XCTestCase {
       [1: "1", 2: "2", 3: "3"] as NSDictionary,
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       [
@@ -231,7 +231,7 @@ final class FoundationTests: XCTestCase {
       ),
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       NSError(
@@ -245,7 +245,7 @@ final class FoundationTests: XCTestCase {
     )
 
     #if !os(Windows) && !os(WASI)
-      class SubclassedError: NSError {}
+      class SubclassedError: NSError, @unchecked Sendable {}
 
       dump = ""
       customDump(
@@ -258,7 +258,7 @@ final class FoundationTests: XCTestCase {
         ),
         to: &dump
       )
-      XCTAssertNoDifference(
+    expectNoDifference(
         dump,
         """
         NSError(
@@ -279,7 +279,7 @@ final class FoundationTests: XCTestCase {
     dump = ""
     customDump(BridgedError.thisIsFine(94) as NSError, to: &dump)
     #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS)
-      XCTAssertNoDifference(
+      expectNoDifference(
         dump,
         """
         FoundationTests.BridgedError.thisIsFine(94)
@@ -287,7 +287,7 @@ final class FoundationTests: XCTestCase {
       )
     #elseif compiler(>=5.4)
       // Can't unwrap bridged Errors on Linux: https://bugs.swift.org/browse/SR-15191
-      XCTAssertNoDifference(
+    expectNoDifference(
         dump.replacingOccurrences(
           of: #"\(unknown context at \$[[:xdigit:]]+\)\."#,
           with: "",
@@ -312,7 +312,7 @@ final class FoundationTests: XCTestCase {
         NSException(name: .genericException, reason: "Oops!", userInfo: nil),
         to: &dump
       )
-      XCTAssertNoDifference(
+      expectNoDifference(
         dump,
         """
         NSException(
@@ -333,7 +333,7 @@ final class FoundationTests: XCTestCase {
         NSExpression(format: "1 + 1"),
         to: &dump
       )
-      XCTAssertNoDifference(
+    expectNoDifference(
         dump,
         """
         1 + 1
@@ -348,7 +348,7 @@ final class FoundationTests: XCTestCase {
       NSIndexPath(),
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       []
@@ -362,7 +362,7 @@ final class FoundationTests: XCTestCase {
       NSIndexSet(indexSet: [1, 2, 3, 5, 7]),
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       IndexSet(
@@ -382,7 +382,7 @@ final class FoundationTests: XCTestCase {
       NSLocale(localeIdentifier: "en_US"),
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       Locale(en_US)
@@ -396,7 +396,7 @@ final class FoundationTests: XCTestCase {
       NSMeasurement(doubleValue: 42, unit: Unit(symbol: "kg")),
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       Measurement(
@@ -414,7 +414,7 @@ final class FoundationTests: XCTestCase {
         NSNotification(name: .init(rawValue: "co.pointfree"), object: nil, userInfo: nil),
         to: &dump
       )
-      XCTAssertNoDifference(
+      expectNoDifference(
         dump,
         """
         Notification(name: "co.pointfree")
@@ -429,7 +429,7 @@ final class FoundationTests: XCTestCase {
       NSNull(),
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       NSNull()
@@ -443,7 +443,7 @@ final class FoundationTests: XCTestCase {
       1 as NSNumber,
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       1
@@ -456,7 +456,7 @@ final class FoundationTests: XCTestCase {
         NSNumber(),
         to: &dump
       )
-      XCTAssertNoDifference(
+    expectNoDifference(
         dump,
         """
         (null pointer)
@@ -471,7 +471,7 @@ final class FoundationTests: XCTestCase {
       [1, 2, 3] as NSOrderedSet,
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       [
@@ -489,7 +489,7 @@ final class FoundationTests: XCTestCase {
       NSRange(0..<1),
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       0..<1
@@ -503,7 +503,7 @@ final class FoundationTests: XCTestCase {
       NSSet(array: [1, 2, 3]),
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       Set([
@@ -522,7 +522,7 @@ final class FoundationTests: XCTestCase {
         NSTimeZone(forSecondsFromGMT: 0),
         to: &dump
       )
-      XCTAssertNoDifference(
+      expectNoDifference(
         dump,
         """
         TimeZone(
@@ -543,14 +543,14 @@ final class FoundationTests: XCTestCase {
       to: &dump
     )
     #if os(Windows) || os(WASI)
-      XCTAssertNoDifference(
+    expectNoDifference(
         dump,
         """
         URL(file:///tmp)
         """
       )
     #else
-      XCTAssertNoDifference(
+    expectNoDifference(
         dump,
         """
         URL(file:///tmp/)
@@ -565,7 +565,7 @@ final class FoundationTests: XCTestCase {
       NSURLComponents(string: "https://www.pointfree.co/login?redirect=episodes"),
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       URLComponents(
@@ -589,7 +589,7 @@ final class FoundationTests: XCTestCase {
       NSURLQueryItem(name: "search", value: "composable architecture"),
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       URLQueryItem(
@@ -610,7 +610,7 @@ final class FoundationTests: XCTestCase {
         request,
         to: &dump
       )
-      XCTAssertNoDifference(
+      expectNoDifference(
         dump,
         """
         URLRequest(
@@ -640,7 +640,7 @@ final class FoundationTests: XCTestCase {
       NSUUID(uuidString: "deadbeef-dead-beef-dead-beefdeadbeef"),
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       UUID(DEADBEEF-DEAD-BEEF-DEAD-BEEFDEADBEEF)
@@ -654,7 +654,7 @@ final class FoundationTests: XCTestCase {
       URL(string: "https://www.pointfree.co/"),
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       URL(https://www.pointfree.co/)

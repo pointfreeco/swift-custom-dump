@@ -1,6 +1,8 @@
+import CustomDump
+import Foundation
+import XCTest
+
 #if canImport(Testing)
-  import CustomDump
-  import Foundation
   import Testing
 
   @Suite
@@ -36,5 +38,19 @@
       }
     }
   }
-
 #endif
+
+@available(iOS 13, macOS 10.15, tvOS 13, watchOS 6, *)
+class ExpectNoDifferenceXCTests: XCTestCase {
+  #if DEBUG && compiler(>=5.4) && (os(iOS) || os(macOS) || os(tvOS) || os(watchOS))
+    func testExpectNoDifference() {
+      XCTExpectFailure()
+
+      let user = User(id: 42, name: "Blob")
+      var other = user
+      other.name += " Sr."
+
+      expectNoDifference(user, other)
+    }
+  #endif
+}

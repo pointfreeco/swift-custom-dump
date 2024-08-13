@@ -16,7 +16,7 @@ import XCTest
 @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
 final class DumpTests: XCTestCase {
   func testAnyType() {
-    XCTAssertNoDifference(
+    expectNoDifference(
       String(customDumping: Foo.Bar.self),
       """
       Foo.Bar.self
@@ -26,77 +26,77 @@ final class DumpTests: XCTestCase {
     struct Feature {
       struct State {}
     }
-    XCTAssertNoDifference(
+    expectNoDifference(
       String(customDumping: Feature.State.self),
       """
       DumpTests.Feature.State.self
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       String(customDumping: (x: Double, y: Double).self),
       """
       (x: Double, y: Double).self
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       String(customDumping: Double?.self),
       """
       Double?.self
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       String(customDumping: [Int].self),
       """
       [Int].self
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       String(customDumping: [String: Int].self),
       """
       [String: Int].self
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       String(customDumping: [[Double: Double?]].self),
       """
       [[Double: Double?]].self
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       String(customDumping: [[Double: Double]?].self),
       """
       [[Double: Double]?].self
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       String(customDumping: [[Double: [Double]]]?.self),
       """
       [[Double: [Double]]]?.self
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       String(customDumping: [[[Double: Double]]]?.self),
       """
       [[[Double: Double]]]?.self
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       String(customDumping: [Double: [Double?]].self),
       """
       [Double: [Double?]].self
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       String(customDumping: [Double: [Double]?].self),
       """
       [Double: [Double]?].self
@@ -112,7 +112,7 @@ final class DumpTests: XCTestCase {
 
     var dump = ""
     customDump(user, to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       UserClass(
@@ -124,7 +124,7 @@ final class DumpTests: XCTestCase {
 
     dump = ""
     customDump(user, to: &dump, maxDepth: 0)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       UserClass(…)
@@ -136,7 +136,7 @@ final class DumpTests: XCTestCase {
 
     dump = ""
     customDump(foo, to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       RecursiveFoo(
@@ -164,7 +164,7 @@ final class DumpTests: XCTestCase {
 
     var dump = ""
     customDump(users, to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       [
@@ -186,7 +186,7 @@ final class DumpTests: XCTestCase {
 
     dump = ""
     customDump(users, to: &dump, maxDepth: 1)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       [
@@ -199,7 +199,7 @@ final class DumpTests: XCTestCase {
 
     dump = ""
     customDump(users, to: &dump, maxDepth: 0)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       […]
@@ -222,7 +222,7 @@ final class DumpTests: XCTestCase {
       ],
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       [
@@ -252,7 +252,7 @@ final class DumpTests: XCTestCase {
       ],
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       [
@@ -283,7 +283,7 @@ final class DumpTests: XCTestCase {
         ] as KeyValuePairs),
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       [
@@ -305,7 +305,7 @@ final class DumpTests: XCTestCase {
       let content: [String: Int]
     }
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       """
       DumpTests.NestedDictionary(
         content: [
@@ -328,7 +328,7 @@ final class DumpTests: XCTestCase {
   func testEnum() {
     var dump = ""
     customDump(Enum.foo, to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       Enum.foo
@@ -337,7 +337,7 @@ final class DumpTests: XCTestCase {
 
     dump = ""
     customDump(Enum.bar(42), to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       Enum.bar(42)
@@ -346,7 +346,7 @@ final class DumpTests: XCTestCase {
 
     dump = ""
     customDump(Enum.fu(bar: 42), to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       Enum.fu(bar: 42)
@@ -355,7 +355,7 @@ final class DumpTests: XCTestCase {
 
     dump = ""
     customDump(Enum.baz(fizz: 0.9, buzz: "2"), to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       Enum.baz(
@@ -367,7 +367,7 @@ final class DumpTests: XCTestCase {
 
     dump = ""
     customDump(Enum.fizz(0.9, buzz: "2"), to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       Enum.fizz(
@@ -379,7 +379,7 @@ final class DumpTests: XCTestCase {
 
     dump = ""
     customDump(Nested.nest(.fizz(0.9, buzz: "2")), to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       Nested.nest(
@@ -395,7 +395,7 @@ final class DumpTests: XCTestCase {
   func testOptional() {
     var dump = ""
     customDump(User?(.init(id: 42, name: "Blob")), to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       User(
@@ -407,7 +407,7 @@ final class DumpTests: XCTestCase {
 
     dump = ""
     customDump(User?(nil), to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       nil
@@ -418,7 +418,7 @@ final class DumpTests: XCTestCase {
   func testSet() {
     var dump = ""
     customDump(Set([1, 2, 3]), to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       Set([
@@ -433,7 +433,7 @@ final class DumpTests: XCTestCase {
   func testSingleValue() {
     var dump = ""
     customDump(1, to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       1
@@ -442,7 +442,7 @@ final class DumpTests: XCTestCase {
 
     dump = ""
     customDump(true, to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       true
@@ -458,7 +458,7 @@ final class DumpTests: XCTestCase {
 
     var dump = ""
     customDump(user, to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       User(
@@ -470,7 +470,7 @@ final class DumpTests: XCTestCase {
 
     dump = ""
     customDump(user, to: &dump, maxDepth: 0)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       User(…)
@@ -490,7 +490,7 @@ final class DumpTests: XCTestCase {
 
     dump = ""
     customDump(pair, to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       Pair(
@@ -508,7 +508,7 @@ final class DumpTests: XCTestCase {
 
     dump = ""
     customDump(pair, to: &dump, maxDepth: 1)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       Pair(
@@ -522,7 +522,7 @@ final class DumpTests: XCTestCase {
   func testTuple() {
     var dump = ""
     customDump((1, 2), to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       (
@@ -534,7 +534,7 @@ final class DumpTests: XCTestCase {
 
     dump = ""
     customDump((x: 1, y: 2, ()), to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       (
@@ -549,42 +549,42 @@ final class DumpTests: XCTestCase {
   func testString() {
     var dump = ""
     customDump("Hello!", to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       #""Hello!""#
     )
 
     dump = ""
     customDump(#"Hello, "world!""#, to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       ##"#"Hello, "world!""#"##
     )
 
     dump = ""
     customDump(####"This has a "### in it"####, to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       #####"####"This has a "### in it"####"#####
     )
 
     dump = ""
     customDump("This has a \\ in it", to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       ##"#"This has a \ in it"#"##
     )
 
     dump = ""
     customDump("This has no special characters in it", to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       "\"This has no special characters in it\""
     )
 
     dump = ""
     customDump("This has a \t in it", to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       "\"This has a \\t in it\""
     )
@@ -593,7 +593,7 @@ final class DumpTests: XCTestCase {
   func testMultilineString() {
     var dump = ""
     customDump("Hello,\nWorld!", to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       #"""
       """
@@ -605,7 +605,7 @@ final class DumpTests: XCTestCase {
 
     dump = ""
     customDump("Hello,\nWorld!"[...], to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       #"""
       """
@@ -630,7 +630,7 @@ final class DumpTests: XCTestCase {
       ),
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       Email(
@@ -658,7 +658,7 @@ final class DumpTests: XCTestCase {
       """##,
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       ###"""
       ##"""
@@ -675,7 +675,7 @@ final class DumpTests: XCTestCase {
   func testAnyHashable() {
     var dump = ""
     customDump(AnyHashable(42), to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       42
@@ -690,7 +690,7 @@ final class DumpTests: XCTestCase {
       ],
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       [
@@ -714,7 +714,7 @@ final class DumpTests: XCTestCase {
       if #available(macOS 13.3, iOS 16.4, watchOS 9.4, tvOS 16.4, *) {
         dump = ""
         customDump(\UserClass.name, to: &dump)
-        XCTAssertNoDifference(
+        expectNoDifference(
           dump,
           #"""
           \UserClass.name
@@ -723,7 +723,7 @@ final class DumpTests: XCTestCase {
 
         dump = ""
         customDump(\Pair.driver.name, to: &dump)
-        XCTAssertNoDifference(
+        expectNoDifference(
           dump,
           #"""
           \Pair.driver.name
@@ -732,7 +732,7 @@ final class DumpTests: XCTestCase {
 
         dump = ""
         customDump(\(x: Double, y: Double).x, to: &dump)
-        XCTAssertNoDifference(
+        expectNoDifference(
           dump,
           #"""
           \(x: Double, y: Double).x
@@ -742,7 +742,7 @@ final class DumpTests: XCTestCase {
         #if DEBUG
           dump = ""
           customDump(\User.name.count, to: &dump)
-          XCTAssertNoDifference(
+          expectNoDifference(
             dump,
             #"""
             \User.name.count
@@ -751,7 +751,7 @@ final class DumpTests: XCTestCase {
 
           dump = ""
           customDump(\Item.$isInStock, to: &dump)
-          XCTAssertNoDifference(
+          expectNoDifference(
             dump,
             #"""
             \Item.$isInStock
@@ -760,7 +760,7 @@ final class DumpTests: XCTestCase {
 
           dump = ""
           customDump(\Wrapped<String>.count, to: &dump)
-          XCTAssertNoDifference(
+          expectNoDifference(
             dump,
             #"""
             \Wrapped<String>.subscript(dynamicMember: <unknown>)
@@ -772,7 +772,7 @@ final class DumpTests: XCTestCase {
       } else {
         dump = ""
         customDump(\UserClass.name, to: &dump)
-        XCTAssertNoDifference(
+        expectNoDifference(
           dump,
           #"""
           \UserClass.name
@@ -781,7 +781,7 @@ final class DumpTests: XCTestCase {
 
         dump = ""
         customDump(\Pair.driver.name, to: &dump)
-        XCTAssertNoDifference(
+        expectNoDifference(
           dump,
           #"""
           \Pair.driver.name
@@ -790,7 +790,7 @@ final class DumpTests: XCTestCase {
 
         dump = ""
         customDump(\User.name.count, to: &dump)
-        XCTAssertNoDifference(
+        expectNoDifference(
           dump,
           #"""
           KeyPath<User, Int>
@@ -799,7 +799,7 @@ final class DumpTests: XCTestCase {
 
         dump = ""
         customDump(\(x: Double, y: Double).x, to: &dump)
-        XCTAssertNoDifference(
+        expectNoDifference(
           dump,
           #"""
           WritableKeyPath<(x: Double, y: Double), Double>
@@ -808,7 +808,7 @@ final class DumpTests: XCTestCase {
 
         dump = ""
         customDump(\Item.$isInStock, to: &dump)
-        XCTAssertNoDifference(
+        expectNoDifference(
           dump,
           #"""
           KeyPath<Item, Wrapped<Bool>>
@@ -817,7 +817,7 @@ final class DumpTests: XCTestCase {
 
         dump = ""
         customDump(\Wrapped<String>.count, to: &dump)
-        XCTAssertNoDifference(
+        expectNoDifference(
           dump,
           #"""
           KeyPath<Wrapped<String>, Int>
@@ -833,7 +833,7 @@ final class DumpTests: XCTestCase {
       Namespaced.Class(x: 0),
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       Namespaced.Class(x: 0)
@@ -845,7 +845,7 @@ final class DumpTests: XCTestCase {
       Namespaced.Enum.x(0),
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       Namespaced.Enum.x(0)
@@ -857,7 +857,7 @@ final class DumpTests: XCTestCase {
       Namespaced.Struct(x: 0),
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       Namespaced.Struct(x: 0)
@@ -871,7 +871,7 @@ final class DumpTests: XCTestCase {
       Result<Result<Int, Error>, Error>.success(.success(42)),
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       Result.success(
@@ -889,7 +889,7 @@ final class DumpTests: XCTestCase {
       Inline.self,
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       DumpTests.Inline.self
@@ -901,7 +901,7 @@ final class DumpTests: XCTestCase {
       Inline(),
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       DumpTests.Inline()
@@ -912,7 +912,7 @@ final class DumpTests: XCTestCase {
   func testCustomMirror() {
     var dump = ""
     customDump(Button(), to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       Button.cancel(
@@ -931,7 +931,7 @@ final class DumpTests: XCTestCase {
       ),
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       LoginState(
@@ -945,7 +945,7 @@ final class DumpTests: XCTestCase {
   func testCustomOverride() {
     var dump = ""
     customDump(Wrapper(rawValue: 42), to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       42
@@ -956,7 +956,7 @@ final class DumpTests: XCTestCase {
   func testStandardLibrary() {
     var dump = ""
     customDump("©" as Character, to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       "©"
@@ -965,7 +965,7 @@ final class DumpTests: XCTestCase {
 
     dump = ""
     customDump("Blob" as StaticString, to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       "Blob"
@@ -974,7 +974,7 @@ final class DumpTests: XCTestCase {
 
     dump = ""
     customDump("©" as UnicodeScalar, to: &dump)
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       "©"
@@ -996,7 +996,7 @@ final class DumpTests: XCTestCase {
 
     customDump(Doctor(), to: &dump)
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       DumpTests.Doctor(
@@ -1027,7 +1027,7 @@ final class DumpTests: XCTestCase {
 
     customDump(Surgeon(), to: &dump)
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       DumpTests.Surgeon(
@@ -1081,7 +1081,7 @@ final class DumpTests: XCTestCase {
     var dump = ""
     customDump(subject, to: &dump)
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       DumpTests.Parent(
@@ -1156,7 +1156,7 @@ final class DumpTests: XCTestCase {
         user2,
       ], to: &dump)
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       [
@@ -1191,14 +1191,14 @@ final class DumpTests: XCTestCase {
     func testDuration() {
       guard #available(macOS 13, iOS 16, watchOS 9, tvOS 16, *) else { return }
 
-      XCTAssertNoDifference(
+      expectNoDifference(
         String(customDumping: Duration.seconds(5)),
         """
         5 seconds
         """
       )
 
-      XCTAssertNoDifference(
+      expectNoDifference(
         String(customDumping: Duration.seconds(5) + .milliseconds(123)),
         """
         5 seconds, 123 milliseconds
@@ -1214,7 +1214,7 @@ final class DumpTests: XCTestCase {
         CGRect(x: 0.5, y: 0.5, width: 1.5, height: 1.5),
         to: &dump
       )
-      XCTAssertNoDifference(
+      expectNoDifference(
         dump,
         """
         CGRect(
@@ -1239,7 +1239,7 @@ final class DumpTests: XCTestCase {
         Animation.easeInOut,
         to: &dump
       )
-      XCTAssertNoDifference(
+      expectNoDifference(
         dump,
         """
         Animation.easeInOut
@@ -1254,7 +1254,7 @@ final class DumpTests: XCTestCase {
       let name = "Blob Sr."
       let _$observationRegistrar = ObservationRegistrar()
     }
-    XCTAssertNoDifference(
+    expectNoDifference(
       String(customDumping: Object()),
       """
       DumpTests.Object(
@@ -1266,7 +1266,7 @@ final class DumpTests: XCTestCase {
       let name = "Blob Jr."
       let _$observationRegistrar = ObservationRegistrar()
     }
-    XCTAssertNoDifference(
+    expectNoDifference(
       String(customDumping: Value()),
       """
       DumpTests.Value(
@@ -1290,7 +1290,7 @@ final class DumpTests: XCTestCase {
         )
       }
     }
-    XCTAssertNoDifference(
+    expectNoDifference(
       String(customDumping: Object()),
       """
       DumpTests.Object(
@@ -1325,7 +1325,7 @@ final class DumpTests: XCTestCase {
     let obj1 = DiffableObject()
     let obj2 = DiffableObject()
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       String(
         customDumping: DiffableObjectsParent(
           objs1: DiffableObjects(obj1: obj1, obj2: obj1),
@@ -1346,7 +1346,7 @@ final class DumpTests: XCTestCase {
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       String(
         customDumping: DiffableObjectsParent(
           objs1: DiffableObjects(obj1: obj1, obj2: obj2),
@@ -1394,7 +1394,7 @@ final class DumpTests: XCTestCase {
     let objs2 = DiffableObjects(obj1: obj2, obj2: obj2)
     let objsParent = DiffableObjectsParent(objs1: objs1, objs2: objs2)
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       String(customDumping: objsParent),
       """
       DumpTests.DiffableObjectsParent(

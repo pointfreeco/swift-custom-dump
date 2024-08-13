@@ -245,7 +245,7 @@ application to print the before and after state when favoriting a landmark:
   ]
 ```
 
-### XCTAssertNoDifference
+### expectNoDifference
 
 The `XCTAssertEqual` function from `XCTest` allows you to assert that two values are equal, and if
 they are not the test suite will fail with a message:
@@ -265,15 +265,15 @@ few moments of hunting through the message to see that the only difference is th
 at the end of the name. The problem gets worse if the type is more complex, consisting of nested
 structures and large collections.
 
-This library also ships with an ``XCTAssertNoDifference(_:_:_:file:line:)`` function to mitigate
+This library also ships with an ``expectNoDifference(_:_:_:file:line:)`` function to mitigate
 these problems. It works like `XCTAssertEqual` except the failure message uses a nicely formatted
 diff to show exactly what is different between the two values:
 
 ```swift
-XCTAssertNoDifference(user, other)
+expectNoDifference(user, other)
 ```
 ```diff
-XCTAssertNoDifference failed: …
+expectNoDifference failed: …
 
   User(
     favoriteNumbers: […],
@@ -285,10 +285,10 @@ XCTAssertNoDifference failed: …
 (First: -, Second: +)
 ```
 
-### XCTAssertDifference
+### expectDifference
 
-``XCTAssertDifference(_:_:operation:changes:file:line:)-8xfxw`` provides the inverse of
-`XCTAssertNoDifference`: it asserts that a value has a set of changes by evaluating a given
+``expectDifference(_:_:operation:changes:file:line:)-8xfxw`` provides the inverse of
+`expectNoDifference`: it asserts that a value has a set of changes by evaluating a given
 expression before and after a given operation and then comparing the results.
 
 For example, given a very simple counter structure, we can write a test against its incrementing
@@ -305,7 +305,7 @@ struct Counter {
 }
 
 var counter = Counter()
-XCTAssertDifference(counter) {
+expectDifference(counter) {
   counter.increment()
 } changes: {
   $0.count = 1
@@ -320,7 +320,7 @@ just the fields you want to assert against in the `changes` closure:
 
 ```swift
 counter.increment()
-XCTAssertDifference(counter) {
+expectDifference(counter) {
   $0.count = 1
   // Don't need to further describe how `isOdd` has changed
 }
