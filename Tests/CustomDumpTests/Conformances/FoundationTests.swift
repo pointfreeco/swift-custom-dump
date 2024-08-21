@@ -258,7 +258,7 @@ final class FoundationTests: XCTestCase {
         ),
         to: &dump
       )
-    expectNoDifference(
+      expectNoDifference(
         dump,
         """
         NSError(
@@ -287,7 +287,7 @@ final class FoundationTests: XCTestCase {
       )
     #elseif compiler(>=5.4)
       // Can't unwrap bridged Errors on Linux: https://bugs.swift.org/browse/SR-15191
-    expectNoDifference(
+      expectNoDifference(
         dump.replacingOccurrences(
           of: #"\(unknown context at \$[[:xdigit:]]+\)\."#,
           with: "",
@@ -333,7 +333,7 @@ final class FoundationTests: XCTestCase {
         NSExpression(format: "1 + 1"),
         to: &dump
       )
-    expectNoDifference(
+      expectNoDifference(
         dump,
         """
         1 + 1
@@ -456,7 +456,7 @@ final class FoundationTests: XCTestCase {
         NSNumber(),
         to: &dump
       )
-    expectNoDifference(
+      expectNoDifference(
         dump,
         """
         (null pointer)
@@ -543,14 +543,14 @@ final class FoundationTests: XCTestCase {
       to: &dump
     )
     #if os(Windows) || os(WASI)
-    expectNoDifference(
+      expectNoDifference(
         dump,
         """
         URL(file:///tmp)
         """
       )
     #else
-    expectNoDifference(
+      expectNoDifference(
         dump,
         """
         URL(file:///tmp/)
