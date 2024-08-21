@@ -9,7 +9,7 @@ final class SwiftTests: XCTestCase {
       character,
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       "a"
@@ -26,7 +26,7 @@ final class SwiftTests: XCTestCase {
       objectIdentifier,
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump.replacingOccurrences(
         of: ":?\\s*0x[\\da-f]+(\\s*)", with: "$1", options: .regularExpression),
       """
@@ -42,7 +42,7 @@ final class SwiftTests: XCTestCase {
       string,
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       "hello world!"
@@ -57,7 +57,7 @@ final class SwiftTests: XCTestCase {
       scalar,
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       "a"
@@ -72,7 +72,7 @@ final class SwiftTests: XCTestCase {
       user,
       to: &dump
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       dump,
       """
       HashableUser(

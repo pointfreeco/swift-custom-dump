@@ -3,7 +3,7 @@
 ///
 /// This can be a great tool to use for building debug tools for applications and libraries. For
 /// example, this library uses ``diff(_:_:format:)`` to implement
-/// ``XCTAssertNoDifference(_:_:_:file:line:)``, which asserts that two values are equal, and
+/// ``expectNoDifference(_:_:_:file:line:)``, which asserts that two values are equal, and
 /// if they are not the failure message is a nicely formatted diff showing exactly what part of the
 /// values are not equal.
 ///

@@ -12,7 +12,7 @@ final class DiffTests: XCTestCase {
       nil
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         (1, (2, 3)) as Any,
         "Blob"
@@ -31,7 +31,7 @@ final class DiffTests: XCTestCase {
   }
 
   func testAnyType() {
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         Foo.Bar.self as Any.Type,
         Foo.self
@@ -44,7 +44,7 @@ final class DiffTests: XCTestCase {
   }
 
   func testClass() {
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         UserClass(
           id: 42,
@@ -67,7 +67,7 @@ final class DiffTests: XCTestCase {
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         NSObject(),
         NSObject()
@@ -78,7 +78,7 @@ final class DiffTests: XCTestCase {
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         RepeatedObject(id: "a"),
         RepeatedObject(id: "b")
@@ -115,7 +115,7 @@ final class DiffTests: XCTestCase {
 
     struct Three { let u1: User, u2: User, u3: User }
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         Three(u1: u1, u2: u2, u3: u2),
         Three(u1: u1, u2: u2, u3: u3)
@@ -133,7 +133,7 @@ final class DiffTests: XCTestCase {
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         [u1, u2, u2],
         [u1, u2, u3]
@@ -155,7 +155,7 @@ final class DiffTests: XCTestCase {
   }
 
   func testCollection() {
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         [
           User(
@@ -215,7 +215,7 @@ final class DiffTests: XCTestCase {
     other.insert(42, at: 300)
     other.remove(at: 700)
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(largeArray, other),
       """
         [
@@ -236,7 +236,7 @@ final class DiffTests: XCTestCase {
   }
 
   func testDictionary() {
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         [
           1: User(
@@ -279,7 +279,7 @@ final class DiffTests: XCTestCase {
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         OrderedDictionary(pairs: [
           1: User(
@@ -322,7 +322,7 @@ final class DiffTests: XCTestCase {
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         OrderedDictionary(pairs: [
           0: User(
@@ -382,7 +382,7 @@ final class DiffTests: XCTestCase {
     other[300] = "42"
     other[700] = nil
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(largeDictionary, other),
       """
         [
@@ -405,7 +405,7 @@ final class DiffTests: XCTestCase {
     XCTAssertEqual(
       diff(Enum.baz(fizz: 1.2, buzz: "Blob"), Enum.baz(fizz: 1.2, buzz: "Blob")), nil)
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(Enum.foo, Enum.bar(42)),
       """
       - Enum.foo
@@ -413,7 +413,7 @@ final class DiffTests: XCTestCase {
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(Enum.bar(42), Enum.bar(43)),
       """
       - Enum.bar(42)
@@ -421,7 +421,7 @@ final class DiffTests: XCTestCase {
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(Enum.fizz(42, buzz: "Blob"), Enum.fizz(42, buzz: "Glob")),
       """
         Enum.fizz(
@@ -432,7 +432,7 @@ final class DiffTests: XCTestCase {
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         Nested.nest(.fizz(42, buzz: "Blob")),
         Nested.nest(.fizz(42, buzz: "Glob"))
@@ -448,7 +448,7 @@ final class DiffTests: XCTestCase {
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         Enum.foo,
         Enum.buzz
@@ -459,7 +459,7 @@ final class DiffTests: XCTestCase {
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         Nested.nest(.foo),
         Nested.nest(.buzz)
@@ -470,7 +470,7 @@ final class DiffTests: XCTestCase {
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         Nested.largerNest(1, .foo),
         Nested.largerNest(1, .buzz)
@@ -493,7 +493,7 @@ final class DiffTests: XCTestCase {
       var offset: Offset
       let result: String
     }
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         State(offset: .page(1), result: "Hello, world!"),
         State(offset: .page(1), result: "Good night, moon!")
@@ -517,7 +517,7 @@ final class DiffTests: XCTestCase {
       nil
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(User?(.init(id: 42, name: "Blob")), nil),
       """
       - User(
@@ -527,7 +527,7 @@ final class DiffTests: XCTestCase {
       + nil
       """
     )
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(User?(.init(id: 42, name: "Blob")), User?(.init(id: 42, name: "Blob, Esq."))),
       """
         User(
@@ -542,7 +542,7 @@ final class DiffTests: XCTestCase {
   func testSet() {
     XCTAssertEqual(diff(Set([1, 2, 3]), Set([1, 2, 3])), nil)
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         Set([1, 2, 3]),
         Set([1, 3, 4])
@@ -564,7 +564,7 @@ final class DiffTests: XCTestCase {
     other.remove(102)
     other.insert(9999)
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(largeSet, other),
       """
         Set([
@@ -579,7 +579,7 @@ final class DiffTests: XCTestCase {
 
   func testSingleValue() {
     XCTAssertEqual(diff(1, 1), nil)
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(1, 2),
       """
       - 1
@@ -588,7 +588,7 @@ final class DiffTests: XCTestCase {
     )
 
     XCTAssertEqual(diff(true, true), nil)
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(true, false),
       """
       - true
@@ -598,7 +598,7 @@ final class DiffTests: XCTestCase {
   }
 
   func testStruct() {
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         NeverEqual(),
         NeverEqual()
@@ -610,7 +610,7 @@ final class DiffTests: XCTestCase {
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         User(
           id: 42,
@@ -630,7 +630,7 @@ final class DiffTests: XCTestCase {
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         Pair(
           driver: User(
@@ -665,7 +665,7 @@ final class DiffTests: XCTestCase {
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         NeverEqualUser(id: 1, name: "Blob"),
         NeverEqualUser(id: 1, name: "Blob")
@@ -680,7 +680,7 @@ final class DiffTests: XCTestCase {
 
   func testTuple() {
     XCTAssertEqual(diff((1, 2), (1, 2)), nil)
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff((1, 2), (1, 3)),
       """
         (
@@ -692,7 +692,7 @@ final class DiffTests: XCTestCase {
     )
 
     XCTAssertEqual(diff((blob: 1, 2), (blob: 1, 2)), nil)
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff((blob: 1, 2), (blob: 1, 3)),
       """
         (
@@ -704,7 +704,7 @@ final class DiffTests: XCTestCase {
     )
 
     XCTAssertEqual(diff((1, (2, 3)), (1, (2, 3))), nil)
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff((1, (2, 3)), (0, (2, 3))),
       """
         (
@@ -716,7 +716,7 @@ final class DiffTests: XCTestCase {
     )
 
     XCTAssertEqual(diff((1, ()), (1, ())), nil)
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff((1, ()), (0, ())),
       """
         (
@@ -731,7 +731,7 @@ final class DiffTests: XCTestCase {
   #if !os(WASI)
     func testNestedCustomMirror() {
       #if compiler(>=5.4)
-        XCTAssertNoDifference(
+        expectNoDifference(
           diff(
             NestedDate(date: Date(timeIntervalSince1970: 0)),
             NestedDate(date: Date(timeIntervalSince1970: 1))
@@ -746,7 +746,7 @@ final class DiffTests: XCTestCase {
   #endif
 
   func testMultilineString() {
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         """
         Hello,
@@ -766,7 +766,7 @@ final class DiffTests: XCTestCase {
       """#
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         """
         Hello,
@@ -786,7 +786,7 @@ final class DiffTests: XCTestCase {
       """#
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         Email(
           subject: "RE: Upcoming Event",
@@ -827,7 +827,7 @@ final class DiffTests: XCTestCase {
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         Email(
           subject: "RE: Upcoming Event",
@@ -863,7 +863,7 @@ final class DiffTests: XCTestCase {
   }
 
   func testAnyHashable() {
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         AnyHashable(42),
         AnyHashable(43)
@@ -874,7 +874,7 @@ final class DiffTests: XCTestCase {
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         [
           AnyHashable(1): User(id: 1, name: "Blob"),
@@ -925,7 +925,7 @@ final class DiffTests: XCTestCase {
       var other = user
       other.friends[0].friends[0].friends[0].name += " Else"
 
-      XCTAssertNoDifference(
+      expectNoDifference(
         diff(user, other),
         """
           FriendlyUser(
@@ -958,7 +958,7 @@ final class DiffTests: XCTestCase {
   #endif
 
   func testInterleavedIndices() {
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         [
           1,
@@ -1000,7 +1000,7 @@ final class DiffTests: XCTestCase {
   }
 
   func testNamespacedTypes() {
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         Namespaced.Class(x: 0),
         Namespaced.Class(x: 1)
@@ -1011,7 +1011,7 @@ final class DiffTests: XCTestCase {
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         Namespaced.Enum.x(0),
         Namespaced.Enum.x(1)
@@ -1022,7 +1022,7 @@ final class DiffTests: XCTestCase {
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         Namespaced.Struct(x: 0),
         Namespaced.Struct(x: 1)
@@ -1035,7 +1035,7 @@ final class DiffTests: XCTestCase {
   }
 
   func testCustomMirror() {
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         LoginState(
           email: "blob@pointfree.co",
@@ -1059,7 +1059,7 @@ final class DiffTests: XCTestCase {
   }
 
   func testCustomOverride() {
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         Wrapper(rawValue: 1),
         Wrapper(rawValue: 2)
@@ -1070,7 +1070,7 @@ final class DiffTests: XCTestCase {
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         Wrapper(
           rawValue: LoginState(
@@ -1098,7 +1098,7 @@ final class DiffTests: XCTestCase {
   }
 
   func testDifferentTypes() {
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         29.99 as Float as Any,
         29.99 as Double as Any
@@ -1109,7 +1109,7 @@ final class DiffTests: XCTestCase {
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         [
           "value": 29.99 as Float
@@ -1158,7 +1158,7 @@ final class DiffTests: XCTestCase {
         var children: Stack<Child.State>
       }
     }
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         Parent.State(children: Stack(elements: [(.init(rawValue: 0), Child.State())])),
         Parent.State(children: Stack(elements: [(.init(rawValue: 1), Child.State())]))
@@ -1184,7 +1184,7 @@ final class DiffTests: XCTestCase {
       var date: Double
       var results: Results
     }
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         State(date: 123_456_789, results: Results()),
         State(date: 123_456_790, results: Results())
@@ -1207,7 +1207,7 @@ final class DiffTests: XCTestCase {
     }
     let blobSr = Value(name: "Blob Sr.")
     let blobJr = Value(name: "Blob Jr.")
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(
         blobSr,
         blobJr
@@ -1228,7 +1228,7 @@ final class DiffTests: XCTestCase {
     }
 
     let obj = Shared()
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(obj, obj),
       """
         #1 User(
@@ -1239,7 +1239,7 @@ final class DiffTests: XCTestCase {
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(Shared(), Shared()),
       """
       - #1 User(
@@ -1253,7 +1253,7 @@ final class DiffTests: XCTestCase {
       """
     )
 
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff([obj, obj, obj], [obj, obj, Shared()]),
       """
         [
@@ -1280,7 +1280,7 @@ final class DiffTests: XCTestCase {
       var count = 0
     }
     let stats = State(stats: Shared(before: Stats(), after: Stats(count: 1)))
-    XCTAssertNoDifference(
+    expectNoDifference(
       diff(stats, stats),
       """
         DiffTests.State(
