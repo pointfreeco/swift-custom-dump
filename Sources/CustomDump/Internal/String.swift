@@ -1,3 +1,5 @@
+import Foundation
+
 extension String {
   init?(stringProtocol value: Any) {
     guard let value = value as? any StringProtocol else { return nil }

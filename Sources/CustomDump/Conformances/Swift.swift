@@ -1,3 +1,5 @@
+import Foundation
+
 extension Character: CustomDumpRepresentable {
   public var customDumpValue: Any {
     String(self)
