@@ -38,3 +38,17 @@ let package = Package(
     ),
   ]
 )
+
+#if os(macOS)
+  package.dependencies.append(contentsOf: [
+    .package(url: "https://github.com/swiftwasm/carton", from: "1.0.0"),
+  ])
+  package.targets.append(
+    .executableTarget(
+      name: "WasmTests",
+      dependencies: [
+        "CustomDump"
+      ]
+    )
+  )
+#endif

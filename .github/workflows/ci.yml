@@ -44,18 +44,26 @@ jobs:
   #       run: make test-linux SWIFT_VERSION=${{ matrix.swift }}
 
   wasm:
-    name: SwiftWasm
-    runs-on: ubuntu-latest
+    name: Wasm
+    runs-on: macos-14
+    strategy:
+      matrix:
+        toolchain:
+          - wasm-DEVELOPMENT-SNAPSHOT-2024-07-08-a
     steps:
-      - uses: actions/checkout@v4
-      - uses: bytecodealliance/actions/wasmtime/setup@v1
-      - uses: swiftwasm/setup-swiftwasm@v1
+      - name: Cache toolchains
+        uses: actions/cache@v3
         with:
-          swift-version: "wasm-DEVELOPMENT-SNAPSHOT-2024-07-16-a"
-      - name: Build tests
-        run: swift build --triple wasm32-unknown-wasi --build-tests
-      - name: Run tests
-        run: wasmtime .build/debug/swift-custom-dumpPackageTests.wasm
+          path: |
+            ~/Library/Developer/Toolchains
+          key: ${{ matrix.toolchain }}
+      - uses: actions/checkout@v4
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app
+      - name: Select Swift version
+        run: echo '${{ matrix.toolchain }}' > .swift-version
+      - name: Build
+        run: swift run carton bundle --debug
 
   # windows:
   #   name: Windows
