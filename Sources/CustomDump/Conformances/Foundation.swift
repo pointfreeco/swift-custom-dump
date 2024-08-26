@@ -1,3 +1,4 @@
+#if canImport(Foundation)
 import Foundation
 
 #if canImport(FoundationNetworking)
@@ -321,3 +322,4 @@ extension UUID: CustomDumpStringConvertible {
     "UUID(\(self.uuidString))"
   }
 }
+#endif
