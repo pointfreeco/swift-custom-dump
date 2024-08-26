@@ -50,7 +50,7 @@ jobs:
       - uses: bytecodealliance/actions/wasmtime/setup@v1
       - uses: swiftwasm/setup-swiftwasm@v1
         with:
-          swift-version: "wasm-5.9.2-RELEASE"
+          swift-version: "wasm-DEVELOPMENT-SNAPSHOT-2024-07-16-a"
       - name: Build tests
         run: swift build --triple wasm32-unknown-wasi --build-tests
       - name: Run tests
