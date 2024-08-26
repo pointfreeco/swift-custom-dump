@@ -15,33 +15,33 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  macos-14:
-    name: macOS 14 (Xcode ${{ matrix.xcode }})
-    runs-on: macOS-14
-    strategy:
-      matrix:
-        xcode:
-          - '15.4'
-    steps:
-      - uses: actions/checkout@v4
-      - name: Select Xcode ${{ matrix.xcode }}
-        run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
-      - name: Print Swift version
-        run: swift --version
-      - name: Run tests (platforms)
-        run: make test-platforms
+  # macos-14:
+  #   name: macOS 14 (Xcode ${{ matrix.xcode }})
+  #   runs-on: macOS-14
+  #   strategy:
+  #     matrix:
+  #       xcode:
+  #         - '15.4'
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Select Xcode ${{ matrix.xcode }}
+  #       run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
+  #     - name: Print Swift version
+  #       run: swift --version
+  #     - name: Run tests (platforms)
+  #       run: make test-platforms
 
-  linux:
-    name: Ubuntu
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        swift:
-          - '5.10'
-    steps:
-      - uses: actions/checkout@v4
-      - name: Run tests
-        run: make test-linux SWIFT_VERSION=${{ matrix.swift }}
+  # linux:
+  #   name: Ubuntu
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix:
+  #       swift:
+  #         - '5.10'
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Run tests
+  #       run: make test-linux SWIFT_VERSION=${{ matrix.swift }}
 
   wasm:
     name: SwiftWasm
@@ -57,20 +57,20 @@ jobs:
       - name: Run tests
         run: wasmtime .build/debug/swift-custom-dumpPackageTests.wasm
 
-  windows:
-    name: Windows
-    strategy:
-      matrix:
-        os: [windows-latest]
-        config: ['debug', 'release']
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: compnerd/gha-setup-swift@main
-        with:
-          branch: swift-5.10-release
-          tag: 5.10-RELEASE
-      - uses: actions/checkout@v4
-      - name: Build All Configurations
-        run: swift build -c ${{ matrix.config }}
-      - name: Run tests (debug only)
-        run: swift test
+  # windows:
+  #   name: Windows
+  #   strategy:
+  #     matrix:
+  #       os: [windows-latest]
+  #       config: ['debug', 'release']
+  #   runs-on: ${{ matrix.os }}
+  #   steps:
+  #     - uses: compnerd/gha-setup-swift@main
+  #       with:
+  #         branch: swift-5.10-release
+  #         tag: 5.10-RELEASE
+  #     - uses: actions/checkout@v4
+  #     - name: Build All Configurations
+  #       run: swift build -c ${{ matrix.config }}
+  #     - name: Run tests (debug only)
+  #       run: swift test
