@@ -52,7 +52,8 @@ jobs:
         with:
           swift-version: "wasm-5.9.2-RELEASE"
       - name: Build tests
-        run: swift build --triple wasm32-unknown-wasi --build-tests
+        # Extend the stack size to avoid stack overflow in the test suites
+        run: swift build --triple wasm32-unknown-wasi --build-tests -Xlinker -z -Xlinker stack-size=$((1024 * 1024))
       - name: Run tests
         run: wasmtime .build/debug/swift-custom-dumpPackageTests.wasm
 
