@@ -105,7 +105,7 @@ public func expectDifference<T: Equatable>(
   }
 }
 
-/// Expect that two values have no difference.
+/// Expects that a value has a set of changes.
 ///
 /// An async version of
 /// ``expectDifference(_:_:operation:changes:fileID:filePath:line:column:)-5fu8q``.
