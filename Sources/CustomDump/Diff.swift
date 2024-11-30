@@ -120,8 +120,8 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
       var rhsChildren = Array(rhsMirror.children)
 
       if isMirrorEqual(lhsChildren, rhsChildren),
-        !(lhs is _CustomDiffObject),
-        !(rhs is _CustomDiffObject)
+        !(lhs is any _CustomDiffObject),
+        !(rhs is any _CustomDiffObject)
       {
         let lhsDump =
           _customDump(
@@ -349,9 +349,9 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
     case (is CustomDumpStringConvertible, _, is CustomDumpStringConvertible, _):
       diffEverything()
 
-    case let (lhs as _CustomDiffObject, _, rhs as _CustomDiffObject, _):
-      let lhsItem = lhs._objectIdentifier
-      let rhsItem = rhs._objectIdentifier
+    case let (lhs as any _CustomDiffObject, _, rhs as any _CustomDiffObject, _):
+      let lhsItem = toAnyHashable(lhs._objectIdentifier)
+      let rhsItem = toAnyHashable(rhs._objectIdentifier)
       if lhsItem == rhsItem {
         let (lhs, rhs) = lhs._customDiffValues
         let subjectType = typeName(type(of: lhs))
@@ -804,12 +804,13 @@ private struct Line: CustomDumpStringConvertible, Identifiable {
   }
 }
 
-public protocol _CustomDiffObject {
+public protocol _CustomDiffObject<ID> {
+  associatedtype ID: Hashable = ObjectIdentifier
   var _customDiffValues: (Any, Any) { get }
-  var _objectIdentifier: ObjectIdentifier { get }
+  var _objectIdentifier: ID { get }
 }
 
-extension _CustomDiffObject where Self: AnyObject {
+extension _CustomDiffObject where Self: AnyObject, ID == ObjectIdentifier {
   public var _objectIdentifier: ObjectIdentifier {
     ObjectIdentifier(self)
   }

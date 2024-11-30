@@ -46,9 +46,9 @@ extension String {
 }
 
 struct ObjectTracker {
-  var idPerItem: [ObjectIdentifier: UInt] = [:]
+  var idPerItem: [AnyHashable: UInt] = [:]
   var occurrencePerType: [String: UInt] = [:]
-  var visitedItems: Set<ObjectIdentifier> = []
+  var visitedItems: Set<AnyHashable> = []
 }
 
 /// Dumps the given value's contents using its mirror to the specified output stream.
@@ -186,8 +186,8 @@ func _customDump<T, TargetStream>(
     case let (value as CustomDumpStringConvertible, _):
       out.write(value.customDumpDescription)
 
-    case let (value as _CustomDiffObject, _):
-      let item = value._objectIdentifier
+    case let (value as any _CustomDiffObject, _):
+      let item = toAnyHashable(value._objectIdentifier)
       let (_, value) = value._customDiffValues
       let subjectType = typeName(type(of: value))
       var occurrence = tracker.occurrencePerType[subjectType, default: 1] {

@@ -9,12 +9,12 @@ extension Mirror {
         let child = self.children.first
       else { return false }
       var value = child.value
-      if value is _CustomDiffObject {
+      if value is any _CustomDiffObject {
         return false
       }
       while let representable = value as? CustomDumpRepresentable {
         value = representable.customDumpValue
-        if value is _CustomDiffObject {
+        if value is any _CustomDiffObject {
           return false
         }
       }
