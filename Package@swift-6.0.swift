@@ -17,14 +17,14 @@ let package = Package(
     )
   ],
   dependencies: [
-    .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "1.2.2")
+    .package(url: "https://github.com/pointfreeco/swift-issue-reporting", from: "1.2.2")
   ],
   targets: [
     .target(
       name: "CustomDump",
       dependencies: [
-        .product(name: "IssueReporting", package: "xctest-dynamic-overlay"),
-        .product(name: "XCTestDynamicOverlay", package: "xctest-dynamic-overlay"),
+        .product(name: "IssueReporting", package: "swift-issue-reporting"),
+        .product(name: "XCTestDynamicOverlay", package: "swift-issue-reporting"),
       ]
     ),
     .testTarget(
