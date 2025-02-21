@@ -1290,6 +1290,19 @@ final class DiffTests: XCTestCase {
       """
     )
   }
+
+  func testRecursion() {
+    class Object {
+      var child: Object?
+    }
+    let object = Object()
+    object.child = object
+    expectNoDifference(
+      diff(object, object),
+      """
+      """
+    )
+  }
 }
 
 private class Shared: _CustomDiffObject, Equatable {
