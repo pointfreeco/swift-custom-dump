@@ -27,11 +27,11 @@ extension Mirror {
 }
 
 func isMirrorEqual(_ lhs: Any, _ rhs: Any) -> Bool {
-  let lhsType = type(of: lhs)
-  if lhsType is AnyClass, lhsType == type(of: rhs), lhs as AnyObject === rhs as AnyObject {
-    return true
-  }
   guard let lhs = lhs as? any Equatable else {
+    let lhsType = type(of: lhs)
+    if lhsType is AnyClass, lhsType == type(of: rhs), lhs as AnyObject === rhs as AnyObject {
+      return true
+    }
     let lhsMirror = Mirror(customDumpReflecting: lhs)
     let rhsMirror = Mirror(customDumpReflecting: rhs)
     guard
