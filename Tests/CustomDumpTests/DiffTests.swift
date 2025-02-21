@@ -1297,11 +1297,7 @@ final class DiffTests: XCTestCase {
     }
     let object = Object()
     object.child = object
-    expectNoDifference(
-      diff(object, object),
-      """
-      """
-    )
+    XCTAssertNil(diff(object, object))
   }
 }
 
