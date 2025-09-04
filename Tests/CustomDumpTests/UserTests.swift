@@ -1,7 +1,7 @@
 
 
     @Test func students() {
-      #expect(student1 == student2)
+      expectNoDifference(student1, student2)
     }
 
 

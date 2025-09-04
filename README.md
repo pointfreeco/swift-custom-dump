@@ -259,12 +259,12 @@ For a real world use case we modified Apple's [Landmarks](https://developer.appl
 <th>#expect</th>
 </tr>
 <tr valign=top>
-<td width=415>
+<td width=50%>
 
 ![](.github/assert-no-difference.png)
 
 </td>
-<td width=415>
+<td width=50%>
 
 ![](.github/expect.png)
 
