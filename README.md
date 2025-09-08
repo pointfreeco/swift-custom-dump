@@ -253,6 +253,25 @@ For a real world use case we modified Apple's [Landmarks](https://developer.appl
 
 ### `expectNoDifference`
 
+<table>
+<tr>
+<th>expectNoDifference</th>
+<th>#expect</th>
+</tr>
+<tr valign=top>
+<td width=50%>
+
+![](.github/assert-no-difference.png)
+
+</td>
+<td width=50%>
+
+![](.github/expect.png)
+
+</td>
+</tr>
+</table>
+
 XCTest's `XCTAssertEqual` and Swift Testing's `#expect(_ == _)` both allow you to assert that two values are equal, and if they are not the test suite will fail with a message:
 
 ```swift
