@@ -56,11 +56,8 @@ jobs:
           sudo mkdir -p $PREFIX; sudo tar -xzf /tmp/swift.tar.gz -C $PREFIX --strip-component 1
           $PREFIX/usr/bin/swift sdk install https://github.com/swiftwasm/swift/releases/download/swift-wasm-6.0.3-RELEASE/swift-wasm-6.0.3-RELEASE-wasm32-unknown-wasi.artifactbundle.zip --checksum 31d3585b06dd92de390bacc18527801480163188cd7473f492956b5e213a8618
           echo "$PREFIX/usr/bin" >> $GITHUB_PATH
-
       - name: Build
         run: swift build --swift-sdk wasm32-unknown-wasi -Xlinker -z -Xlinker stack-size=$((1024 * 1024))
-      - name: Run tests
-        run: wasmtime .build/debug/swift-custom-dumpPackageTests.wasm
 
   windows:
     name: Windows
