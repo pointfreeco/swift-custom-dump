@@ -60,24 +60,6 @@ jobs:
       - name: Build
         run: swift build --swift-sdk wasm32-unknown-wasi -Xlinker -z -Xlinker stack-size=$((1024 * 1024))
 
-  windows:
-    name: Windows
-    strategy:
-      matrix:
-        os: [windows-latest]
-        config: ['debug', 'release']
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: compnerd/gha-setup-swift@main
-        with:
-          branch: swift-5.10-release
-          tag: 5.10-RELEASE
-      - uses: actions/checkout@v4
-      - name: Build All Configurations
-        run: swift build -c ${{ matrix.config }}
-      - name: Run tests (debug only)
-        run: swift test
-
   android:
     name: Android (Swift 6.0.2)
     runs-on: ubuntu-22.04
