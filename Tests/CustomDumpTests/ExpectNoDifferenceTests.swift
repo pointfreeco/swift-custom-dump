@@ -24,7 +24,7 @@ import XCTest
         expectNoDifference(user, otherUser)
       } matching: {
         $0.description == """
-          Expectation failed: Difference: …
+          Issue recorded (error): Difference: …
 
               ExpectNoDifferenceTests.User(
                 id: UUID(DEADBEEF-DEAD-BEEF-DEAD-BEEFDEADBEEF),
