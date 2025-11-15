@@ -14,13 +14,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  macos:
-    name: macOS (Xcode ${{ matrix.xcode }})
-    runs-on: macos-15
+  macos-14:
+    name: macOS 14 (Xcode ${{ matrix.xcode }})
+    runs-on: macOS-14
     strategy:
       matrix:
         xcode:
-          - '16.4'
+          - '15.4'
     steps:
       - uses: actions/checkout@v4
       - name: Select Xcode ${{ matrix.xcode }}
@@ -31,17 +31,16 @@ jobs:
         run: make test-platforms
 
   linux:
+    name: Ubuntu
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         swift:
-          - '6.1'
-    name: Ubuntu (Swift ${{ matrix.swift }})
-    runs-on: ubuntu-latest
-    container: swift:${{ matrix.swift }}
+          - '5.10'
     steps:
       - uses: actions/checkout@v4
       - name: Run tests
-        run: swift test --parallel
+        run: make test-linux SWIFT_VERSION=${{ matrix.swift }}
 
   wasm:
     name: Wasm
@@ -61,10 +60,6 @@ jobs:
         run: swift build --swift-sdk wasm32-unknown-wasi -Xlinker -z -Xlinker stack-size=$((1024 * 1024))
 
   android:
-    strategy:
-      matrix:
-        swift:
-          - "6.0.2"
     name: Android
     runs-on: ubuntu-latest
     steps:
