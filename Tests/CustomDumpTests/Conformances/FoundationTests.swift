@@ -626,8 +626,7 @@ final class FoundationTests: XCTestCase {
           ],
           httpBody: nil,
           httpBodyStream: nil,
-          httpShouldHandleCookies: true,
-          httpShouldUsePipelining: false
+          httpShouldHandleCookies: true
         )
         """
       )
