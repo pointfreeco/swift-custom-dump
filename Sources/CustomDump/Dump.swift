@@ -180,13 +180,13 @@ func _customDump<T, TargetStream>(
     }
 
     switch (value, mirror.displayStyle) {
-    case let (value as Any.Type, _):
+    case (let value as Any.Type, _):
       out.write("\(typeName(value)).self")
 
-    case let (value as CustomDumpStringConvertible, _):
+    case (let value as CustomDumpStringConvertible, _):
       out.write(value.customDumpDescription)
 
-    case let (value as _CustomDiffObject, _):
+    case (let value as _CustomDiffObject, _):
       let item = value._objectIdentifier
       let (_, value) = value._customDiffValues
       let subjectType = typeName(type(of: value))
@@ -219,7 +219,7 @@ func _customDump<T, TargetStream>(
         )
       }
 
-    case let (value as CustomDumpRepresentable, _):
+    case (let value as CustomDumpRepresentable, _):
       customDumpHelp(
         value.customDumpValue,
         to: &out,
@@ -230,7 +230,7 @@ func _customDump<T, TargetStream>(
         maxDepth: maxDepth
       )
 
-    case let (value as AnyObject, .class?):
+    case (let value as AnyObject, .class?):
       let item = ObjectIdentifier(value)
       var occurrence = tracker.occurrencePerType[typeName(mirror.subjectType), default: 0] {
         didSet { tracker.occurrencePerType[typeName(mirror.subjectType)] = occurrence }

@@ -349,7 +349,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
     case (is CustomDumpStringConvertible, _, is CustomDumpStringConvertible, _):
       diffEverything()
 
-    case let (lhs as _CustomDiffObject, _, rhs as _CustomDiffObject, _):
+    case (let lhs as _CustomDiffObject, _, let rhs as _CustomDiffObject, _):
       let lhsItem = lhs._objectIdentifier
       let rhsItem = rhs._objectIdentifier
       if lhsItem == rhsItem {
@@ -400,7 +400,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         diffEverything()
       }
 
-    case let (lhs as CustomDumpRepresentable, _, rhs as CustomDumpRepresentable, _):
+    case (let lhs as CustomDumpRepresentable, _, let rhs as CustomDumpRepresentable, _):
       out.write(
         diffHelp(
           lhs.customDumpValue,
@@ -413,7 +413,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         )
       )
 
-    case let (lhs as AnyObject, .class?, rhs as AnyObject, .class?):
+    case (let lhs as AnyObject, .class?, let rhs as AnyObject, .class?):
       let lhsItem = ObjectIdentifier(lhs)
       let rhsItem = ObjectIdentifier(rhs)
       let subjectType = typeName(lhsMirror.subjectType)
