@@ -1,5 +1,6 @@
 import CustomDump
 import Foundation
+#if canImport(XCTest)
 import XCTest
 
 #if canImport(Testing)
@@ -54,3 +55,4 @@ class ExpectNoDifferenceXCTests: XCTestCase {
     }
   #endif
 }
+#endif
