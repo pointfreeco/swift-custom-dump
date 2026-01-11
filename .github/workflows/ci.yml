@@ -14,13 +14,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  macos-14:
-    name: macOS 14 (Xcode ${{ matrix.xcode }})
-    runs-on: macOS-14
+  macos-26:
+    name: macOS 26 (Xcode ${{ matrix.xcode }})
+    runs-on: macOS-26
     strategy:
       matrix:
         xcode:
-          - '15.4'
+          - '26.2'
     steps:
       - uses: actions/checkout@v4
       - name: Select Xcode ${{ matrix.xcode }}
@@ -36,7 +36,7 @@ jobs:
     strategy:
       matrix:
         swift:
-          - '5.10'
+          - '6.2.3'
     steps:
       - uses: actions/checkout@v4
       - name: Run tests
@@ -52,54 +52,21 @@ jobs:
         run: |
           PREFIX=/opt/swift
           set -ex
-          curl -f -o /tmp/swift.tar.gz "https://download.swift.org/swift-6.0.3-release/ubuntu2204/swift-6.0.3-RELEASE/swift-6.0.3-RELEASE-ubuntu22.04.tar.gz"
+          curl -f -o /tmp/swift.tar.gz "https://download.swift.org/swift-6.2-release/ubuntu2204/swift-6.2-RELEASE/swift-6.2-RELEASE-ubuntu22.04.tar.gz"
           sudo mkdir -p $PREFIX; sudo tar -xzf /tmp/swift.tar.gz -C $PREFIX --strip-component 1
-          $PREFIX/usr/bin/swift sdk install https://github.com/swiftwasm/swift/releases/download/swift-wasm-6.0.3-RELEASE/swift-wasm-6.0.3-RELEASE-wasm32-unknown-wasi.artifactbundle.zip --checksum 31d3585b06dd92de390bacc18527801480163188cd7473f492956b5e213a8618
+          $PREFIX/usr/bin/swift sdk install https://github.com/swiftwasm/swift/releases/download/swift-wasm-6.2-RELEASE/swift-wasm-6.2-RELEASE-wasm32-unknown-wasip1.artifactbundle.zip --checksum f206a9ff2352f726d88a59d2241b9581264326471265229b7ffd133d2593b92b
           echo "$PREFIX/usr/bin" >> $GITHUB_PATH
-
       - name: Build
-        run: swift build --swift-sdk wasm32-unknown-wasi -Xlinker -z -Xlinker stack-size=$((1024 * 1024))
+        run: swift build --swift-sdk 6.2-RELEASE-wasm32-unknown-wasip1 -Xlinker -z -Xlinker stack-size=$((1024 * 1024))
 
   android:
-    name: Android (Swift 6.0.2)
-    runs-on: ubuntu-22.04
+    name: Android
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-      - name: Install Swift
-        uses: tayloraswift/swift-install-action@master
+      - uses: actions/checkout@v4
+      - name: "Test Swift Package on Android"
+        uses: skiptools/swift-android-action@v2
         with:
-          swift-prefix: swift-6.0.2-release/ubuntu2204/swift-6.0.2-RELEASE
-          swift-id: swift-6.0.2-RELEASE-ubuntu22.04
-      - name: Check Swift
-        run: swift --version
-      - name: Install Android SDK
-        run:
-          swift sdk install https://github.com/finagolfin/swift-android-sdk/releases/download/6.0.2/swift-6.0.2-RELEASE-android-24-0.1.artifactbundle.tar.gz --checksum d75615eac3e614131133c7cc2076b0b8fb4327d89dce802c25cd53e75e1881f4
-      - name: Check Android SDK
-        run:
-          swift sdk configure --show-configuration swift-6.0.2-RELEASE-android-24-0.1 x86_64-unknown-linux-android24
-      - name: Build Tests
-        run:
-          swift build --build-tests --swift-sdk x86_64-unknown-linux-android24 -Xswiftc -Xclang-linker -Xswiftc -fuse-ld=lld
-      - name: Prepare Android Emulator Test Script
-        run: |
-          mkdir pack
-          cp .build/x86_64-unknown-linux-android24/debug/swift-custom-dumpPackageTests.xctest pack
-          
-          cp /home/runner/.config/swiftpm/swift-sdks/swift-6.0.2-RELEASE-android-24-0.1.artifactbundle/swift-6.0.2-release-android-24-sdk/android-27c-sysroot/usr/lib/x86_64-linux-android/24/lib*.so pack
-          rm pack/lib{c,dl,log,m,z}.so
-
-          set -x
-          cat > ~/test-toolchain.sh << EOF
-          adb push pack /data/local/tmp
-          adb shell /data/local/tmp/pack/swift-custom-dumpPackageTests.xctest
-          EOF
-          
-          chmod +x ~/test-toolchain.sh
-      - name: Run Tests on Android Emulator
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 29
-          arch: x86_64
-          script: ~/test-toolchain.sh
+          swift-version: '6.2'
+          # Ubuntu runners low on space causes the emulator to fail to install
+          free-disk-space: true

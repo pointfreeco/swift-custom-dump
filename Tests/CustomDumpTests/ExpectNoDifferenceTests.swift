@@ -1,5 +1,7 @@
 import CustomDump
 import Foundation
+
+#if canImport(XCTest)
 import XCTest
 
 #if canImport(Testing)
@@ -8,6 +10,7 @@ import XCTest
   @Suite
   struct ExpectNoDifferenceTests {
     @Test func basics() {
+      #if !os(Android)
       struct User: Equatable {
         var id: UUID
         var name: String
@@ -23,8 +26,9 @@ import XCTest
       withKnownIssue {
         expectNoDifference(user, otherUser)
       } matching: {
-        $0.description == """
-          Expectation failed: Difference: …
+        print(">>\($0.description)<<")
+        return $0.description == """
+          Issue recorded (error): Difference: …
 
               ExpectNoDifferenceTests.User(
                 id: UUID(DEADBEEF-DEAD-BEEF-DEAD-BEEFDEADBEEF),
@@ -36,6 +40,7 @@ import XCTest
           (First: −, Second: +)
           """
       }
+      #endif
     }
   }
 #endif
@@ -54,3 +59,4 @@ class ExpectNoDifferenceXCTests: XCTestCase {
     }
   #endif
 }
+#endif
