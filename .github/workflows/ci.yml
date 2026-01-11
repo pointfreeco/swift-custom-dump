@@ -57,7 +57,7 @@ jobs:
           $PREFIX/usr/bin/swift sdk install https://github.com/swiftwasm/swift/releases/download/swift-wasm-6.2-RELEASE/swift-wasm-6.2-RELEASE-wasm32-unknown-wasip1-threads.artifactbundle.zip --checksum df8dee548a572f9325e997e1378f4dbab1dbfc986f92a35887b313e19007835d
           echo "$PREFIX/usr/bin" >> $GITHUB_PATH
       - name: Build
-        run: swift build --swift-sdk wasm32-unknown-wasi -Xlinker -z -Xlinker stack-size=$((1024 * 1024))
+        run: swift build --swift-sdk 6.2-RELEASE-wasm32-unknown-wasip1-threads -Xlinker -z -Xlinker stack-size=$((1024 * 1024))
 
   android:
     name: Android
@@ -66,3 +66,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: "Test Swift Package on Android"
         uses: skiptools/swift-android-action@v2
+        with:
+          swift-version: '6.2'
+          # Ubuntu runners low on space causes the emulator to fail to install
+          free-disk-space: true
