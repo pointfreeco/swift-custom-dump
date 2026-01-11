@@ -1,5 +1,7 @@
 import CustomDump
 import Foundation
+import IssueReportingTestSupport
+
 #if canImport(XCTest)
 import XCTest
 
