@@ -1,6 +1,5 @@
 import CustomDump
 import Foundation
-import IssueReportingTestSupport
 
 #if canImport(XCTest)
 import XCTest
@@ -25,8 +24,9 @@ import XCTest
       otherUser.name += " Jr."
       withKnownIssue {
         expectNoDifference(user, otherUser)
-      } matching: { _ in
-       return true // Desperate
+      } matching: {
+        print(">>\($0.description)<<")
+        return true // Desperate
 //        $0.description == """
 //          Issue recorded (error): Difference: …
 //
