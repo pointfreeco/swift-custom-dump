@@ -10,6 +10,7 @@ import XCTest
   @Suite
   struct ExpectNoDifferenceTests {
     @Test func basics() {
+      #if !os(Android)
       struct User: Equatable {
         var id: UUID
         var name: String
@@ -26,20 +27,20 @@ import XCTest
         expectNoDifference(user, otherUser)
       } matching: {
         print(">>\($0.description)<<")
-        return true // Desperate
-//        $0.description == """
-//          Issue recorded (error): Difference: …
-//
-//              ExpectNoDifferenceTests.User(
-//                id: UUID(DEADBEEF-DEAD-BEEF-DEAD-BEEFDEADBEEF),
-//            −   name: "Blob",
-//            +   name: "Blob Jr.",
-//                bio: "Blobbed around the world."
-//              )
-//
-//          (First: −, Second: +)
-//          """
+        return $0.description == """
+          Issue recorded (error): Difference: …
+
+              ExpectNoDifferenceTests.User(
+                id: UUID(DEADBEEF-DEAD-BEEF-DEAD-BEEFDEADBEEF),
+            −   name: "Blob",
+            +   name: "Blob Jr.",
+                bio: "Blobbed around the world."
+              )
+
+          (First: −, Second: +)
+          """
       }
+      #endif
     }
   }
 #endif
