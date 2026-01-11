@@ -1,5 +1,6 @@
 import CustomDump
 import Foundation
+import IssueReportingTestSupport
 import XCTest
 
 #if canImport(FoundationNetworking)
