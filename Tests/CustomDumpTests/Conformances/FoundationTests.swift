@@ -601,18 +601,17 @@ final class FoundationTests: XCTestCase {
   }
 
   #if !os(WASI)
-    func testNSURLRequest() {
-      #if compiler(>=5.10)
-        var dump = ""
-        let request = NSMutableURLRequest(url: URL(string: "https://www.pointfree.co")!)
-        request.addValue("text/html", forHTTPHeaderField: "Accept")
-        request.httpShouldUsePipelining = false
-        customDump(
-          request,
-          to: &dump
-        )
-        expectNoDifference(
-          dump,
+  func testNSURLRequest() {
+    var dump = ""
+    let request = NSMutableURLRequest(url: URL(string: "https://www.pointfree.co")!)
+    request.addValue("text/html", forHTTPHeaderField: "Accept")
+    request.httpShouldUsePipelining = false
+    customDump(
+      request,
+      to: &dump
+    )
+    expectNoDifference(
+      dump,
           """
           URLRequest(
             url: URL(https://www.pointfree.co),
@@ -630,39 +629,8 @@ final class FoundationTests: XCTestCase {
             httpShouldHandleCookies: true
           )
           """
-        )
-      #else
-        var dump = ""
-        let request = NSMutableURLRequest(url: URL(string: "https://www.pointfree.co")!)
-        request.addValue("text/html", forHTTPHeaderField: "Accept")
-        request.httpShouldUsePipelining = false
-        customDump(
-          request,
-          to: &dump
-        )
-        expectNoDifference(
-          dump,
-          """
-          URLRequest(
-            url: URL(https://www.pointfree.co),
-            cachePolicy: 0,
-            timeoutInterval: 60.0,
-            mainDocumentURL: nil,
-            networkServiceType: URLRequest.NetworkServiceType.default,
-            allowsCellularAccess: true,
-            httpMethod: "GET",
-            allHTTPHeaderFields: [
-              "Accept": "text/html"
-            ],
-            httpBody: nil,
-            httpBodyStream: nil,
-            httpShouldHandleCookies: true,
-            httpShouldUsePipelining: false
-          )
-          """
-        )
-      #endif
-    }
+    )
+  }
   #endif
 
   func testNSUUID() {
