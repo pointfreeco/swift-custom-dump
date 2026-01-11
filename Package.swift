@@ -31,7 +31,6 @@ let package = Package(
       name: "CustomDumpTests",
       dependencies: [
         "CustomDump",
-        .product(name: "IssueReportingTestSupport", package: "xctest-dynamic-overlay"),
       ]
     ),
   ]
