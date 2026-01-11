@@ -54,10 +54,10 @@ jobs:
           set -ex
           curl -f -o /tmp/swift.tar.gz "https://download.swift.org/swift-6.2-release/ubuntu2204/swift-6.2-RELEASE/swift-6.2-RELEASE-ubuntu22.04.tar.gz"
           sudo mkdir -p $PREFIX; sudo tar -xzf /tmp/swift.tar.gz -C $PREFIX --strip-component 1
-          $PREFIX/usr/bin/swift sdk install https://github.com/swiftwasm/swift/releases/download/swift-wasm-6.2-RELEASE/swift-wasm-6.2-RELEASE-wasm32-unknown-wasip1-threads.artifactbundle.zip --checksum df8dee548a572f9325e997e1378f4dbab1dbfc986f92a35887b313e19007835d
+          $PREFIX/usr/bin/swift sdk install https://github.com/swiftwasm/swift/releases/download/swift-wasm-6.2-RELEASE/swift-wasm-6.2-RELEASE-wasm32-unknown-wasip1.artifactbundle.zip --checksum f206a9ff2352f726d88a59d2241b9581264326471265229b7ffd133d2593b92b
           echo "$PREFIX/usr/bin" >> $GITHUB_PATH
       - name: Build
-        run: swift build --swift-sdk 6.2-RELEASE-wasm32-unknown-wasip1-threads -Xlinker -z -Xlinker stack-size=$((1024 * 1024))
+        run: swift build --swift-sdk 6.2-RELEASE-wasm32-unknown-wasip1 -Xlinker -z -Xlinker stack-size=$((1024 * 1024))
 
   android:
     name: Android

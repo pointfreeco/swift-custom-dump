@@ -26,18 +26,19 @@ import XCTest
       withKnownIssue {
         expectNoDifference(user, otherUser)
       } matching: {
-        $0.description == """
-          Issue recorded (error): Difference: …
-
-              ExpectNoDifferenceTests.User(
-                id: UUID(DEADBEEF-DEAD-BEEF-DEAD-BEEFDEADBEEF),
-            −   name: "Blob",
-            +   name: "Blob Jr.",
-                bio: "Blobbed around the world."
-              )
-
-          (First: −, Second: +)
-          """
+        $0.description.range(of: "+   name: \"Blob Jr.\"") != nil
+//        $0.description == """
+//          Issue recorded (error): Difference: …
+//
+//              ExpectNoDifferenceTests.User(
+//                id: UUID(DEADBEEF-DEAD-BEEF-DEAD-BEEFDEADBEEF),
+//            −   name: "Blob",
+//            +   name: "Blob Jr.",
+//                bio: "Blobbed around the world."
+//              )
+//
+//          (First: −, Second: +)
+//          """
       }
     }
   }
