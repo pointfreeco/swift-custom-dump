@@ -34,6 +34,25 @@ let package = Package(
       name: "CustomDumpTests",
       dependencies: [
         "CustomDump",
+        .product(
+          name: "IssueReportingTestSupport",
+          package: "xctest-dynamic-overlay",
+          condition: .when(
+            platforms: [
+              .android,
+              .driverKit,
+              .iOS,
+              .linux,
+              .macCatalyst,
+              .macOS,
+              .openbsd,
+              .tvOS,
+              .visionOS,
+              .watchOS,
+              .windows,
+            ] // Everything but wasi
+          )
+        ),
       ]
     ),
   ]
