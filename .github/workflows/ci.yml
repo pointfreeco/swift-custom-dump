@@ -35,7 +35,7 @@ jobs:
     strategy:
       matrix:
         swift:
-          - '5.10'
+          - '6.2'
     steps:
       - uses: actions/checkout@v5
       - name: Run tests
