@@ -109,6 +109,9 @@ public func expectDifference<T: Equatable>(
 ///
 /// An async version of
 /// ``expectDifference(_:_:operation:changes:fileID:filePath:line:column:)-5fu8q``.
+#if compiler(>=6.2)
+nonisolated(nonsending)
+#endif
 public func expectDifference<T: Equatable>(
   _ expression: @autoclosure () throws -> T,
   _ message: @autoclosure () -> String? = nil,
