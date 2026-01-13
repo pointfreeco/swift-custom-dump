@@ -110,58 +110,111 @@ public func expectDifference<T: Equatable>(
 /// An async version of
 /// ``expectDifference(_:_:operation:changes:fileID:filePath:line:column:)-5fu8q``.
 #if compiler(>=6.2)
-nonisolated(nonsending)
-#endif
-public func expectDifference<T: Equatable>(
-  _ expression: @autoclosure () throws -> T,
-  _ message: @autoclosure () -> String? = nil,
-  operation: () async throws -> Void = {},
-  changes updateExpectingResult: (inout T) throws -> Void,
-  fileID: StaticString = #fileID,
-  filePath: StaticString = #filePath,
-  line: UInt = #line,
-  column: UInt = #column
-) async {
-  do {
-    var expression1 = try expression()
-    try updateExpectingResult(&expression1)
-    try await operation()
-    let expression2 = try expression()
-    guard expression1 != expression2 else { return }
-    let format = DiffFormat.proportional
-    guard let difference = diff(expression1, expression2, format: format)
-    else {
+  nonisolated(nonsending) public func expectDifference<T: Equatable>(
+    _ expression: @autoclosure () throws -> T,
+    _ message: @autoclosure () -> String? = nil,
+    operation: () async throws -> Void = {},
+    changes updateExpectingResult: (inout T) throws -> Void,
+    fileID: StaticString = #fileID,
+    filePath: StaticString = #filePath,
+    line: UInt = #line,
+    column: UInt = #column
+  ) async {
+    do {
+      var expression1 = try expression()
+      try updateExpectingResult(&expression1)
+      try await operation()
+      let expression2 = try expression()
+      guard expression1 != expression2 else { return }
+      let format = DiffFormat.proportional
+      guard let difference = diff(expression1, expression2, format: format)
+      else {
+        reportIssue(
+          """
+          ("\(expression1)" is not equal to ("\(expression2)"), but no difference was detected.
+          """,
+          fileID: fileID,
+          filePath: filePath,
+          line: line,
+          column: column
+        )
+        return
+      }
       reportIssue(
         """
-        ("\(expression1)" is not equal to ("\(expression2)"), but no difference was detected.
+        \(message()?.appending(" - ") ?? "")Difference: …
+
+        \(difference.indenting(by: 2))
+
+        (Expected: \(format.first), Actual: \(format.second))
         """,
         fileID: fileID,
         filePath: filePath,
         line: line,
         column: column
       )
-      return
+    } catch {
+      reportIssue(
+        error,
+        fileID: fileID,
+        filePath: filePath,
+        line: line,
+        column: column
+      )
     }
-    reportIssue(
-      """
-      \(message()?.appending(" - ") ?? "")Difference: …
-
-      \(difference.indenting(by: 2))
-
-      (Expected: \(format.first), Actual: \(format.second))
-      """,
-      fileID: fileID,
-      filePath: filePath,
-      line: line,
-      column: column
-    )
-  } catch {
-    reportIssue(
-      error,
-      fileID: fileID,
-      filePath: filePath,
-      line: line,
-      column: column
-    )
   }
-}
+#else
+  public func expectDifference<T: Equatable>(
+    _ expression: @autoclosure () throws -> T,
+    _ message: @autoclosure () -> String? = nil,
+    operation: () async throws -> Void = {},
+    changes updateExpectingResult: (inout T) throws -> Void,
+    fileID: StaticString = #fileID,
+    filePath: StaticString = #filePath,
+    line: UInt = #line,
+    column: UInt = #column
+  ) async {
+    do {
+      var expression1 = try expression()
+      try updateExpectingResult(&expression1)
+      try await operation()
+      let expression2 = try expression()
+      guard expression1 != expression2 else { return }
+      let format = DiffFormat.proportional
+      guard let difference = diff(expression1, expression2, format: format)
+      else {
+        reportIssue(
+          """
+          ("\(expression1)" is not equal to ("\(expression2)"), but no difference was detected.
+          """,
+          fileID: fileID,
+          filePath: filePath,
+          line: line,
+          column: column
+        )
+        return
+      }
+      reportIssue(
+        """
+        \(message()?.appending(" - ") ?? "")Difference: …
+
+        \(difference.indenting(by: 2))
+
+        (Expected: \(format.first), Actual: \(format.second))
+        """,
+        fileID: fileID,
+        filePath: filePath,
+        line: line,
+        column: column
+      )
+    } catch {
+      reportIssue(
+        error,
+        fileID: fileID,
+        filePath: filePath,
+        line: line,
+        column: column
+      )
+    }
+  }
+#endif
