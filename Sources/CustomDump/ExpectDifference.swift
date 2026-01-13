@@ -164,11 +164,11 @@ public func expectDifference<T: Equatable>(
     }
   }
 #else
-  public func expectDifference<T: Equatable>(
-    _ expression: @autoclosure () throws -> T,
-    _ message: @autoclosure () -> String? = nil,
-    operation: () async throws -> Void = {},
-    changes updateExpectingResult: (inout T) throws -> Void,
+public func expectDifference<T: Equatable & Sendable>(
+    _ expression: @autoclosure @Sendable () throws -> T,
+    _ message: @autoclosure @Sendable () -> String? = nil,
+    operation: @Sendable () async throws -> Void = {},
+    changes updateExpectingResult: @Sendable (inout T) throws -> Void,
     fileID: StaticString = #fileID,
     filePath: StaticString = #filePath,
     line: UInt = #line,
