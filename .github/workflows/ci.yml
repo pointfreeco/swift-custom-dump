@@ -14,15 +14,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  macos-14:
-    name: macOS 14 (Xcode ${{ matrix.xcode }})
-    runs-on: macOS-14
+  macos-26:
+    runs-on: macos-26
     strategy:
       matrix:
         xcode:
-          - '15.4'
+          - '26.2'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Select Xcode ${{ matrix.xcode }}
         run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
       - name: Print Swift version
@@ -36,9 +35,9 @@ jobs:
     strategy:
       matrix:
         swift:
-          - '5.10'
+          - '6.2'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Run tests
         run: make test-linux SWIFT_VERSION=${{ matrix.swift }}
 
@@ -46,7 +45,7 @@ jobs:
     name: Wasm
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: bytecodealliance/actions/wasmtime/setup@v1
       - name: Install Swift and Swift SDK for WebAssembly
         run: |
@@ -86,7 +85,7 @@ jobs:
         run: |
           mkdir pack
           cp .build/x86_64-unknown-linux-android24/debug/swift-custom-dumpPackageTests.xctest pack
-          
+
           cp /home/runner/.config/swiftpm/swift-sdks/swift-6.0.2-RELEASE-android-24-0.1.artifactbundle/swift-6.0.2-release-android-24-sdk/android-27c-sysroot/usr/lib/x86_64-linux-android/24/lib*.so pack
           rm pack/lib{c,dl,log,m,z}.so
 
@@ -95,7 +94,7 @@ jobs:
           adb push pack /data/local/tmp
           adb shell /data/local/tmp/pack/swift-custom-dumpPackageTests.xctest
           EOF
-          
+
           chmod +x ~/test-toolchain.sh
       - name: Run Tests on Android Emulator
         uses: reactivecircus/android-emulator-runner@v2
