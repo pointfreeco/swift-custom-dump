@@ -1,8 +1,8 @@
-PLATFORM_IOS = iOS Simulator,name=iPhone 11 Pro Max
+PLATFORM_IOS = iOS Simulator,id=$(call udid_for,iPhone)
 PLATFORM_MACOS = macOS
 PLATFORM_MAC_CATALYST = macOS,variant=Mac Catalyst
 PLATFORM_TVOS = tvOS Simulator,name=Apple TV
-SWIFT_VERSION = 5.7
+SWIFT_VERSION = 6.2
 SWIFT_TEST_ARGS = --parallel
 
 test-all: test-linux test-swift test-platforms
@@ -74,3 +74,7 @@ format:
 	swift format --in-place --recursive .
 
 .PHONY: format test-all test-linux test-swift
+
+define udid_for
+$(shell xcrun simctl list --json devices available '$(1)' | jq -r '[.devices|to_entries|sort_by(.key)|reverse|.[].value|select(length > 0)|.[0]][0].udid')
+endef
