@@ -105,11 +105,11 @@ public func expectDifference<T: Equatable>(
   }
 }
 
-/// Expects that a value has a set of changes.
-///
-/// An async version of
-/// ``expectDifference(_:_:operation:changes:fileID:filePath:line:column:)-5fu8q``.
 #if compiler(>=6.2)
+  /// Expects that a value has a set of changes.
+  ///
+  /// An async version of
+  /// ``expectDifference(_:_:operation:changes:fileID:filePath:line:column:)-5fu8q``.
   nonisolated(nonsending) public func expectDifference<T: Equatable>(
     _ expression: @autoclosure () throws -> T,
     _ message: @autoclosure () -> String? = nil,
@@ -164,7 +164,7 @@ public func expectDifference<T: Equatable>(
     }
   }
 #else
-public func expectDifference<T: Equatable & Sendable>(
+  public func expectDifference<T: Equatable & Sendable>(
     _ expression: @autoclosure @Sendable () throws -> T,
     _ message: @autoclosure @Sendable () -> String? = nil,
     operation: @Sendable () async throws -> Void = {},
