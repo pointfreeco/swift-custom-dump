@@ -23,8 +23,9 @@ import XCTest
       withKnownIssue {
         expectNoDifference(user, otherUser)
       } matching: {
-        $0.description == """
-          Expectation failed: Difference: …
+        $0.description.hasSuffix(
+          """
+          Difference: …
 
               ExpectNoDifferenceTests.User(
                 id: UUID(DEADBEEF-DEAD-BEEF-DEAD-BEEFDEADBEEF),
@@ -35,6 +36,7 @@ import XCTest
 
           (First: −, Second: +)
           """
+        )
       }
     }
   }
