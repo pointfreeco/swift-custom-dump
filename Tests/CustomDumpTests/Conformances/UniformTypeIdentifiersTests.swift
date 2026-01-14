@@ -12,9 +12,9 @@
           dump,
           """
           [
-            [0]: public.data,
-            [1]: public.jpeg,
-            [2]: com.adobe.pdf
+            [0]: UTType(public.data),
+            [1]: UTType(public.jpeg),
+            [2]: UTType(com.adobe.pdf)
           ]
           """
         )
