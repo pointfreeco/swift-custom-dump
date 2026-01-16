@@ -1,9 +1,8 @@
 import CustomDump
-import XCTest
+import Testing
 
-@available(*, deprecated)
-class ExpectDifferencesTests: XCTestCase {
-  func testExpectDifference() {
+struct ExpectDifferenceTests {
+  @Test func basics() {
     var user = User(id: 42, name: "Blob")
     func increment<Value>(_ root: inout Value, at keyPath: WritableKeyPath<Value, Int>) {
       root[keyPath: keyPath] += 1
@@ -16,29 +15,41 @@ class ExpectDifferencesTests: XCTestCase {
     }
   }
 
-  func testExpectDifference_NonExhaustive() {
-    let user = User(id: 42, name: "Blob")
-
+  @Test func nonExhaustive() {
+    var user = User(id: 42, name: "Blob")
+    user.id += 1
+    user.name += " Jr"
     expectDifference(user) {
-      $0.id = 42
-      $0.name = "Blob"
+      $0.name = "Blob Jr"
     }
   }
 
-  #if DEBUG && compiler(>=5.4) && (os(iOS) || os(macOS) || os(tvOS) || os(watchOS))
-    func testExpectDifference_Failure() {
-      var user = User(id: 42, name: "Blob")
-      func increment<Value>(_ root: inout Value, at keyPath: WritableKeyPath<Value, Int>) {
-        root[keyPath: keyPath] += 1
-      }
+  @Test func failure() {
+    var user = User(id: 42, name: "Blob")
+    func increment<Value>(_ root: inout Value, at keyPath: WritableKeyPath<Value, Int>) {
+      root[keyPath: keyPath] += 1
+    }
 
-      XCTExpectFailure()
-
+    withKnownIssue {
       expectDifference(user) {
         increment(&user, at: \.id)
       } changes: {
         $0.id = 44
       }
+    } matching: {
+      $0.description.hasSuffix(
+        """
+        Difference: …
+
+            User(
+          −   id: 44,
+          +   id: 43,
+              name: "Blob"
+            )
+
+        (Expected: −, Actual: +)
+        """
+      )
     }
-  #endif
+  }
 }

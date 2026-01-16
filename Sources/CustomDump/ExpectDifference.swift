@@ -31,8 +31,8 @@ import IssueReporting
 ///
 /// If the `changes` does not exhaustively describe all changed fields, the assertion will fail.
 ///
-/// By omitting the operation you can write a "non-exhaustive" assertion against a value by
-/// describing just the fields you want to assert against in the `changes` closure:
+/// To write a "non-exhaustive" assertion against a value, perform the mutating work up front, and
+/// describe just the fields you want to assert against in the `changes` closure:
 ///
 /// ```swift
 /// counter.increment()
@@ -54,7 +54,7 @@ import IssueReporting
 public func expectDifference<T: Equatable>(
   _ expression: @autoclosure () throws -> T,
   _ message: @autoclosure () -> String? = nil,
-  operation: () throws -> Void = {},
+  operation: (() throws -> Void)? = nil,
   changes updateExpectingResult: (inout T) throws -> Void,
   fileID: StaticString = #fileID,
   filePath: StaticString = #filePath,
@@ -62,46 +62,24 @@ public func expectDifference<T: Equatable>(
   column: UInt = #column
 ) {
   do {
-    var expression1 = try expression()
-    try updateExpectingResult(&expression1)
-    try operation()
-    let expression2 = try expression()
-    guard expression1 != expression2 else { return }
-    let format = DiffFormat.proportional
-    guard let difference = diff(expression1, expression2, format: format)
-    else {
-      reportIssue(
-        """
-        ("\(expression1)" is not equal to ("\(expression2)"), but no difference was detected.
-        """,
-        fileID: fileID,
-        filePath: filePath,
-        line: line,
-        column: column
-      )
-      return
-    }
-    reportIssue(
-      """
-      \(message()?.appending(" - ") ?? "")Difference: …
-
-      \(difference.indenting(by: 2))
-
-      (Expected: \(format.first), Actual: \(format.second))
-      """,
+    let original = try expression()
+    try operation?()
+    var expected = original
+    try updateExpectingResult(&expected)
+    let actual = try expression()
+    expectDifferenceHelp(
+      original: original,
+      expected: expected,
+      actual: actual,
+      isExhaustive: operation != nil,
+      message: expected != actual || operation != nil ? message() : nil,
       fileID: fileID,
       filePath: filePath,
       line: line,
       column: column
     )
   } catch {
-    reportIssue(
-      error,
-      fileID: fileID,
-      filePath: filePath,
-      line: line,
-      column: column
-    )
+    reportIssue(error, fileID: fileID, filePath: filePath, line: line, column: column)
   }
 }
 
@@ -113,7 +91,7 @@ public func expectDifference<T: Equatable>(
   nonisolated(nonsending) public func expectDifference<T: Equatable>(
     _ expression: @autoclosure () throws -> T,
     _ message: @autoclosure () -> String? = nil,
-    operation: () async throws -> Void = {},
+    operation: () async throws -> Void,
     changes updateExpectingResult: (inout T) throws -> Void,
     fileID: StaticString = #fileID,
     filePath: StaticString = #filePath,
@@ -121,53 +99,31 @@ public func expectDifference<T: Equatable>(
     column: UInt = #column
   ) async {
     do {
-      var expression1 = try expression()
-      try updateExpectingResult(&expression1)
+      let original = try expression()
       try await operation()
-      let expression2 = try expression()
-      guard expression1 != expression2 else { return }
-      let format = DiffFormat.proportional
-      guard let difference = diff(expression1, expression2, format: format)
-      else {
-        reportIssue(
-          """
-          ("\(expression1)" is not equal to ("\(expression2)"), but no difference was detected.
-          """,
-          fileID: fileID,
-          filePath: filePath,
-          line: line,
-          column: column
-        )
-        return
-      }
-      reportIssue(
-        """
-        \(message()?.appending(" - ") ?? "")Difference: …
-
-        \(difference.indenting(by: 2))
-
-        (Expected: \(format.first), Actual: \(format.second))
-        """,
+      var expected = original
+      try updateExpectingResult(&expected)
+      let actual = try expression()
+      expectDifferenceHelp(
+        original: original,
+        expected: expected,
+        actual: actual,
+        isExhaustive: true,
+        message: expected != actual ? message() : nil,
         fileID: fileID,
         filePath: filePath,
         line: line,
         column: column
       )
     } catch {
-      reportIssue(
-        error,
-        fileID: fileID,
-        filePath: filePath,
-        line: line,
-        column: column
-      )
+      reportIssue(error, fileID: fileID, filePath: filePath, line: line, column: column)
     }
   }
 #else
   public func expectDifference<T: Equatable & Sendable>(
     _ expression: @autoclosure @Sendable () throws -> T,
     _ message: @autoclosure @Sendable () -> String? = nil,
-    operation: @Sendable () async throws -> Void = {},
+    operation: @Sendable () async throws -> Void,
     changes updateExpectingResult: @Sendable (inout T) throws -> Void,
     fileID: StaticString = #fileID,
     filePath: StaticString = #filePath,
@@ -175,46 +131,79 @@ public func expectDifference<T: Equatable>(
     column: UInt = #column
   ) async {
     do {
-      var expression1 = try expression()
-      try updateExpectingResult(&expression1)
+      let original = try expression()
       try await operation()
-      let expression2 = try expression()
-      guard expression1 != expression2 else { return }
-      let format = DiffFormat.proportional
-      guard let difference = diff(expression1, expression2, format: format)
-      else {
-        reportIssue(
-          """
-          ("\(expression1)" is not equal to ("\(expression2)"), but no difference was detected.
-          """,
-          fileID: fileID,
-          filePath: filePath,
-          line: line,
-          column: column
-        )
-        return
-      }
-      reportIssue(
-        """
-        \(message()?.appending(" - ") ?? "")Difference: …
-
-        \(difference.indenting(by: 2))
-
-        (Expected: \(format.first), Actual: \(format.second))
-        """,
+      var expected = original
+      try updateExpectingResult(&expected)
+      let actual = try expression()
+      expectDifferenceHelp(
+        original: original,
+        expected: expected,
+        actual: actual,
+        isExhaustive: true,
+        message: expected != actual ? message() : nil,
         fileID: fileID,
         filePath: filePath,
         line: line,
         column: column
       )
     } catch {
+      reportIssue(error, fileID: fileID, filePath: filePath, line: line, column: column)
+    }
+  }
+#endif
+
+private func expectDifferenceHelp<T: Equatable>(
+  original: T,
+  expected: T,
+  actual: T,
+  isExhaustive: Bool,
+  message: String?,
+  fileID: StaticString = #fileID,
+  filePath: StaticString = #filePath,
+  line: UInt = #line,
+  column: UInt = #column
+) {
+  guard expected != actual else {
+    if isExhaustive, original == actual {
       reportIssue(
-        error,
+        """
+        \(message?.appending(" - ") ?? "")No difference detected after applying changes.
+        """,
         fileID: fileID,
         filePath: filePath,
         line: line,
         column: column
       )
     }
+    return
   }
-#endif
+  let format = DiffFormat.proportional
+  guard let difference = diff(expected, actual, format: format)
+  else {
+    reportIssue(
+      """
+      \(message?.appending(" - ") ?? "")\
+      ("\(expected)" is not equal to ("\(actual)"), but no difference was detected.
+      """,
+      fileID: fileID,
+      filePath: filePath,
+      line: line,
+      column: column
+    )
+    return
+  }
+  reportIssue(
+    """
+    \(message?.appending(" - ") ?? "")Difference: …
+
+    \(difference.indenting(by: 2))
+
+    (Expected: \(format.first), Actual: \(format.second))
+    """,
+    fileID: fileID,
+    filePath: filePath,
+    line: line,
+    column: column
+  )
+}
