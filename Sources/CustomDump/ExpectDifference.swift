@@ -61,7 +61,7 @@ public func expectDifference<T: Equatable>(
   line: UInt = #line,
   column: UInt = #column
 ) {
-  withErrorReporting(fileID: fileID, filePath: filePath, line: line, column: column) {
+  do {
     let original = try expression()
     try operation?()
     var expected = original
@@ -78,6 +78,8 @@ public func expectDifference<T: Equatable>(
       line: line,
       column: column
     )
+  } catch {
+    reportIssue(error, fileID: fileID, filePath: filePath, line: line, column: column)
   }
 }
 
@@ -96,7 +98,7 @@ public func expectDifference<T: Equatable>(
     line: UInt = #line,
     column: UInt = #column
   ) async {
-    await withErrorReporting(fileID: fileID, filePath: filePath, line: line, column: column) {
+    do {
       let original = try expression()
       try await operation()
       var expected = original
@@ -113,6 +115,8 @@ public func expectDifference<T: Equatable>(
         line: line,
         column: column
       )
+    } catch {
+      reportIssue(error, fileID: fileID, filePath: filePath, line: line, column: column)
     }
   }
 #else
@@ -126,7 +130,7 @@ public func expectDifference<T: Equatable>(
     line: UInt = #line,
     column: UInt = #column
   ) async {
-    await withErrorReporting(fileID: fileID, filePath: filePath, line: line, column: column) {
+    do {
       let original = try expression()
       try await operation()
       var expected = original
@@ -143,6 +147,8 @@ public func expectDifference<T: Equatable>(
         line: line,
         column: column
       )
+    } catch {
+      reportIssue(error, fileID: fileID, filePath: filePath, line: line, column: column)
     }
   }
 #endif

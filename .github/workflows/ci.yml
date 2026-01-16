@@ -63,4 +63,4 @@ jobs:
           swift sdk install https://download.swift.org/swift-6.2.3-release/wasm-sdk/swift-6.2.3-RELEASE/swift-6.2.3-RELEASE_wasm.artifactbundle.tar.gz --checksum 394040ecd5260e68bb02f6c20aeede733b9b90702c2204e178f3e42413edad2a
 
       - name: Build
-        run: swift build --swift-sdk swift-6.2.3-RELEASE_wasm -Xlinker -z -Xlinker stack-size=$((1024 * 1024))
+        run: swift build --swift-sdk swift-6.2.3-RELEASE_wasm --target CustomDump -Xlinker -z -Xlinker stack-size=$((1024 * 1024))
