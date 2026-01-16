@@ -254,23 +254,25 @@
       }
     }
 
-    @available(iOS 26.0, macCatalyst 26.0, tvOS 26.0, visionOS 26.0, *)
-    @available(watchOS, unavailable)
-    extension UISplitViewController.LayoutEnvironment: CustomDumpStringConvertible {
-      public var customDumpDescription: String {
-        switch self {
-        case .none:
-          return "UISplitViewController.LayoutEnvironment.none"
-        case .expanded:
-          return "UISplitViewController.LayoutEnvironment.expanded"
-        case .collapsed:
-          return "UISplitViewController.LayoutEnvironment.collapsed"
-        @unknown default:
-          return
-            "UISplitViewController.LayoutEnvironment.(@unknown default, rawValue: \(self.rawValue))"
+    #if compiler(>=6.2)  // Check for Xcode 26
+      @available(iOS 26.0, macCatalyst 26.0, tvOS 26.0, visionOS 26.0, *)
+      @available(watchOS, unavailable)
+      extension UISplitViewController.LayoutEnvironment: CustomDumpStringConvertible {
+        public var customDumpDescription: String {
+          switch self {
+          case .none:
+            return "UISplitViewController.LayoutEnvironment.none"
+          case .expanded:
+            return "UISplitViewController.LayoutEnvironment.expanded"
+          case .collapsed:
+            return "UISplitViewController.LayoutEnvironment.collapsed"
+          @unknown default:
+            return
+              "UISplitViewController.LayoutEnvironment.(@unknown default, rawValue: \(self.rawValue))"
+          }
         }
       }
-    }
+    #endif
 
   #endif
 #endif
