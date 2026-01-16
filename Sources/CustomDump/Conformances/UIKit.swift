@@ -119,5 +119,161 @@
         )
       }
     }
+
+    @available(iOS 8.0, macCatalyst 13.1, *)
+    @available(watchOS, unavailable)
+    extension UISplitViewController.DisplayMode: CustomDumpStringConvertible {
+      public var customDumpDescription: String {
+        switch self {
+        case .automatic:
+          return "UISplitViewController.DisplayMode.automatic"
+        case .secondaryOnly:
+          return "UISplitViewController.DisplayMode.secondaryOnly"
+        case .oneBesideSecondary:
+          return "UISplitViewController.DisplayMode.oneBesideSecondary"
+        case .oneOverSecondary:
+          return "UISplitViewController.DisplayMode.oneOverSecondary"
+        case .twoBesideSecondary:
+          return "UISplitViewController.DisplayMode.twoBesideSecondary"
+        case .twoOverSecondary:
+          return "UISplitViewController.DisplayMode.twoOverSecondary"
+        case .twoDisplaceSecondary:
+          return "UISplitViewController.DisplayMode.twoDisplaceSecondary"
+        @unknown default:
+          return "UISplitViewController.DisplayMode.(@unknown default, rawValue: \(self.rawValue))"
+        }
+      }
+    }
+
+    @available(iOS 14.5, macCatalyst 14.5, tvOS 14.5, *)
+    @available(watchOS, unavailable)
+    extension UISplitViewController.DisplayModeButtonVisibility: CustomDumpStringConvertible {
+      public var customDumpDescription: String {
+        switch self {
+        case .automatic:
+          return "UISplitViewController.DisplayModeButtonVisibility.automatic"
+        case .never:
+          return "UISplitViewController.DisplayModeButtonVisibility.never"
+        case .always:
+          return "UISplitViewController.DisplayModeButtonVisibility.always"
+        @unknown default:
+          return
+            "UISplitViewController.DisplayModeButtonVisibility.(@unknown default, rawValue: \(self.rawValue))"
+        }
+      }
+
+    }
+
+    @available(iOS 14.0, macCatalyst 14.0, tvOS 14.0, *)
+    @available(watchOS, unavailable)
+    extension UISplitViewController.SplitBehavior: CustomDumpStringConvertible {
+      public var customDumpDescription: String {
+        switch self {
+        case .automatic:
+          return "UISplitViewController.SplitBehavior.automatic"
+        case .tile:
+          return "UISplitViewController.SplitBehavior.tile"
+        case .overlay:
+          return "UISplitViewController.SplitBehavior.overlay"
+        case .displace:
+          return "UISplitViewController.SplitBehavior.displace"
+        @unknown default:
+          return
+            "UISplitViewController.SplitBehavior.(@unknown default, rawValue: \(self.rawValue))"
+        }
+      }
+
+    }
+
+    @available(iOS 14.0, macCatalyst 14.0, tvOS 14.0, *)
+    @available(watchOS, unavailable)
+    extension UISplitViewController.Column: CustomDumpStringConvertible {
+      public var customDumpDescription: String {
+        switch self {
+        case .primary:
+          return "UISplitViewController.Column.primary"
+        case .supplementary:
+          return "UISplitViewController.Column.supplementary"
+        case .secondary:
+          return "UISplitViewController.Column.secondary"
+        case .compact:
+          return "UISplitViewController.Column.compact"
+        case .inspector:
+          return "UISplitViewController.Column.inspector"
+        @unknown default:
+          return "UISplitViewController.Column.(@unknown default, rawValue: \(self.rawValue))"
+        }
+      }
+    }
+
+    @available(iOS 14.0, macCatalyst 14.0, tvOS 14.0, *)
+    @available(watchOS, unavailable)
+    extension UISplitViewController.Style: CustomDumpStringConvertible {
+      public var customDumpDescription: String {
+        switch self {
+        case .unspecified:
+          return "UISplitViewController.Style.unspecified"
+        case .doubleColumn:
+          return "UISplitViewController.Style.doubleColumn"
+        case .tripleColumn:
+          return "UISplitViewController.Style.tripleColumn"
+        @unknown default:
+          return "UISplitViewController.Style.(@unknown default, rawValue: \(self.rawValue))"
+        }
+      }
+    }
+
+    @available(iOS 11.0, macCatalyst 13.1, tvOS 11.0, *)
+    @available(watchOS, unavailable)
+    extension UISplitViewController.PrimaryEdge: CustomDumpStringConvertible {
+      public var customDumpDescription: String {
+        switch self {
+        case .leading:
+          return "UISplitViewController.PrimaryEdge.leading"
+        case .trailing:
+          return "UISplitViewController.PrimaryEdge.trailing"
+        @unknown default:
+          return "UISplitViewController.PrimaryEdge.(@unknown default, rawValue: \(self.rawValue))"
+        }
+      }
+    }
+
+    @available(iOS 13.0, macCatalyst 13.1, *)
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
+    extension UISplitViewController.BackgroundStyle: CustomDumpStringConvertible {
+      public var customDumpDescription: String {
+        switch self {
+        case .none:
+          return "UISplitViewController.BackgroundStyle.none"
+        case .sidebar:
+          return "UISplitViewController.BackgroundStyle.sidebar"
+        @unknown default:
+          return
+            "UISplitViewController.BackgroundStyle.(@unknown default, rawValue: \(self.rawValue))"
+        }
+      }
+    }
+
+    #if compiler(>=6.2)  // Check for Xcode 26
+      @available(iOS 26.0, macCatalyst 26.0, tvOS 26.0, visionOS 26.0, *)
+      @available(watchOS, unavailable)
+      extension UISplitViewController.LayoutEnvironment: CustomDumpStringConvertible {
+        public var customDumpDescription: String {
+          switch self {
+          case .none:
+            return "UISplitViewController.LayoutEnvironment.none"
+          case .expanded:
+            return "UISplitViewController.LayoutEnvironment.expanded"
+          case .collapsed:
+            return "UISplitViewController.LayoutEnvironment.collapsed"
+          @unknown default:
+            return
+              "UISplitViewController.LayoutEnvironment.(@unknown default, rawValue: \(self.rawValue))"
+          }
+        }
+      }
+    #endif
+
   #endif
 #endif
