@@ -238,7 +238,8 @@
       }
     }
 
-    @available(iOS 13.0, macCatalyst 13.1, tvOS 13.0, *)
+    @available(iOS 13.0, macCatalyst 13.1, *)
+    @available(tvOS, unavailable)
     @available(watchOS, unavailable)
     extension UISplitViewController.BackgroundStyle: CustomDumpStringConvertible {
       public var customDumpDescription: String {
