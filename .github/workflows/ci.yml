@@ -35,7 +35,6 @@ jobs:
     strategy:
       matrix:
         swift:
-          - '6.1.3'
           - '6.2.3'
     steps:
       - uses: actions/checkout@v5
