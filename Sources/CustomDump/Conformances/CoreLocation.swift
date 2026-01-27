@@ -1,6 +1,63 @@
 #if canImport(CoreLocation)
   import CoreLocation
 
+  @available(iOS 13.4, macOS 10.15.4, tvOS 13.4, watchOS 6.2, *)
+  extension CLLocation: CustomDumpReflectable {
+    public var customDumpMirror: Mirror {
+      var ellipsoidalAltitude: Any? = nil
+      var sourceInformation: Any? = nil
+
+      if #available(iOS 15, macOS 12, tvOS 15, watchOS 8, *) {
+        ellipsoidalAltitude = self.ellipsoidalAltitude
+        sourceInformation = self.sourceInformation
+      }
+
+      let children: KeyValuePairs<String, Any?> = [
+        "timestamp": timestamp,
+        "coordinate": coordinate,
+        "altitude": altitude,
+        "ellipsoidalAltitude": ellipsoidalAltitude,
+        "horizontalAccuracy": horizontalAccuracy,
+        "verticalAccuracy": verticalAccuracy,
+        "course": course,
+        "courseAccuracy": courseAccuracy,
+        "speed": speed,
+        "speedAccuracy": speedAccuracy,
+        "sourceInformation": sourceInformation,
+        "floor": floor as Any,
+      ]
+
+      return Mirror(
+        self,
+        children: children.lazy.compactMap {
+          guard let value = $1 else { return nil }
+          return ($0, value)
+        },
+        displayStyle: .class
+      )
+    }
+  }
+
+  @available(iOS 15, macOS 12, tvOS 15, watchOS 8, *)
+  extension CLLocationSourceInformation: CustomDumpReflectable {
+    public var customDumpMirror: Mirror {
+      Mirror(
+        self,
+        children: [
+          "isProducedByAccessory": isProducedByAccessory,
+          "isSimulatedBySoftware": isSimulatedBySoftware,
+        ],
+        displayStyle: .class
+      )
+    }
+  }
+
+  extension CLFloor: CustomDumpReflectable {
+    public var customDumpMirror: Mirror {
+      Mirror(self, children: ["level": level], displayStyle: .class)
+    }
+  }
+
   #if compiler(>=5.4)
     extension CLAccuracyAuthorization: CustomDumpStringConvertible {
       public var customDumpDescription: String {
