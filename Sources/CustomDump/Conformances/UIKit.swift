@@ -198,7 +198,7 @@
           return "UISplitViewController.Column.secondary"
         case .compact:
           return "UISplitViewController.Column.compact"
-        #if compiler(>=5.9)  // Xcode 15+ (iOS 17 SDK)
+        #if compiler(>=6.2) // Xcode 26 / iOS 26 SDK
         case .inspector:
           return "UISplitViewController.Column.inspector"
         #endif
