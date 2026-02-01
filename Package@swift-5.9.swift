@@ -17,12 +17,14 @@ let package = Package(
     )
   ],
   dependencies: [
+    .package(url: "https://github.com/apple/swift-syntax", from: "509.0.0"),
     .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "1.2.2")
   ],
   targets: [
     .target(
       name: "CustomDump",
       dependencies: [
+        "CustomDumpMacros",
         .product(name: "IssueReporting", package: "xctest-dynamic-overlay"),
         .product(name: "XCTestDynamicOverlay", package: "xctest-dynamic-overlay"),
       ],
@@ -30,10 +32,21 @@ let package = Package(
         .enableExperimentalFeature("StrictConcurrency")
       ]
     ),
+    .macro(
+      name: "CustomDumpMacros",
+      dependencies: [
+        .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
+        .product(name: "SwiftDiagnostics", package: "swift-syntax"),
+        .product(name: "SwiftSyntax", package: "swift-syntax"),
+        .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
+        .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
+      ]
+    ),
     .testTarget(
       name: "CustomDumpTests",
       dependencies: [
-        "CustomDump"
+        "CustomDump",
+        "CustomDumpMacros"
       ]
     ),
   ]

@@ -52,4 +52,28 @@ struct ExpectDifferenceTests {
       )
     }
   }
+
+  @Test func diffableState() async throws {
+    let model = FeatureModel()
+
+    await expectDifference(model) {
+      try await model.factButtonTapped()
+    } changes: {
+      $0.fact = "0 is a good number"
+    }
+
+  }
 }
+
+@DiffableState
+private class FeatureModel {
+  var count: Int = 0
+  var fact: String?
+  var isEven: Bool { count.isMultiple(of: 2) }
+  func factButtonTapped() async throws {
+    fact = nil
+    try await Task.sleep(for: .seconds(0))
+    fact = "\(count) is a good number."
+  }
+}
+
