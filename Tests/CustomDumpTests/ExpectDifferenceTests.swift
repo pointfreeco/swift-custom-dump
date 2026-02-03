@@ -56,7 +56,7 @@ struct ExpectDifferenceTests {
     }
   }
 
-  @Test func diffableState() async throws {
+  @Test func customDumpRepresentable() async throws {
     let model = FeatureModel()
 
     await expectDifference(model) {

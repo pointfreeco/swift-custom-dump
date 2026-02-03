@@ -128,7 +128,7 @@ private enum DeclKind {
         $0.name.tokenKind == .keyword(.static) || $0.name.tokenKind == .keyword(.class)
       }) != true
       else { return nil }
-      guard accessLevel(for: varDecl) == requiredAccess
+      guard accessLevel(for: varDecl) >= requiredAccess
       else { return nil }
       guard !hasCustomDumpIgnored(varDecl)
       else { return nil }
@@ -185,12 +185,16 @@ private func isStoredProperty(_ binding: PatternBindingSyntax) -> Bool {
   }
 }
 
-private enum AccessLevel: Equatable {
-  case `public`
-  case `package`
-  case `internal`
-  case `fileprivate`
+private enum AccessLevel: Int, Comparable {
   case `private`
+  case `fileprivate`
+  case `internal`
+  case `package`
+  case `public`
+
+  static func < (lhs: Self, rhs: Self) -> Bool {
+    lhs.rawValue < rhs.rawValue
+  }
 }
 
 private func accessLevel(for declaration: some DeclGroupSyntax) -> AccessLevel {
