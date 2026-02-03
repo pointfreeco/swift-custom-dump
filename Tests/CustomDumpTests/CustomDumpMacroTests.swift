@@ -15,7 +15,7 @@ struct CustomDumpMacroTests {
 }
 
 @CustomDump
-public final class Model {
+final class Model {
   var count: Int {
     didSet {
       cache = count

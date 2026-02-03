@@ -200,9 +200,6 @@ private func isClosureType(_ type: TypeSyntax) -> Bool {
   if let type = type.as(AttributedTypeSyntax.self) {
     return isClosureType(type.baseType)
   }
-  if let type = type.as(ParenthesizedTypeSyntax.self) {
-    return isClosureType(type.baseType)
-  }
   return false
 }
 
