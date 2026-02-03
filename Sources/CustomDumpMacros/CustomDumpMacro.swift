@@ -149,6 +149,8 @@ private enum DeclKind {
           )
           return nil
         }
+        guard !isClosureType(typeAnnotation)
+        else { return nil }
 
         return ModelDecl.Property(
           name: identifier,
@@ -183,6 +185,25 @@ private func isStoredProperty(_ binding: PatternBindingSyntax) -> Bool {
   case .getter:
     return false
   }
+}
+
+private func isClosureType(_ type: TypeSyntax) -> Bool {
+  if type.as(FunctionTypeSyntax.self) != nil {
+    return true
+  }
+  if let type = type.as(OptionalTypeSyntax.self) {
+    return isClosureType(type.wrappedType)
+  }
+  if let type = type.as(ImplicitlyUnwrappedOptionalTypeSyntax.self) {
+    return isClosureType(type.wrappedType)
+  }
+  if let type = type.as(AttributedTypeSyntax.self) {
+    return isClosureType(type.baseType)
+  }
+  if let type = type.as(ParenthesizedTypeSyntax.self) {
+    return isClosureType(type.baseType)
+  }
+  return false
 }
 
 private enum AccessLevel: Int, Comparable {
