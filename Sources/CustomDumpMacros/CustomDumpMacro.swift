@@ -81,7 +81,7 @@ private struct ModelDecl {
     var type: String
   }
 
-  var access: String?
+  var access: AccessLevel
   var properties: [Property]
 
   init?(
@@ -93,10 +93,11 @@ private struct ModelDecl {
       return nil
     }
 
-    self.access = accessModifier(for: declaration)
+    self.access = accessLevel(for: declaration)
     self.properties = declKind.storedProperties(
       from: declaration,
-      context: context
+      context: context,
+      requiredAccess: self.access
     )
   }
 }
@@ -117,7 +118,8 @@ private enum DeclKind {
 
   func storedProperties(
     from declaration: some DeclGroupSyntax,
-    context: some MacroExpansionContext
+    context: some MacroExpansionContext,
+    requiredAccess: AccessLevel
   ) -> [ModelDecl.Property] {
     declaration.memberBlock.members.compactMap { member -> [ModelDecl.Property]? in
       guard let varDecl = member.decl.as(VariableDeclSyntax.self)
@@ -126,7 +128,9 @@ private enum DeclKind {
         $0.name.tokenKind == .keyword(.static) || $0.name.tokenKind == .keyword(.class)
       }) != true
       else { return nil }
-      guard !hasDiffableStateIgnored(varDecl)
+      guard accessLevel(for: varDecl) == requiredAccess
+      else { return nil }
+      guard !hasCustomDumpIgnored(varDecl)
       else { return nil }
 
       return varDecl.bindings.compactMap { binding in
@@ -156,7 +160,7 @@ private enum DeclKind {
   }
 }
 
-private func hasDiffableStateIgnored(_ varDecl: VariableDeclSyntax) -> Bool {
+private func hasCustomDumpIgnored(_ varDecl: VariableDeclSyntax) -> Bool {
   return attributes(of: varDecl).contains { attribute in
     guard let attribute = attribute.as(AttributeSyntax.self) else { return false }
     let name = attribute.attributeName.trimmedDescription
@@ -181,7 +185,23 @@ private func isStoredProperty(_ binding: PatternBindingSyntax) -> Bool {
   }
 }
 
-private func accessModifier(for declaration: some DeclGroupSyntax) -> String? {
+private enum AccessLevel: Equatable {
+  case `public`
+  case `package`
+  case `internal`
+  case `fileprivate`
+  case `private`
+}
+
+private func accessLevel(for declaration: some DeclGroupSyntax) -> AccessLevel {
+  accessLevel(from: modifiers(of: declaration))
+}
+
+private func accessLevel(for varDecl: VariableDeclSyntax) -> AccessLevel {
+  accessLevel(from: modifiers(of: varDecl))
+}
+
+private func accessLevel(from modifiers: DeclModifierListSyntax) -> AccessLevel {
   let accessLevels: [TokenKind] = [
     .keyword(.public),
     .keyword(.open),
@@ -190,15 +210,25 @@ private func accessModifier(for declaration: some DeclGroupSyntax) -> String? {
     .keyword(.fileprivate),
     .keyword(.private),
   ]
-  for modifier in modifiers(of: declaration) {
+  for modifier in modifiers {
     if accessLevels.contains(modifier.name.tokenKind) {
-      if modifier.name.tokenKind == .keyword(.open) {
-        return "public"
+      switch modifier.name.tokenKind {
+      case .keyword(.open), .keyword(.public):
+        return .public
+      case .keyword(.package):
+        return .package
+      case .keyword(.internal):
+        return .internal
+      case .keyword(.fileprivate):
+        return .fileprivate
+      case .keyword(.private):
+        return .private
+      default:
+        break
       }
-      return modifier.name.text
     }
   }
-  return nil
+  return .internal
 }
 
 private func hasMainActorAnnotation(_ declaration: some DeclGroupSyntax) -> Bool {
@@ -242,13 +272,13 @@ private func attributes(of varDecl: VariableDeclSyntax) -> AttributeListSyntax {
 }
 
 private struct DiffableStateDiagnostic: DiagnosticMessage {
-  let message = "@Diffable can only be applied to a class or actor."
+  let message = "'@CustomDump' can only be applied to a class or actor."
   let diagnosticID = MessageID(domain: "CustomDumpMacros", id: "DiffableStateClassOrActor")
   let severity: DiagnosticSeverity = .error
 }
 
 private struct DiffableStateMissingTypeDiagnostic: DiagnosticMessage {
-  let message = "@Diffable requires explicit type annotations for stored properties."
+  let message = "'@CustomDump' requires explicit type annotations for stored properties."
   let diagnosticID = MessageID(domain: "CustomDumpMacros", id: "DiffableStateMissingType")
   let severity: DiagnosticSeverity = .error
 }
