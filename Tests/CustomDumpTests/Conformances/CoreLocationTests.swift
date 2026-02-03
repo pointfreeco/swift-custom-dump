@@ -24,27 +24,27 @@
       var dump = ""
       customDump(item, to: &dump)
 
-      XCTAssertEqual(
+      expectNoDifference(
         dump,
         """
         CLLocation(
-          timestamp: Date(2001-01-01T00:00:00.000Z),
           coordinate: CLLocationCoordinate2D(
             latitude: 10.0,
             longitude: 20.0
           ),
           altitude: 300.0,
-          ellipsoidalAltitude: 0.0,
           horizontalAccuracy: 4.0,
           verticalAccuracy: 5.0,
           course: 6.0,
           courseAccuracy: 7.0,
           speed: 8.0,
           speedAccuracy: 9.0,
+          timestamp: Date(2001-01-01T00:00:00.000Z),
           sourceInformation: CLLocationSourceInformation(
             isProducedByAccessory: false,
             isSimulatedBySoftware: true
           ),
+          ellipsoidalAltitude: 0.0,
           floor: nil
         )
         """

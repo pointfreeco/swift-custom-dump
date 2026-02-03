@@ -13,23 +13,23 @@
       }
 
       let children: KeyValuePairs<String, Any?> = [
-        "timestamp": timestamp,
         "coordinate": coordinate,
         "altitude": altitude,
-        "ellipsoidalAltitude": ellipsoidalAltitude,
         "horizontalAccuracy": horizontalAccuracy,
         "verticalAccuracy": verticalAccuracy,
         "course": course,
         "courseAccuracy": courseAccuracy,
         "speed": speed,
         "speedAccuracy": speedAccuracy,
+        "timestamp": timestamp,
         "sourceInformation": sourceInformation,
+        "ellipsoidalAltitude": ellipsoidalAltitude,
         "floor": floor as Any,
       ]
 
       return Mirror(
         self,
-        children: children.lazy.compactMap {
+        children: children.compactMap {
           guard let value = $1 else { return nil }
           return ($0, value)
         },
