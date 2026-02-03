@@ -68,7 +68,7 @@ struct ExpectDifferenceTests {
 
   @MainActor
   @CustomDump
-  @Observable
+  // @Observable
   fileprivate class FeatureModel {
     var count: Int = 0
     var fact: String?
