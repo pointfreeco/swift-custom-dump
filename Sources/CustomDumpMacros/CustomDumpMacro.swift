@@ -45,10 +45,14 @@ public struct CustomDumpMacro: ExtensionMacro {
     #else
       conformanceIsolation = ""
     #endif
+    let conformance =
+      hasCustomDumpRepresentableConformance(declaration)
+      ? ""
+      : ": \(conformanceIsolation)CustomDump.CustomDumpRepresentable"
     return [
       DeclSyntax(
         """
-        extension \(type.trimmed): \(raw: conformanceIsolation)CustomDump.CustomDumpRepresentable {
+        extension \(type.trimmed)\(raw: conformance) {
         \(raw: members)
         }
         """
@@ -257,6 +261,21 @@ private func hasMainActorAnnotation(_ declaration: some DeclGroupSyntax) -> Bool
     guard let attribute = attribute.as(AttributeSyntax.self) else { return false }
     let name = attribute.attributeName.trimmedDescription
     return name.split(separator: ".").last == "MainActor"
+  }
+}
+
+private func hasCustomDumpRepresentableConformance(_ declaration: some DeclGroupSyntax) -> Bool {
+  guard
+    let inheritedTypes = declaration
+      .as(ClassDeclSyntax.self)?
+      .inheritanceClause?
+      .inheritedTypes
+  else { return false }
+
+  return inheritedTypes.contains { inheritedType in
+    let trimmed = inheritedType.type.trimmedDescription
+    let lastToken = trimmed.split(whereSeparator: { $0 == " " || $0 == "\t" }).last
+    return lastToken?.split(separator: ".").last == "CustomDumpRepresentable"
   }
 }
 

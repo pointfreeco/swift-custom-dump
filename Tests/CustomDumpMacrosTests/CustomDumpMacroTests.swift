@@ -94,5 +94,77 @@
         """
       }
     }
+
+    @Test func alreadyConforms() {
+      assertMacro {
+        """
+        @CustomDump
+        final class FeatureModel: CustomDumpRepresentable {
+          var count: Int
+
+          init(count: Int) {
+            self.count = count
+          }
+        }
+        """
+      } expansion: {
+        """
+        final class FeatureModel: CustomDumpRepresentable {
+          var count: Int
+
+          init(count: Int) {
+            self.count = count
+          }
+        }
+
+        extension FeatureModel {
+          public struct CustomDumpValue: Equatable {
+            public var count: Int
+          }
+
+          public var customDumpValue: CustomDumpValue {
+            CustomDumpValue(count: self.count)
+          }
+        }
+        """
+      }
+    }
+
+    @Test func alreadyConformsMainActor() {
+      assertMacro {
+        """
+        @CustomDump
+        @MainActor
+        final class FeatureModel: @MainActor CustomDumpRepresentable {
+          var count: Int
+
+          init(count: Int) {
+            self.count = count
+          }
+        }
+        """
+      } expansion: {
+        """
+        @MainActor
+        final class FeatureModel: @MainActor CustomDumpRepresentable {
+          var count: Int
+
+          init(count: Int) {
+            self.count = count
+          }
+        }
+
+        extension FeatureModel {
+          public struct CustomDumpValue: Equatable {
+            public var count: Int
+          }
+
+          public var customDumpValue: CustomDumpValue {
+            CustomDumpValue(count: self.count)
+          }
+        }
+        """
+      }
+    }
   }
 #endif
