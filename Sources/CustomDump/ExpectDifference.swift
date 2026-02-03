@@ -93,12 +93,12 @@ public func expectDifference<T: CustomDumpRepresentable>(
   _ expression: @autoclosure () throws -> T,
   _ message: @autoclosure () -> String? = nil,
   operation: (() throws -> Void)? = nil,
-  changes updateExpectingResult: (inout T.Representation) throws -> Void,
+  changes updateExpectingResult: (inout T.CustomDumpValue) throws -> Void,
   fileID: StaticString = #fileID,
   filePath: StaticString = #filePath,
   line: UInt = #line,
   column: UInt = #column
-) where T.Representation: Equatable {
+) where T.CustomDumpValue: Equatable {
   do {
     let originalModel = try expression()
     let original = originalModel.customDumpValue
@@ -164,16 +164,16 @@ public func expectDifference<T: CustomDumpRepresentable>(
   /// An async version of
   /// ``expectDifference(_:_:operation:changes:fileID:filePath:line:column:)-5fu8q`` for
   /// ``Diffable`` models.
-nonisolated(nonsending) public func expectDifference<T: CustomDumpRepresentable>(
+  nonisolated(nonsending) public func expectDifference<T: CustomDumpRepresentable>(
     _ expression: @autoclosure () throws -> T,
     _ message: @autoclosure () -> String? = nil,
     operation: () async throws -> Void,
-    changes updateExpectingResult: (inout T.Representation) throws -> Void,
+    changes updateExpectingResult: (inout T.CustomDumpValue) throws -> Void,
     fileID: StaticString = #fileID,
     filePath: StaticString = #filePath,
     line: UInt = #line,
     column: UInt = #column
-) async where T.Representation: Equatable {
+  ) async where T.CustomDumpValue: Equatable {
     do {
       let originalModel = try expression()
       let original = originalModel.customDumpValue
@@ -229,23 +229,23 @@ nonisolated(nonsending) public func expectDifference<T: CustomDumpRepresentable>
     }
   }
 
-  public func expectDifference<T: _Diffable & Sendable>(
+  public func expectDifference<T: CustomDumpRepresentable & Sendable>(
     _ expression: @autoclosure @Sendable () throws -> T,
     _ message: @autoclosure @Sendable () -> String? = nil,
     operation: @Sendable () async throws -> Void,
-    changes updateExpectingResult: @Sendable (inout T._DiffableRepresentation) throws -> Void,
+    changes updateExpectingResult: @Sendable (inout T.CustomDumpValue) throws -> Void,
     fileID: StaticString = #fileID,
     filePath: StaticString = #filePath,
     line: UInt = #line,
     column: UInt = #column
-  ) async {
+  ) async where T.CustomDumpValue: Equatable {
     do {
       let originalModel = try expression()
-      let original = originalModel._diffableRepresentation
+      let original = originalModel.customDumpValue
       try await operation()
       var expected = original
       try updateExpectingResult(&expected)
-      let actual = try expression()._diffableRepresentation
+      let actual = try expression().customDumpValue
       expectDifferenceHelp(
         original: original,
         expected: expected,

@@ -1,16 +1,6 @@
-import SwiftCompilerPlugin
 import SwiftSyntax
-import SwiftSyntaxBuilder
 import SwiftSyntaxMacros
 import SwiftDiagnostics
-
-@main
-struct CustomDumpMacrosPlugin: CompilerPlugin {
-  let providingMacros: [Macro.Type] = [
-    CustomDumpMacro.self,
-    CustomDumpIgnoredMacro.self,
-  ]
-}
 
 struct CustomDumpMacro: MemberMacro, ExtensionMacro {
   static func expansion(
@@ -25,30 +15,30 @@ struct CustomDumpMacro: MemberMacro, ExtensionMacro {
     let properties = modelDecl.properties
 
     let propertyLines = properties.map {
-      "var \($0.name): \($0.type)"
+      "public var \($0.name): \($0.type)"
     }
 
     let initArguments = properties
       .map { "\($0.name): self.\($0.name)" }
       .joined(separator: ", ")
 
-    let diffableStateStruct: DeclSyntax =
+    let representation: DeclSyntax =
       """
-      struct Representation: Equatable {
-        \(raw: propertyLines.joined(separator: "\n  "))
+      public struct CustomDumpValue: Equatable {
+      \(raw: propertyLines.joined(separator: "\n  "))
       }
       """
 
-    let diffableStateProperty: DeclSyntax =
+    let customDumpValue: DeclSyntax =
       """
-      var customDumpValue: Representation {
-        Representation(\(raw: initArguments))
+      public var customDumpValue: CustomDumpValue {
+      CustomDumpValue(\(raw: initArguments))
       }
       """
 
     return [
-      diffableStateStruct,
-      diffableStateProperty,
+      representation,
+      customDumpValue,
     ]
   }
 

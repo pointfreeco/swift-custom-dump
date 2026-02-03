@@ -12,7 +12,7 @@ extension Mirror {
       if value is _CustomDiffObject {
         return false
       }
-      while let representable = value as? CustomDumpRepresentable {
+      while let representable = value as? any CustomDumpRepresentable {
         value = representable.customDumpValue
         if value is _CustomDiffObject {
           return false

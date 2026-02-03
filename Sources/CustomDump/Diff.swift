@@ -400,7 +400,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         diffEverything()
       }
 
-    case (let lhs as CustomDumpRepresentable, _, let rhs as CustomDumpRepresentable, _):
+    case (let lhs as any CustomDumpRepresentable, _, let rhs as any CustomDumpRepresentable, _):
       out.write(
         diffHelp(
           lhs.customDumpValue,

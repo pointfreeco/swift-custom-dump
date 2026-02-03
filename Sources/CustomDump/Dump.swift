@@ -219,7 +219,7 @@ func _customDump<T, TargetStream>(
         )
       }
 
-    case (let value as CustomDumpRepresentable, _):
+    case (let value as any CustomDumpRepresentable, _):
       customDumpHelp(
         value.customDumpValue,
         to: &out,

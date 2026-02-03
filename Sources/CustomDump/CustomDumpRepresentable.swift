@@ -11,7 +11,7 @@
 ///
 /// extension ID: CustomDumpRepresentable {
 ///   var customDumpValue: Any {
-///     self.rawValue
+///     rawValue
 ///   }
 /// }
 ///
@@ -20,8 +20,10 @@
 /// ```text
 /// "deadbeef"
 /// ```
-public protocol CustomDumpRepresentable<Representation> {
-  associatedtype Representation = Any
+public protocol CustomDumpRepresentable<CustomDumpValue> {
+  /// A type representing the custom dump.
+  associatedtype CustomDumpValue = Any
+
   /// The custom dump value for this instance.
-  var customDumpValue: Representation { get }
+  var customDumpValue: CustomDumpValue { get }
 }
