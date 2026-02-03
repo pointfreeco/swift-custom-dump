@@ -24,6 +24,8 @@ jobs:
       - uses: actions/checkout@v5
       - name: Select Xcode ${{ matrix.xcode }}
         run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
+      - name: Disable prebuilts
+        run: defaults write com.apple.dt.Xcode IDEPackageEnablePrebuilts NO
       - name: Print Swift version
         run: swift --version
       - name: Run tests (platforms)
