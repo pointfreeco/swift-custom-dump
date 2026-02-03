@@ -3,7 +3,7 @@
 //
 //struct DiffableStateMacroTests {
 //  @Test func diffableStateSnapshot() {
-//    @DiffableState
+//    @Diffable
 //    final class Model {
 //      var count: Int
 //      var name: String

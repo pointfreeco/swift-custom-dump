@@ -20,7 +20,8 @@
 /// ```text
 /// "deadbeef"
 /// ```
-public protocol CustomDumpRepresentable {
+public protocol CustomDumpRepresentable<Representation> {
+  associatedtype Representation = Any
   /// The custom dump value for this instance.
-  var customDumpValue: Any { get }
+  var customDumpValue: Representation { get }
 }

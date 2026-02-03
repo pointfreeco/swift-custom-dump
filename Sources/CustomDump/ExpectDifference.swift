@@ -85,27 +85,27 @@ public func expectDifference<T: Equatable>(
 
 /// Expects that a reference-type value has a set of changes based on its diffable state.
 ///
-/// This function evaluates a model's ``DiffableState`` before and after a given operation and
+/// This function evaluates a model's ``Diffable`` before and after a given operation and
 /// compares the results. The comparison is done by invoking the `changes` closure with a mutable
 /// version of the initial diffable state, and then asserting that the modifications made match the
 /// final diffable state using ``expectNoDifference``.
-public func expectDifference<T: DiffableState>(
+public func expectDifference<T: CustomDumpRepresentable>(
   _ expression: @autoclosure () throws -> T,
   _ message: @autoclosure () -> String? = nil,
   operation: (() throws -> Void)? = nil,
-  changes updateExpectingResult: (inout T.DiffableState) throws -> Void,
+  changes updateExpectingResult: (inout T.Representation) throws -> Void,
   fileID: StaticString = #fileID,
   filePath: StaticString = #filePath,
   line: UInt = #line,
   column: UInt = #column
-) {
+) where T.Representation: Equatable {
   do {
     let originalModel = try expression()
-    let original = originalModel.diffableState
+    let original = originalModel.customDumpValue
     try operation?()
     var expected = original
     try updateExpectingResult(&expected)
-    let actual = try expression().diffableState
+    let actual = try expression().customDumpValue
     expectDifferenceHelp(
       original: original,
       expected: expected,
@@ -163,24 +163,24 @@ public func expectDifference<T: DiffableState>(
   ///
   /// An async version of
   /// ``expectDifference(_:_:operation:changes:fileID:filePath:line:column:)-5fu8q`` for
-  /// ``DiffableState`` models.
-  nonisolated(nonsending) public func expectDifference<T: DiffableState>(
+  /// ``Diffable`` models.
+nonisolated(nonsending) public func expectDifference<T: CustomDumpRepresentable>(
     _ expression: @autoclosure () throws -> T,
     _ message: @autoclosure () -> String? = nil,
     operation: () async throws -> Void,
-    changes updateExpectingResult: (inout T.DiffableState) throws -> Void,
+    changes updateExpectingResult: (inout T.Representation) throws -> Void,
     fileID: StaticString = #fileID,
     filePath: StaticString = #filePath,
     line: UInt = #line,
     column: UInt = #column
-  ) async {
+) async where T.Representation: Equatable {
     do {
       let originalModel = try expression()
-      let original = originalModel.diffableState
+      let original = originalModel.customDumpValue
       try await operation()
       var expected = original
       try updateExpectingResult(&expected)
-      let actual = try expression().diffableState
+      let actual = try expression().customDumpValue
       expectDifferenceHelp(
         original: original,
         expected: expected,
@@ -229,11 +229,11 @@ public func expectDifference<T: DiffableState>(
     }
   }
 
-  public func expectDifference<T: DiffableState & Sendable>(
+  public func expectDifference<T: _Diffable & Sendable>(
     _ expression: @autoclosure @Sendable () throws -> T,
     _ message: @autoclosure @Sendable () -> String? = nil,
     operation: @Sendable () async throws -> Void,
-    changes updateExpectingResult: @Sendable (inout T.DiffableState) throws -> Void,
+    changes updateExpectingResult: @Sendable (inout T._DiffableRepresentation) throws -> Void,
     fileID: StaticString = #fileID,
     filePath: StaticString = #filePath,
     line: UInt = #line,
@@ -241,11 +241,11 @@ public func expectDifference<T: DiffableState>(
   ) async {
     do {
       let originalModel = try expression()
-      let original = originalModel.diffableState
+      let original = originalModel._diffableRepresentation
       try await operation()
       var expected = original
       try updateExpectingResult(&expected)
-      let actual = try expression().diffableState
+      let actual = try expression()._diffableRepresentation
       expectDifferenceHelp(
         original: original,
         expected: expected,

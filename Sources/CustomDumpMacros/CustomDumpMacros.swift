@@ -7,12 +7,12 @@ import SwiftDiagnostics
 @main
 struct CustomDumpMacrosPlugin: CompilerPlugin {
   let providingMacros: [Macro.Type] = [
-    DiffableStateMacro.self,
-    DiffableStateIgnoredMacro.self,
+    CustomDumpMacro.self,
+    CustomDumpIgnoredMacro.self,
   ]
 }
 
-struct DiffableStateMacro: MemberMacro, ExtensionMacro {
+struct CustomDumpMacro: MemberMacro, ExtensionMacro {
   static func expansion(
     of node: AttributeSyntax,
     providingMembersOf declaration: some DeclGroupSyntax,
@@ -34,15 +34,15 @@ struct DiffableStateMacro: MemberMacro, ExtensionMacro {
 
     let diffableStateStruct: DeclSyntax =
       """
-      struct DiffableState: Equatable {
+      struct Representation: Equatable {
         \(raw: propertyLines.joined(separator: "\n  "))
       }
       """
 
     let diffableStateProperty: DeclSyntax =
       """
-      var diffableState: DiffableState {
-        .init(\(raw: initArguments))
+      var customDumpValue: Representation {
+        Representation(\(raw: initArguments))
       }
       """
 
@@ -63,10 +63,11 @@ struct DiffableStateMacro: MemberMacro, ExtensionMacro {
       return []
     }
 
+    let mainActorPrefix = hasMainActorAnnotation(declaration) ? "@MainActor " : ""
     return [
       DeclSyntax(
       """
-      extension \(type.trimmed): CustomDump.DiffableState {}
+      extension \(type.trimmed): \(raw: mainActorPrefix)CustomDump.CustomDumpRepresentable {}
       """
       )
       .cast(ExtensionDeclSyntax.self)
@@ -74,7 +75,7 @@ struct DiffableStateMacro: MemberMacro, ExtensionMacro {
   }
 }
 
-struct DiffableStateIgnoredMacro: PeerMacro {
+struct CustomDumpIgnoredMacro: PeerMacro {
   static func expansion(
     of node: SwiftSyntax.AttributeSyntax,
     providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
@@ -169,7 +170,7 @@ private func hasDiffableStateIgnored(_ varDecl: VariableDeclSyntax) -> Bool {
   return attributes(of: varDecl).contains { attribute in
     guard let attribute = attribute.as(AttributeSyntax.self) else { return false }
     let name = attribute.attributeName.trimmedDescription
-    return name.split(separator: ".").last == "DiffableStateIgnored"
+    return name.split(separator: ".").last == "CustomDumpIgnored"
   }
 }
 
@@ -210,11 +211,27 @@ private func accessModifier(for declaration: some DeclGroupSyntax) -> String? {
   return nil
 }
 
+private func hasMainActorAnnotation(_ declaration: some DeclGroupSyntax) -> Bool {
+  attributes(of: declaration).contains { attribute in
+    guard let attribute = attribute.as(AttributeSyntax.self) else { return false }
+    let name = attribute.attributeName.trimmedDescription
+    return name.split(separator: ".").last == "MainActor"
+  }
+}
+
 private func modifiers(of declaration: some DeclGroupSyntax) -> DeclModifierListSyntax {
 #if compiler(>=6.0)
   return declaration.modifiers
 #else
   return declaration.modifiers ?? []
+#endif
+}
+
+private func attributes(of declaration: some DeclGroupSyntax) -> AttributeListSyntax {
+#if compiler(>=6.0)
+  return declaration.attributes
+#else
+  return declaration.attributes ?? []
 #endif
 }
 
@@ -235,13 +252,13 @@ private func attributes(of varDecl: VariableDeclSyntax) -> AttributeListSyntax {
 }
 
 private struct DiffableStateDiagnostic: DiagnosticMessage {
-  let message = "@DiffableState can only be applied to a class or actor."
+  let message = "@Diffable can only be applied to a class or actor."
   let diagnosticID = MessageID(domain: "CustomDumpMacros", id: "DiffableStateClassOrActor")
   let severity: DiagnosticSeverity = .error
 }
 
 private struct DiffableStateMissingTypeDiagnostic: DiagnosticMessage {
-  let message = "@DiffableState requires explicit type annotations for stored properties."
+  let message = "@Diffable requires explicit type annotations for stored properties."
   let diagnosticID = MessageID(domain: "CustomDumpMacros", id: "DiffableStateMissingType")
   let severity: DiagnosticSeverity = .error
 }

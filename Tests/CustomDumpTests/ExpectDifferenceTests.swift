@@ -1,6 +1,8 @@
 import CustomDump
 import Testing
 
+@MainActor
+@Suite
 struct ExpectDifferenceTests {
   @Test func basics() {
     var user = User(id: 42, name: "Blob")
@@ -57,6 +59,7 @@ struct ExpectDifferenceTests {
     let model = FeatureModel()
 
     await expectDifference(model) {
+      await model.increment()
       try await model.factButtonTapped()
     } changes: {
       $0.fact = "0 is a good number"
@@ -65,15 +68,21 @@ struct ExpectDifferenceTests {
   }
 }
 
-@DiffableState
+import Observation
+
+@MainActor
+@CustomDump
+@Observable
 private class FeatureModel {
   var count: Int = 0
   var fact: String?
   var isEven: Bool { count.isMultiple(of: 2) }
+  @CustomDumpIgnored
+  var task: Task<Void, Never>?
+  func increment() { count += 1 }
   func factButtonTapped() async throws {
     fact = nil
     try await Task.sleep(for: .seconds(0))
     fact = "\(count) is a good number."
   }
 }
-
