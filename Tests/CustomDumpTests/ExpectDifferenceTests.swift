@@ -78,7 +78,7 @@ struct ExpectDifferenceTests {
     func increment() { count += 1 }
     func factButtonTapped() async throws {
       fact = nil
-      try await Task.sleep(for: .seconds(0))
+      await Task.yield()
       fact = "\(count) is a good number."
     }
   }
