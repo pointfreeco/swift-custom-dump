@@ -2,8 +2,8 @@ import SwiftSyntax
 import SwiftSyntaxMacros
 import SwiftDiagnostics
 
-struct CustomDumpMacro: MemberMacro, ExtensionMacro {
-  static func expansion(
+public struct CustomDumpMacro: MemberMacro, ExtensionMacro {
+  public static func expansion(
     of node: AttributeSyntax,
     providingMembersOf declaration: some DeclGroupSyntax,
     in context: some MacroExpansionContext
@@ -25,7 +25,7 @@ struct CustomDumpMacro: MemberMacro, ExtensionMacro {
     let representation: DeclSyntax =
       """
       public struct CustomDumpValue: Equatable {
-      \(raw: propertyLines.joined(separator: "\n  "))
+      \(raw: propertyLines.joined(separator: "\n"))
       }
       """
 
@@ -42,7 +42,7 @@ struct CustomDumpMacro: MemberMacro, ExtensionMacro {
     ]
   }
 
-  static func expansion(
+  public static func expansion(
     of node: SwiftSyntax.AttributeSyntax,
     attachedTo declaration: some SwiftSyntax.DeclGroupSyntax,
     providingExtensionsOf type: some SwiftSyntax.TypeSyntaxProtocol,
@@ -66,7 +66,7 @@ struct CustomDumpMacro: MemberMacro, ExtensionMacro {
 }
 
 struct CustomDumpIgnoredMacro: PeerMacro {
-  static func expansion(
+  public static func expansion(
     of node: SwiftSyntax.AttributeSyntax,
     providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
     in context: some SwiftSyntaxMacros.MacroExpansionContext
