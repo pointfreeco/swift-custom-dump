@@ -2,12 +2,14 @@ import SwiftSyntax
 import SwiftSyntaxMacros
 import SwiftDiagnostics
 
-public struct CustomDumpMacro: MemberMacro, ExtensionMacro {
+public struct CustomDumpMacro: ExtensionMacro {
   public static func expansion(
-    of node: AttributeSyntax,
-    providingMembersOf declaration: some DeclGroupSyntax,
-    in context: some MacroExpansionContext
-  ) throws -> [DeclSyntax] {
+    of node: SwiftSyntax.AttributeSyntax,
+    attachedTo declaration: some SwiftSyntax.DeclGroupSyntax,
+    providingExtensionsOf type: some SwiftSyntax.TypeSyntaxProtocol,
+    conformingTo protocols: [SwiftSyntax.TypeSyntax],
+    in context: some SwiftSyntaxMacros.MacroExpansionContext
+  ) throws -> [SwiftSyntax.ExtensionDeclSyntax] {
     guard let modelDecl = ModelDecl(declaration: declaration, context: context) else {
       return []
     }
@@ -22,43 +24,34 @@ public struct CustomDumpMacro: MemberMacro, ExtensionMacro {
       .map { "\($0.name): self.\($0.name)" }
       .joined(separator: ", ")
 
-    let representation: DeclSyntax =
+    let representation =
       """
       public struct CustomDumpValue: Equatable {
-      \(raw: propertyLines.joined(separator: "\n"))
+      \(propertyLines.joined(separator: "\n"))
       }
       """
 
-    let customDumpValue: DeclSyntax =
+    let customDumpValue =
       """
       public var customDumpValue: CustomDumpValue {
-      CustomDumpValue(\(raw: initArguments))
+      CustomDumpValue(\(initArguments))
       }
       """
 
-    return [
-      representation,
-      customDumpValue,
-    ]
-  }
-
-  public static func expansion(
-    of node: SwiftSyntax.AttributeSyntax,
-    attachedTo declaration: some SwiftSyntax.DeclGroupSyntax,
-    providingExtensionsOf type: some SwiftSyntax.TypeSyntaxProtocol,
-    conformingTo protocols: [SwiftSyntax.TypeSyntax],
-    in context: some SwiftSyntaxMacros.MacroExpansionContext
-  ) throws -> [SwiftSyntax.ExtensionDeclSyntax] {
-    guard DeclKind(declaration) != nil else {
-      return []
-    }
-
-    let mainActorPrefix = hasMainActorAnnotation(declaration) ? "@MainActor " : ""
+    let members = [representation, customDumpValue].joined(separator: "\n\n")
+    let conformanceIsolation: String
+    #if compiler(>=6.2)
+      conformanceIsolation = hasMainActorAnnotation(declaration) ? "@MainActor " : ""
+    #else
+      conformanceIsolation = ""
+    #endif
     return [
       DeclSyntax(
-      """
-      extension \(type.trimmed): \(raw: mainActorPrefix)CustomDump.CustomDumpRepresentable {}
-      """
+        """
+        extension \(type.trimmed): \(raw: conformanceIsolation)CustomDump.CustomDumpRepresentable {
+        \(raw: members)
+        }
+        """
       )
       .cast(ExtensionDeclSyntax.self)
     ]
@@ -89,7 +82,14 @@ private struct ModelDecl {
     context: some MacroExpansionContext
   ) {
     guard let declKind = DeclKind(declaration) else {
-      context.diagnose(Diagnostic(node: Syntax(declaration), message: DiffableStateDiagnostic()))
+      context.diagnose(
+        Diagnostic(
+          node: Syntax(declaration),
+          message: MacroExpansionErrorMessage(
+            "'@CustomDump' can only be applied to a class."
+          )
+        )
+      )
       return nil
     }
 
@@ -104,13 +104,10 @@ private struct ModelDecl {
 
 private enum DeclKind {
   case `class`
-  case actor
 
   init?(_ declaration: some DeclGroupSyntax) {
     if declaration.as(ClassDeclSyntax.self) != nil {
       self = .class
-    } else if declaration.as(ActorDeclSyntax.self) != nil {
-      self = .actor
     } else {
       return nil
     }
@@ -144,7 +141,9 @@ private enum DeclKind {
           context.diagnose(
             Diagnostic(
               node: Syntax(binding),
-              message: DiffableStateMissingTypeDiagnostic()
+              message: MacroExpansionErrorMessage(
+                "'@CustomDump' requires explicit type annotations for stored properties."
+              )
             )
           )
           return nil
@@ -291,16 +290,4 @@ private func attributes(of varDecl: VariableDeclSyntax) -> AttributeListSyntax {
 #else
   return varDecl.attributes ?? []
 #endif
-}
-
-private struct DiffableStateDiagnostic: DiagnosticMessage {
-  let message = "'@CustomDump' can only be applied to a class or actor."
-  let diagnosticID = MessageID(domain: "CustomDumpMacros", id: "DiffableStateClassOrActor")
-  let severity: DiagnosticSeverity = .error
-}
-
-private struct DiffableStateMissingTypeDiagnostic: DiagnosticMessage {
-  let message = "'@CustomDump' requires explicit type annotations for stored properties."
-  let diagnosticID = MessageID(domain: "CustomDumpMacros", id: "DiffableStateMissingType")
-  let severity: DiagnosticSeverity = .error
 }

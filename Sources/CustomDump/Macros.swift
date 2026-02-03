@@ -3,8 +3,11 @@
 /// This macro defines an inner, equatable struct representation of a reference type. This can
 /// enhance the exhaustive testability of an object through
 /// ``expectDifference(_:_:operation:changes:fileID:filePath:line:column:)``.
-@attached(member, names: named(CustomDumpValue), named(customDumpValue))
-@attached(extension, conformances: CustomDumpRepresentable)
+@attached(
+  extension,
+  conformances: CustomDumpRepresentable,
+  names: named(CustomDumpValue), named(customDumpValue)
+)
 public macro CustomDump() = #externalMacro(module: "CustomDumpMacros", type: "CustomDumpMacro")
 
 /// Flags a property to be ignored by `@CustomDump`.
