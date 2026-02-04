@@ -7,7 +7,7 @@
   @Suite(
     .macros(
       [CustomDumpMacro.self],
-      record: .failed
+      record: .missing
     )
   )
   struct CustomDumpMacroTests {
@@ -162,6 +162,53 @@
           public var customDumpValue: CustomDumpValue {
             CustomDumpValue(count: self.count)
           }
+        }
+        """
+      }
+    }
+
+    @Test func emptyClass() {
+      assertMacro {
+        """
+        @CustomDump
+        final class EmptyModel {
+          init() {}
+        }
+        """
+      } expansion: {
+        """
+        final class EmptyModel {
+          init() {}
+        }
+
+        extension EmptyModel: CustomDump.CustomDumpRepresentable {
+          public struct CustomDumpValue: Equatable {
+
+          }
+
+          public var customDumpValue: CustomDumpValue {
+            CustomDumpValue()
+          }
+        }
+        """
+      }
+    }
+
+    @Test func missingTypeAnnotation() {
+      assertMacro {
+        """
+        @CustomDump
+        final class FeatureModel {
+          var count = 0
+        }
+        """
+      } diagnostics: {
+        """
+        @CustomDump
+        final class FeatureModel {
+          var count = 0
+              ┬────────
+              ╰─ 🛑 '@CustomDump' requires explicit type annotations for stored properties.
         }
         """
       }
