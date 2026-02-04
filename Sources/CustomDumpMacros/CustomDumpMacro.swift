@@ -1,6 +1,6 @@
+import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxMacros
-import SwiftDiagnostics
 
 public struct CustomDumpMacro: ExtensionMacro {
   public static func expansion(
@@ -16,11 +16,19 @@ public struct CustomDumpMacro: ExtensionMacro {
 
     let properties = modelDecl.properties
 
-    let propertyLines = properties.map {
-      "public var \($0.name): \($0.type)"
+    let propertyLines = properties.map { property in
+      switch property.kind {
+      case .type(let type):
+        return "public var \(property.name): \(type)"
+      case .initializer(let defaultValue):
+        return "public var \(property.name) = \(defaultValue)"
+      case .pair(type: let type, initializer: let defaultValue):
+        return "public var \(property.name): \(type) = \(defaultValue)"
+      }
     }
 
-    let initArguments = properties
+    let initArguments =
+      properties
       .map { "\($0.name): self.\($0.name)" }
       .joined(separator: ", ")
 
@@ -75,7 +83,13 @@ struct CustomDumpIgnoredMacro: PeerMacro {
 private struct ModelDecl {
   struct Property {
     var name: String
-    var type: String
+    var kind: Kind
+
+    enum Kind {
+      case type(String)
+      case initializer(String)
+      case pair(type: String, initializer: String)
+    }
   }
 
   var access: AccessLevel
@@ -125,9 +139,10 @@ private enum DeclKind {
     declaration.memberBlock.members.compactMap { member -> [ModelDecl.Property]? in
       guard let varDecl = member.decl.as(VariableDeclSyntax.self)
       else { return nil }
-      guard modifiers(of: varDecl).contains(where: {
-        $0.name.tokenKind == .keyword(.static) || $0.name.tokenKind == .keyword(.class)
-      }) != true
+      guard
+        modifiers(of: varDecl).contains(where: {
+          $0.name.tokenKind == .keyword(.static) || $0.name.tokenKind == .keyword(.class)
+        }) != true
       else { return nil }
       guard accessLevel(for: varDecl) >= requiredAccess
       else { return nil }
@@ -141,7 +156,11 @@ private enum DeclKind {
         guard isStoredProperty(binding)
         else { return nil }
 
-        guard let typeAnnotation = binding.typeAnnotation?.type else {
+        let typeAnnotation = binding.typeAnnotation?.type
+        let defaultValue = binding.initializer?.value.trimmedDescription
+
+        switch (typeAnnotation, defaultValue) {
+        case (nil, nil):
           context.diagnose(
             Diagnostic(
               node: Syntax(binding),
@@ -151,17 +170,39 @@ private enum DeclKind {
             )
           )
           return nil
-        }
-        guard !isClosureType(typeAnnotation)
-        else { return nil }
+        case (nil, let defaultValue):
+          guard !isClosureInitializer(defaultValue)
+          else { return nil }
 
-        return ModelDecl.Property(
-          name: identifier,
-          type: typeAnnotation.trimmedDescription
-        )
+          return ModelDecl.Property(
+            name: identifier,
+            kind: .initializer(defaultValue)
+          )
+        case (let typeAnnotation, nil):
+          guard !isClosureType(typeAnnotation)
+          else { return nil }
+
+          return ModelDecl.Property(
+            name: identifier,
+            kind: .type(typeAnnotation.trimmedDescription)
+          )
+        case (let typeAnnotation, let defaultValue):
+          guard !isClosureType(typeAnnotation)
+          else { return nil }
+          guard !isClosureInitializer(defaultValue)
+          else { return nil }
+
+          return ModelDecl.Property(
+            name: identifier,
+            kind: .pair(
+              type: typeAnnotation.trimmedDescription,
+              initializer: defaultValue
+            )
+          )
+        }
       }
     }
-    .flatMap { $0 }
+    .flatMap(\.self)
   }
 }
 
@@ -204,6 +245,10 @@ private func isClosureType(_ type: TypeSyntax) -> Bool {
     return isClosureType(type.baseType)
   }
   return false
+}
+
+private func isClosureInitializer(_ initializer: String) -> Bool {
+  initializer.first == "{"
 }
 
 private enum AccessLevel: Int, Comparable {
@@ -266,7 +311,8 @@ private func hasMainActorAnnotation(_ declaration: some DeclGroupSyntax) -> Bool
 
 private func hasCustomDumpRepresentableConformance(_ declaration: some DeclGroupSyntax) -> Bool {
   guard
-    let inheritedTypes = declaration
+    let inheritedTypes =
+      declaration
       .as(ClassDeclSyntax.self)?
       .inheritanceClause?
       .inheritedTypes
@@ -280,33 +326,33 @@ private func hasCustomDumpRepresentableConformance(_ declaration: some DeclGroup
 }
 
 private func modifiers(of declaration: some DeclGroupSyntax) -> DeclModifierListSyntax {
-#if compiler(>=6.0)
-  return declaration.modifiers
-#else
-  return declaration.modifiers ?? []
-#endif
+  #if compiler(>=6.0)
+    return declaration.modifiers
+  #else
+    return declaration.modifiers ?? []
+  #endif
 }
 
 private func attributes(of declaration: some DeclGroupSyntax) -> AttributeListSyntax {
-#if compiler(>=6.0)
-  return declaration.attributes
-#else
-  return declaration.attributes ?? []
-#endif
+  #if compiler(>=6.0)
+    return declaration.attributes
+  #else
+    return declaration.attributes ?? []
+  #endif
 }
 
 private func modifiers(of varDecl: VariableDeclSyntax) -> DeclModifierListSyntax {
-#if compiler(>=6.0)
-  return varDecl.modifiers
-#else
-  return varDecl.modifiers ?? []
-#endif
+  #if compiler(>=6.0)
+    return varDecl.modifiers
+  #else
+    return varDecl.modifiers ?? []
+  #endif
 }
 
 private func attributes(of varDecl: VariableDeclSyntax) -> AttributeListSyntax {
-#if compiler(>=6.0)
-  return varDecl.attributes
-#else
-  return varDecl.attributes ?? []
-#endif
+  #if compiler(>=6.0)
+    return varDecl.attributes
+  #else
+    return varDecl.attributes ?? []
+  #endif
 }

@@ -194,7 +194,7 @@
       }
     }
 
-    @Test func missingTypeAnnotation() {
+    @Test func defaultLiteral() {
       assertMacro {
         """
         @CustomDump
@@ -202,13 +202,40 @@
           var count = 0
         }
         """
+      } expansion: {
+        """
+        final class FeatureModel {
+          var count = 0
+        }
+
+        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+          public struct CustomDumpValue: Equatable {
+            public var count = 0
+          }
+
+          public var customDumpValue: CustomDumpValue {
+            CustomDumpValue(count: self.count)
+          }
+        }
+        """
+      }
+    }
+
+    @Test func missingTypeAnnotation() {
+      assertMacro {
+        """
+        @CustomDump
+        final class FeatureModel {
+          @FetchAll(Reminder.all) var reminders
+        }
+        """
       } diagnostics: {
         """
         @CustomDump
         final class FeatureModel {
-          var count = 0
-              ┬────────
-              ╰─ 🛑 '@CustomDump' requires explicit type annotations for stored properties.
+          @FetchAll(Reminder.all) var reminders
+                                      ┬────────
+                                      ╰─ 🛑 '@CustomDump' requires explicit type annotations for stored properties.
         }
         """
       }
