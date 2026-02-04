@@ -170,7 +170,7 @@ private enum DeclKind {
             )
           )
           return nil
-        case (nil, let defaultValue):
+        case (nil, let defaultValue?):
           guard !isClosureInitializer(defaultValue)
           else { return nil }
 
@@ -178,7 +178,7 @@ private enum DeclKind {
             name: identifier,
             kind: .initializer(defaultValue)
           )
-        case (let typeAnnotation, nil):
+        case (let typeAnnotation?, nil):
           guard !isClosureType(typeAnnotation)
           else { return nil }
 
@@ -186,7 +186,7 @@ private enum DeclKind {
             name: identifier,
             kind: .type(typeAnnotation.trimmedDescription)
           )
-        case (let typeAnnotation, let defaultValue):
+        case (let typeAnnotation?, let defaultValue?):
           guard !isClosureType(typeAnnotation)
           else { return nil }
           guard !isClosureInitializer(defaultValue)

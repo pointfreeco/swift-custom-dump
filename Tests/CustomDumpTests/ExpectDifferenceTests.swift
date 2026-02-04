@@ -1,4 +1,5 @@
 import CustomDump
+import InlineSnapshotTesting
 import Observation
 import Testing
 
@@ -64,22 +65,32 @@ struct ExpectDifferenceTests {
     } changes: {
       $0.fact = "0 is a good number."
     }
-  }
 
-  @MainActor
-  @CustomDump
-  // @Observable
-  fileprivate class FeatureModel {
-    var count: Int = 0
-    var fact: String?
-    var isEven: Bool { count.isMultiple(of: 2) }
-    @CustomDumpIgnored
-    var task: Task<Void, Never>?
-    func increment() { count += 1 }
-    func factButtonTapped() async throws {
-      fact = nil
-      await Task.yield()
-      fact = "\(count) is a good number."
-    }
+    expectNoDifference(
+      String(customDumping: model),
+      """
+      FeatureModel(
+        count: 0,
+        fact: "0 is a good number."
+      )
+      """
+    )
+  }
+}
+
+@MainActor
+@CustomDump
+// @Observable
+fileprivate class FeatureModel {
+  var count = 0
+  var fact: String?
+  var isEven: Bool { count.isMultiple(of: 2) }
+  @CustomDumpIgnored
+  var task: Task<Void, Never>?
+  func increment() { count += 1 }
+  func factButtonTapped() async throws {
+    fact = nil
+    await Task.yield()
+    fact = "\(count) is a good number."
   }
 }
