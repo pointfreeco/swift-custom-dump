@@ -1,5 +1,4 @@
 import CustomDump
-import InlineSnapshotTesting
 import Observation
 import Testing
 
