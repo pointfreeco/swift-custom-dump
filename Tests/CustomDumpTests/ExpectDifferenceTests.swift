@@ -75,11 +75,43 @@ struct ExpectDifferenceTests {
       """
     )
   }
+
+  @Test func `struct`() async {
+    var state = FeatureState()
+
+    await expectDifference(state) {
+      try await state.factButtonTapped()
+    } changes: {
+      $0.fact = "0 is a good number."
+    }
+
+    expectNoDifference(
+      String(customDumping: state),
+      """
+      FeatureState(
+        count: 0,
+        fact: "0 is a good number."
+      )
+      """
+    )
+  }
+}
+
+@CustomDump
+fileprivate struct FeatureState {
+  var count = 0
+  @PW var fact: String?
+  var isEven: Bool { count.isMultiple(of: 2) }
+  @CustomDumpIgnored
+  var task: Task<Void, Never>?
+  mutating func factButtonTapped() async throws {
+    await Task.yield()
+    fact = "\(count) is a good number."
+  }
 }
 
 @MainActor
 @CustomDump
-// @Observable
 fileprivate class FeatureModel {
   var count = 0
   var fact: String?
@@ -93,3 +125,9 @@ fileprivate class FeatureModel {
     fact = "\(count) is a good number."
   }
 }
+
+@propertyWrapper
+struct PW<WrappedValue> {
+  var wrappedValue: WrappedValue
+}
+extension PW: Sendable where WrappedValue: Sendable {}

@@ -49,9 +49,11 @@
           public struct CustomDumpValue: Equatable {
             public var title: String
           }
-
           public var customDumpValue: CustomDumpValue {
             CustomDumpValue(title: self.title)
+          }
+          public var customDumpSubjectType: Any.Type {
+            FeatureModel.self
           }
         }
         """
@@ -86,9 +88,11 @@
           public struct CustomDumpValue: Equatable {
             public var count: Int
           }
-
           public var customDumpValue: CustomDumpValue {
             CustomDumpValue(count: self.count)
+          }
+          public var customDumpSubjectType: Any.Type {
+            FeatureModel.self
           }
         }
         """
@@ -121,9 +125,11 @@
           public struct CustomDumpValue: Equatable {
             public var count: Int
           }
-
           public var customDumpValue: CustomDumpValue {
             CustomDumpValue(count: self.count)
+          }
+          public var customDumpSubjectType: Any.Type {
+            FeatureModel.self
           }
         }
         """
@@ -158,9 +164,11 @@
           public struct CustomDumpValue: Equatable {
             public var count: Int
           }
-
           public var customDumpValue: CustomDumpValue {
             CustomDumpValue(count: self.count)
+          }
+          public var customDumpSubjectType: Any.Type {
+            FeatureModel.self
           }
         }
         """
@@ -185,9 +193,11 @@
           public struct CustomDumpValue: Equatable {
 
           }
-
           public var customDumpValue: CustomDumpValue {
             CustomDumpValue()
+          }
+          public var customDumpSubjectType: Any.Type {
+            EmptyModel.self
           }
         }
         """
@@ -212,9 +222,11 @@
           public struct CustomDumpValue: Equatable {
             public var count = 0
           }
-
           public var customDumpValue: CustomDumpValue {
             CustomDumpValue(count: self.count)
+          }
+          public var customDumpSubjectType: Any.Type {
+            FeatureModel.self
           }
         }
         """

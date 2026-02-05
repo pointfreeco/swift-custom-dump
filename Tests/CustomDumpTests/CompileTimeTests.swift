@@ -1,7 +1,11 @@
 import CustomDump
 
+#if canImport(Observation)
+  import Observation
+#endif
+
 @CustomDump
-fileprivate class FilePrivate {
+private class FilePrivate {
   var count: Int = 0
 }
 
@@ -9,3 +13,12 @@ fileprivate class FilePrivate {
 private class Private {
   var count: Int = 0
 }
+
+#if canImport(Observation)
+  @CustomDump
+  @Observable
+  @available(macOS 14.0, iOS 17.0, watchOS 10.0, tvOS 17.0, *)
+  private class ObservableModel {
+    var count: Int = 0
+  }
+#endif

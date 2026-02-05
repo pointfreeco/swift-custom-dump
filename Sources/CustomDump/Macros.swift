@@ -6,7 +6,7 @@
 @attached(
   extension,
   conformances: CustomDumpRepresentable,
-  names: named(CustomDumpValue), named(customDumpValue)
+  names: named(CustomDumpValue), named(customDumpValue), named(customDumpSubjectType)
 )
 public macro CustomDump() = #externalMacro(module: "CustomDumpMacros", type: "CustomDumpMacro")
 

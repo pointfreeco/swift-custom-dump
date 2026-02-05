@@ -96,6 +96,7 @@ func _customDump<T, TargetStream>(
 ) -> T where TargetStream: TextOutputStream {
   func customDumpHelp<InnerT, InnerTargetStream>(
     _ value: InnerT,
+    subjectType: Any.Type? = nil,
     to target: inout InnerTargetStream,
     name: String?,
     nameSuffix: String,
@@ -113,6 +114,7 @@ func _customDump<T, TargetStream>(
     }
 
     let mirror = Mirror(customDumpReflecting: value)
+    let subjectType = subjectType ?? mirror.subjectType
     var out = ""
 
     func dumpChildren(
@@ -222,6 +224,7 @@ func _customDump<T, TargetStream>(
     case (let value as any CustomDumpRepresentable, _):
       customDumpHelp(
         value.customDumpValue,
+        subjectType: value.customDumpSubjectType,
         to: &out,
         name: nil,
         nameSuffix: "",
@@ -232,8 +235,8 @@ func _customDump<T, TargetStream>(
 
     case (let value as AnyObject, .class?):
       let item = ObjectIdentifier(value)
-      var occurrence = tracker.occurrencePerType[typeName(mirror.subjectType), default: 0] {
-        didSet { tracker.occurrencePerType[typeName(mirror.subjectType)] = occurrence }
+      var occurrence = tracker.occurrencePerType[typeName(subjectType), default: 0] {
+        didSet { tracker.occurrencePerType[typeName(subjectType)] = occurrence }
       }
 
       var id: String {
@@ -246,7 +249,7 @@ func _customDump<T, TargetStream>(
         out.write("\(id) ")
       }
       if tracker.visitedItems.contains(item) {
-        out.write("\(typeName(mirror.subjectType))(↩︎)")
+        out.write("\(typeName(subjectType))(↩︎)")
       } else {
         tracker.visitedItems.insert(item)
         occurrence += 1
@@ -259,7 +262,7 @@ func _customDump<T, TargetStream>(
         }
         dumpChildren(
           of: Mirror(value, children: children),
-          prefix: "\(typeName(mirror.subjectType))(",
+          prefix: "\(typeName(subjectType))(",
           suffix: ")",
           shouldSort: false,
           filter: macroPropertyFilter(for: value)
@@ -325,7 +328,7 @@ func _customDump<T, TargetStream>(
       }
 
     case (_, .enum?):
-      out.write(isRoot ? "\(typeName(mirror.subjectType))." : ".")
+      out.write(isRoot ? "\(typeName(subjectType))." : ".")
       if let child = mirror.children.first {
         let childMirror = Mirror(customDumpReflecting: child.value)
         let associatedValuesMirror =
@@ -391,7 +394,7 @@ func _customDump<T, TargetStream>(
     case (_, .struct?):
       dumpChildren(
         of: mirror,
-        prefix: "\(typeName(mirror.subjectType))(",
+        prefix: "\(typeName(subjectType))(",
         suffix: ")",
         shouldSort: false,
         filter: macroPropertyFilter(for: value)

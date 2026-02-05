@@ -45,8 +45,13 @@ public struct CustomDumpMacro: ExtensionMacro {
       CustomDumpValue(\(initArguments))
       }
       """
+    let customDumpSubjectType = """
+      public var customDumpSubjectType: Any.Type {
+      \(modelDecl.name).self
+      }
+      """
 
-    let members = [representation, customDumpValue].joined(separator: "\n\n")
+    let members = [representation, customDumpValue, customDumpSubjectType].joined(separator: "\n")
     let conformanceIsolation: String
     #if compiler(>=6.2)
       conformanceIsolation = hasMainActorAnnotation(declaration) ? "@MainActor " : ""
@@ -93,18 +98,22 @@ private struct ModelDecl {
   }
 
   var access: AccessLevel
+  var name: String
   var properties: [Property]
 
   init?(
     declaration: some DeclGroupSyntax,
     context: some MacroExpansionContext
   ) {
-    guard let declKind = DeclKind(declaration) else {
+    guard
+      let name = declaration.as(ClassDeclSyntax.self)?.name
+        ?? declaration.as(StructDeclSyntax.self)?.name
+    else {
       context.diagnose(
         Diagnostic(
           node: Syntax(declaration),
           message: MacroExpansionErrorMessage(
-            "'@CustomDump' can only be applied to a class."
+            "'@CustomDump' can only be applied to classes and structs."
           )
         )
       )
@@ -112,26 +121,15 @@ private struct ModelDecl {
     }
 
     self.access = accessLevel(for: declaration)
-    self.properties = declKind.storedProperties(
+    self.name = name.text
+    self.properties = Self.storedProperties(
       from: declaration,
       context: context,
       requiredAccess: self.access
     )
   }
-}
 
-private enum DeclKind {
-  case `class`
-
-  init?(_ declaration: some DeclGroupSyntax) {
-    if declaration.as(ClassDeclSyntax.self) != nil {
-      self = .class
-    } else {
-      return nil
-    }
-  }
-
-  func storedProperties(
+  static func storedProperties(
     from declaration: some DeclGroupSyntax,
     context: some MacroExpansionContext,
     requiredAccess: AccessLevel
@@ -204,6 +202,20 @@ private enum DeclKind {
     }
     .flatMap(\.self)
   }
+}
+
+private enum DeclKind {
+  case `class`
+
+  init?(_ declaration: some DeclGroupSyntax) {
+    if declaration.as(ClassDeclSyntax.self) != nil {
+      self = .class
+    } else {
+      return nil
+    }
+  }
+
+
 }
 
 private func hasCustomDumpIgnored(_ varDecl: VariableDeclSyntax) -> Bool {
