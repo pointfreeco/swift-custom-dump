@@ -275,7 +275,7 @@
       }
     }
 
-    @Test func customDumpValueInheritsHashableAndSendable() {
+    @Test func customDumpValueInheritsSendableNotHashable() {
       assertMacro {
         """
         @CustomDump
@@ -298,7 +298,44 @@
         }
 
         extension FeatureModel: CustomDump.CustomDumpRepresentable {
-          public struct CustomDumpValue: Equatable, Hashable, Sendable {
+          public struct CustomDumpValue: Equatable, Sendable {
+            public var count: Int
+          }
+          public var customDumpValue: CustomDumpValue {
+            CustomDumpValue(count: self.count)
+          }
+          public var customDumpSubjectType: Any.Type {
+            FeatureModel.self
+          }
+        }
+        """
+      }
+    }
+
+    @Test func customDumpValueDoesNotInheritHashableWhenHashImplemented() {
+      assertMacro {
+        """
+        @CustomDump
+        struct FeatureModel: Hashable {
+          var count: Int
+
+          func hash(into hasher: inout Hasher) {
+            hasher.combine(self.count)
+          }
+        }
+        """
+      } expansion: {
+        """
+        struct FeatureModel: Hashable {
+          var count: Int
+
+          func hash(into hasher: inout Hasher) {
+            hasher.combine(self.count)
+          }
+        }
+
+        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+          public struct CustomDumpValue: Equatable {
             public var count: Int
           }
           public var customDumpValue: CustomDumpValue {
@@ -574,6 +611,35 @@
         extension FeatureModel: CustomDump.CustomDumpRepresentable {
           public struct CustomDumpValue: Equatable {
             public var child: Child.CustomDumpValue = (Factory<FeatureModel>.make()).customDumpValue
+          }
+          public var customDumpValue: CustomDumpValue {
+            CustomDumpValue(child: self.child.customDumpValue)
+          }
+          public var customDumpSubjectType: Any.Type {
+            FeatureModel.self
+          }
+        }
+        """
+      }
+    }
+
+    @Test func customDumpPropertyInitializerNestedImplicitMemberUnchanged() {
+      assertMacro {
+        """
+        @CustomDump
+        final class FeatureModel {
+          @CustomDumpValue var child: ChildContainer = ChildContainer(child: .make())
+        }
+        """
+      } expansion: {
+        """
+        final class FeatureModel {
+          @CustomDumpValue var child: ChildContainer = ChildContainer(child: .make())
+        }
+
+        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+          public struct CustomDumpValue: Equatable {
+            public var child: ChildContainer.CustomDumpValue = (ChildContainer(child: .make())).customDumpValue
           }
           public var customDumpValue: CustomDumpValue {
             CustomDumpValue(child: self.child.customDumpValue)

@@ -392,9 +392,6 @@ private func customDumpValueConformances(
   properties: [ModelDecl.Property]
 ) -> [String] {
   var conformances = ["Equatable"]
-  if hasConformance(named: "Hashable", in: declaration) {
-    conformances.append("Hashable")
-  }
   if let sendableConformance = sendableConformance(in: declaration) {
     conformances.append(sendableConformance)
   }
@@ -499,9 +496,26 @@ private func rewriteDefaultValue(
 ) -> ExprSyntax {
   let expression = rewriteSelf(in: expression, with: modelTypeName)
   guard let propertyTypeName else { return expression }
-  return ImplicitMemberRewriter(typeName: propertyTypeName)
-    .rewrite(expression)
-    .cast(ExprSyntax.self)
+
+  if
+    var memberAccess = expression.as(MemberAccessExprSyntax.self),
+    memberAccess.base == nil
+  {
+    memberAccess.base = ExprSyntax(stringLiteral: propertyTypeName)
+    return ExprSyntax(memberAccess)
+  }
+
+  if
+    var functionCall = expression.as(FunctionCallExprSyntax.self),
+    var calledExpression = functionCall.calledExpression.as(MemberAccessExprSyntax.self),
+    calledExpression.base == nil
+  {
+    calledExpression.base = ExprSyntax(stringLiteral: propertyTypeName)
+    functionCall.calledExpression = ExprSyntax(calledExpression)
+    return ExprSyntax(functionCall)
+  }
+
+  return expression
 }
 
 private final class SelfRewriter: SyntaxRewriter {
@@ -525,20 +539,5 @@ private final class SelfRewriter: SyntaxRewriter {
     var node = node
     node.name = .identifier(self.typeName)
     return TypeSyntax(node)
-  }
-}
-
-private final class ImplicitMemberRewriter: SyntaxRewriter {
-  let typeName: String
-
-  init(typeName: String) {
-    self.typeName = typeName
-  }
-
-  override func visit(_ node: MemberAccessExprSyntax) -> ExprSyntax {
-    guard node.base == nil else { return ExprSyntax(node) }
-    var node = node
-    node.base = ExprSyntax(stringLiteral: self.typeName)
-    return ExprSyntax(node)
   }
 }
