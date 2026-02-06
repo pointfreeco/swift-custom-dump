@@ -94,6 +94,16 @@ struct ExpectDifferenceTests {
       )
       """
     )
+    expectNoDifference(
+      diff(FeatureState(), state),
+      """
+        FeatureState(
+          count: 0,
+      -   fact: nil
+      +   fact: "0 is a good number."
+        )
+      """
+    )
   }
 }
 

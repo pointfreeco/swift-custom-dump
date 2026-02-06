@@ -31,6 +31,8 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
   func diffHelp(
     _ lhs: Any,
     _ rhs: Any,
+    lhsSubjectType: Any.Type? = nil,
+    rhsSubjectType: Any.Type? = nil,
     lhsName: String?,
     rhsName: String?,
     separator: String,
@@ -53,6 +55,8 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
 
     let lhsMirror = Mirror(customDumpReflecting: lhs)
     let rhsMirror = Mirror(customDumpReflecting: rhs)
+    let lhsSubjectType = lhsSubjectType ?? lhsMirror.subjectType
+    let rhsSubjectType = rhsSubjectType ?? rhsMirror.subjectType
     var out = ""
 
     func diffEverything() {
@@ -73,9 +77,9 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         tracker: &tracker
       )
       if lhs == rhs {
-        if lhsMirror.subjectType != rhsMirror.subjectType {
-          lhs.append(" as \(typeName(lhsMirror.subjectType))")
-          rhs.append(" as \(typeName(rhsMirror.subjectType))")
+        if lhsSubjectType != rhsSubjectType {
+          lhs.append(" as \(typeName(lhsSubjectType))")
+          rhs.append(" as \(typeName(rhsSubjectType))")
         }
       }
       lhs.append(separator)
@@ -92,7 +96,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
       )
     }
 
-    guard lhsMirror.subjectType == rhsMirror.subjectType
+    guard lhsSubjectType == rhsSubjectType
     else {
       diffEverything()
       return out
@@ -405,6 +409,8 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         diffHelp(
           lhs.customDumpValue,
           rhs.customDumpValue,
+          lhsSubjectType: lhs.customDumpSubjectType,
+          rhsSubjectType: rhs.customDumpSubjectType,
           lhsName: lhsName,
           rhsName: rhsName,
           separator: separator,
@@ -416,7 +422,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
     case (let lhs as AnyObject, .class?, let rhs as AnyObject, .class?):
       let lhsItem = ObjectIdentifier(lhs)
       let rhsItem = ObjectIdentifier(rhs)
-      let subjectType = typeName(lhsMirror.subjectType)
+      let subjectType = typeName(lhsSubjectType)
       if !tracker.visitedItems.contains(lhsItem) && !tracker.visitedItems.contains(rhsItem) {
         if lhsItem == rhsItem {
           diffChildren(
@@ -591,7 +597,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         ? rhsChildMirror
         : Mirror(rhs, unlabeledChildren: [rhsChild.value], displayStyle: .tuple)
 
-      let subjectType = isRoot ? typeName(lhsMirror.subjectType) : ""
+      let subjectType = isRoot ? typeName(lhsSubjectType) : ""
       diffChildren(
         lhsAssociatedValuesMirror,
         rhsAssociatedValuesMirror,
@@ -667,7 +673,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
       diffChildren(
         lhsMirror,
         rhsMirror,
-        prefix: "\(typeName(lhsMirror.subjectType))(",
+        prefix: "\(typeName(lhsSubjectType))(",
         suffix: ")",
         elementIndent: 2,
         elementSeparator: ",",
