@@ -77,7 +77,7 @@ public enum CustomDumpMacro: ExtensionMacro {
       """
     let customDumpSubjectType = """
       public var customDumpSubjectType: Any.Type {
-      \(modelDecl.name).self
+      \(type.trimmedDescription).self
       }
       """
 
