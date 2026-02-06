@@ -1,4 +1,3 @@
-import Foundation
 import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxMacros
@@ -401,28 +400,50 @@ private func hasConformance(
   named conformanceName: String,
   in declaration: some DeclGroupSyntax
 ) -> Bool {
-  inheritedTypeDescriptions(in: declaration).contains { inheritedType in
-    let lastToken = inheritedType.split(whereSeparator: { $0 == " " || $0 == "\t" }).last
-    return lastToken?.split(separator: ".").last == Substring(conformanceName)
+  inheritedTypes(in: declaration).contains { inheritedType in
+    conformanceBaseName(of: inheritedType.type) == conformanceName
   }
 }
 
 private func sendableConformance(in declaration: some DeclGroupSyntax) -> String? {
-  for inheritedType in inheritedTypeDescriptions(in: declaration) {
-    let lastToken = inheritedType.split(whereSeparator: { $0 == " " || $0 == "\t" }).last
-    guard lastToken?.split(separator: ".").last == "Sendable" else { continue }
-    return inheritedType.contains("@unchecked") ? "@unchecked Sendable" : "Sendable"
+  for inheritedType in inheritedTypes(in: declaration) {
+    guard conformanceBaseName(of: inheritedType.type) == "Sendable" else { continue }
+    return hasUncheckedSpecifier(in: inheritedType.type) ? "@unchecked Sendable" : "Sendable"
   }
   return nil
 }
 
-private func inheritedTypeDescriptions(in declaration: some DeclGroupSyntax) -> [String] {
+private func inheritedTypes(in declaration: some DeclGroupSyntax) -> [InheritedTypeSyntax] {
   guard
     let inheritedTypes =
       declaration.as(ClassDeclSyntax.self)?.inheritanceClause?.inheritedTypes
       ?? declaration.as(StructDeclSyntax.self)?.inheritanceClause?.inheritedTypes
   else { return [] }
-  return inheritedTypes.map { $0.type.trimmedDescription }
+  return Array(inheritedTypes)
+}
+
+private func conformanceBaseName(of type: TypeSyntax) -> String? {
+  if let type = type.as(IdentifierTypeSyntax.self) {
+    return type.name.text
+  }
+  if let type = type.as(MemberTypeSyntax.self) {
+    return type.name.text
+  }
+  if let type = type.as(AttributedTypeSyntax.self) {
+    return conformanceBaseName(of: type.baseType)
+  }
+  return nil
+}
+
+private func hasUncheckedSpecifier(in type: TypeSyntax) -> Bool {
+  guard let type = type.as(AttributedTypeSyntax.self) else { return false }
+  let hasUnchecked =
+    type.attributes.contains { attribute in
+      guard let attribute = attribute.as(AttributeSyntax.self) else { return false }
+      let name = attribute.attributeName.trimmedDescription
+      return name.split(separator: ".").last == "unchecked"
+    }
+  return hasUnchecked || hasUncheckedSpecifier(in: type.baseType)
 }
 
 private func modifiers(of declaration: some DeclGroupSyntax) -> DeclModifierListSyntax {
