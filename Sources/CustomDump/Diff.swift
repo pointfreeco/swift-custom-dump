@@ -530,7 +530,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
           }
           return lhs.key == rhs.key
         },
-        areInIncreasingOrder: lhsMirror.subjectType is _UnorderedCollection.Type
+        areInIncreasingOrder: lhsSubjectType is _UnorderedCollection.Type
           ? {
             let (lhsValue, rhsValue): (Any, Any)
             if let lhs = $0.value as? (key: AnyHashable, value: Any),
@@ -646,7 +646,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         areEquivalent: {
           isIdentityEqual($0.value, $1.value) || isMirrorEqual($0.value, $1.value)
         },
-        areInIncreasingOrder: lhsMirror.subjectType is _UnorderedCollection.Type
+        areInIncreasingOrder: lhsSubjectType is _UnorderedCollection.Type
           ? {
             let lhsDump = _customDump(
               $0.value,
