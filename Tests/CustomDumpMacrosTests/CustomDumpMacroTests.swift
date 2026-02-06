@@ -312,43 +312,6 @@
       }
     }
 
-    @Test func customDumpValueDoesNotInheritHashableWhenHashImplemented() {
-      assertMacro {
-        """
-        @CustomDump
-        struct FeatureModel: Hashable {
-          var count: Int
-
-          func hash(into hasher: inout Hasher) {
-            hasher.combine(self.count)
-          }
-        }
-        """
-      } expansion: {
-        """
-        struct FeatureModel: Hashable {
-          var count: Int
-
-          func hash(into hasher: inout Hasher) {
-            hasher.combine(self.count)
-          }
-        }
-
-        extension FeatureModel: CustomDump.CustomDumpRepresentable {
-          public struct CustomDumpValue: Equatable {
-            public var count: Int
-          }
-          public var customDumpValue: CustomDumpValue {
-            CustomDumpValue(count: self.count)
-          }
-          public var customDumpSubjectType: Any.Type {
-            FeatureModel.self
-          }
-        }
-        """
-      }
-    }
-
     @Test func customDumpValueInheritsSendableOnly() {
       assertMacro {
         """

@@ -259,19 +259,6 @@ private struct ModelDecl {
   }
 }
 
-private enum DeclKind {
-  case `class`
-
-  init?(_ declaration: some DeclGroupSyntax) {
-    if declaration.as(ClassDeclSyntax.self) != nil {
-      self = .class
-    } else {
-      return nil
-    }
-  }
-
-}
-
 private func hasCustomDumpIgnored(_ varDecl: VariableDeclSyntax) -> Bool {
   return attributes(of: varDecl).contains { attribute in
     guard let attribute = attribute.as(AttributeSyntax.self) else { return false }
