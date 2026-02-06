@@ -27,7 +27,7 @@ public protocol CustomDumpRepresentable<CustomDumpValue> {
   /// The custom dump value for this instance.
   var customDumpValue: CustomDumpValue { get }
 
-  /// A type representing the type of the custom dump.
+  /// A type representing the custom dump.
   var customDumpSubjectType: Any.Type { get }
 }
 
