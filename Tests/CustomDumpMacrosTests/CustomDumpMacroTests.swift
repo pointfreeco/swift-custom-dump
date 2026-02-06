@@ -491,6 +491,43 @@
       }
     }
 
+    @Test func customDumpPropertyInitializerRewritesSelf() {
+      assertMacro {
+        """
+        @CustomDump
+        final class FeatureModel {
+          @CustomDump var child: Child = Self.makeChild()
+
+          static func makeChild() -> Child {
+            Child()
+          }
+        }
+        """
+      } expansion: {
+        """
+        final class FeatureModel {
+          var child: Child = Self.makeChild()
+
+          static func makeChild() -> Child {
+            Child()
+          }
+        }
+
+        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+          public struct CustomDumpValue: Equatable {
+            public var child: Child.CustomDumpValue = (FeatureModel.makeChild()).customDumpValue
+          }
+          public var customDumpValue: CustomDumpValue {
+            CustomDumpValue(child: self.child.customDumpValue)
+          }
+          public var customDumpSubjectType: Any.Type {
+            FeatureModel.self
+          }
+        }
+        """
+      }
+    }
+
     @Test func missingTypeAnnotation() {
       assertMacro {
         """

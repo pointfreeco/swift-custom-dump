@@ -27,12 +27,14 @@ public struct CustomDumpMacro: ExtensionMacro {
       case .type(let type):
         return "public var \(property.name): \(type)\(customDumpValueSuffix)"
       case .initializer(let defaultValue):
+        let defaultValue = rewriteSelf(in: defaultValue, with: modelDecl.name).trimmedDescription
         if property.isCustomDumpRepresentable {
           return "public var \(property.name) = (\(defaultValue)).customDumpValue"
         } else {
           return "public var \(property.name) = \(defaultValue)"
         }
       case .pair(let type, initializer: let defaultValue):
+        let defaultValue = rewriteSelf(in: defaultValue, with: modelDecl.name).trimmedDescription
         if property.isCustomDumpRepresentable {
           return """
             public var \(property.name): \(type)\(customDumpValueSuffix) = \
@@ -122,8 +124,8 @@ private struct ModelDecl {
 
     enum Kind {
       case type(String)
-      case initializer(String)
-      case pair(type: String, initializer: String)
+      case initializer(ExprSyntax)
+      case pair(type: String, initializer: ExprSyntax)
     }
   }
 
@@ -186,7 +188,7 @@ private struct ModelDecl {
         else { return nil }
 
         let typeAnnotation = binding.typeAnnotation?.type
-        let defaultValue = binding.initializer?.value.trimmedDescription
+        let defaultValue = binding.initializer?.value
 
         switch (typeAnnotation, defaultValue) {
         case (nil, nil):
@@ -310,8 +312,8 @@ private func isClosureType(_ type: TypeSyntax) -> Bool {
   return false
 }
 
-private func isClosureInitializer(_ initializer: String) -> Bool {
-  initializer.first == "{"
+private func isClosureInitializer(_ initializer: ExprSyntax) -> Bool {
+  initializer.as(ClosureExprSyntax.self) != nil
 }
 
 private enum AccessLevel: Int, Comparable {
@@ -453,4 +455,32 @@ private func attributes(of varDecl: VariableDeclSyntax) -> AttributeListSyntax {
   #else
     return varDecl.attributes ?? []
   #endif
+}
+
+private func rewriteSelf(in expression: ExprSyntax, with typeName: String) -> ExprSyntax {
+  SelfRewriter(typeName: typeName).rewrite(expression).cast(ExprSyntax.self)
+}
+
+private final class SelfRewriter: SyntaxRewriter {
+  let typeName: String
+
+  init(typeName: String) {
+    self.typeName = typeName
+  }
+
+  override func visit(_ node: DeclReferenceExprSyntax) -> ExprSyntax {
+    guard node.baseName.tokenKind == .keyword(.Self) || node.baseName.text == "Self"
+    else { return ExprSyntax(node) }
+    var node = node
+    node.baseName = .identifier(self.typeName)
+    return ExprSyntax(node)
+  }
+
+  override func visit(_ node: IdentifierTypeSyntax) -> TypeSyntax {
+    guard node.name.tokenKind == .keyword(.Self) || node.name.text == "Self"
+    else { return TypeSyntax(node) }
+    var node = node
+    node.name = .identifier(self.typeName)
+    return TypeSyntax(node)
+  }
 }
