@@ -15,7 +15,10 @@ public struct CustomDumpMacro: ExtensionMacro {
     }
 
     let properties = modelDecl.properties
-    let customDumpValueConformances = customDumpValueConformances(for: declaration)
+    let customDumpValueConformances = customDumpValueConformances(
+      for: declaration,
+      properties: properties
+    )
 
     let propertyLines = properties.map { property in
       let customDumpValueSuffix = property.isCustomDumpRepresentable ? ".CustomDumpValue" : ""
@@ -368,7 +371,8 @@ private func hasCustomDumpRepresentableConformance(_ declaration: some DeclGroup
 }
 
 private func customDumpValueConformances(
-  for declaration: some DeclGroupSyntax
+  for declaration: some DeclGroupSyntax,
+  properties: [ModelDecl.Property]
 ) -> [String] {
   var conformances = ["Equatable"]
   if hasConformance(named: "Hashable", in: declaration) {
@@ -376,6 +380,12 @@ private func customDumpValueConformances(
   }
   if hasConformance(named: "Sendable", in: declaration) {
     conformances.append("Sendable")
+  }
+  if
+    hasConformance(named: "Identifiable", in: declaration),
+    properties.contains(where: { $0.name == "id" })
+  {
+    conformances.append("Identifiable")
   }
   return conformances
 }

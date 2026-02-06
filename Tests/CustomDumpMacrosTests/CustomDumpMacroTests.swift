@@ -341,6 +341,69 @@
       }
     }
 
+    @Test func customDumpValueInheritsIdentifiableWhenIDIncluded() {
+      assertMacro {
+        """
+        @CustomDump
+        struct FeatureModel: Identifiable {
+          var id: UUID
+          var count: Int
+        }
+        """
+      } expansion: {
+        """
+        struct FeatureModel: Identifiable {
+          var id: UUID
+          var count: Int
+        }
+
+        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+          public struct CustomDumpValue: Equatable, Identifiable {
+            public var id: UUID
+            public var count: Int
+          }
+          public var customDumpValue: CustomDumpValue {
+            CustomDumpValue(id: self.id, count: self.count)
+          }
+          public var customDumpSubjectType: Any.Type {
+            FeatureModel.self
+          }
+        }
+        """
+      }
+    }
+
+    @Test func customDumpValueDoesNotInheritIdentifiableWhenIDExcluded() {
+      assertMacro {
+        """
+        @CustomDump
+        struct FeatureModel: Identifiable {
+          @CustomDumpIgnored var id: UUID
+          var count: Int
+        }
+        """
+      } expansion: {
+        """
+        struct FeatureModel: Identifiable {
+          @CustomDumpIgnored var id: UUID
+          var count: Int
+        }
+
+        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+          public struct CustomDumpValue: Equatable {
+            public var count: Int
+          }
+          public var customDumpValue: CustomDumpValue {
+            CustomDumpValue(count: self.count)
+          }
+          public var customDumpSubjectType: Any.Type {
+            FeatureModel.self
+          }
+        }
+        """
+      }
+    }
+
     @Test func customDumpPropertyMissingTypeAnnotation() {
       assertMacro {
         """
