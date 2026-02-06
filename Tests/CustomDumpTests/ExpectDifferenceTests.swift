@@ -114,6 +114,15 @@ struct ExpectDifferenceTests {
       42
     )
   }
+
+  @Test func customDumpPropertyDefaultNestedStaticShorthand() {
+    let model = NestedStaticShorthandModel()
+
+    expectNoDifference(
+      model.customDumpValue.container.child.count,
+      42
+    )
+  }
 }
 
 @CustomDump
@@ -163,4 +172,14 @@ fileprivate struct StaticShorthandChild {
 @CustomDump
 fileprivate final class StaticShorthandModel {
   @CustomDumpValue var child: StaticShorthandChild = .make()
+}
+
+@CustomDump
+fileprivate struct ChildContainer {
+  @CustomDumpValue var child: StaticShorthandChild
+}
+
+@CustomDump
+fileprivate final class NestedStaticShorthandModel {
+  @CustomDumpValue var container: ChildContainer = ChildContainer(child: .make())
 }
