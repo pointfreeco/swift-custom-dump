@@ -477,6 +477,32 @@
           @FetchAll(Reminder.all) var reminders
                                       ┬────────
                                       ╰─ 🛑 '@CustomDump' requires explicit type annotations for stored properties.
+                                         ✏️ Insert ': <#Type#>'
+        }
+        """
+      } fixes: {
+        """
+        @CustomDump
+        final class FeatureModel {
+          @FetchAll(Reminder.all) var reminders: <#Type#>
+        }
+        """
+      } expansion: {
+        """
+        final class FeatureModel {
+          @FetchAll(Reminder.all) var reminders: <#Type#>
+        }
+
+        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+          public struct CustomDumpValue: Equatable {
+            public var reminders: <#Type#>
+          }
+          public var customDumpValue: CustomDumpValue {
+            CustomDumpValue(reminders: self.reminders)
+          }
+          public var customDumpSubjectType: Any.Type {
+            FeatureModel.self
+          }
         }
         """
       }

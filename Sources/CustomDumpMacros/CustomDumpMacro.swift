@@ -189,11 +189,21 @@ private struct ModelDecl {
 
         switch (typeAnnotation, defaultValue) {
         case (nil, nil):
+          let typeAnnotation = TypeAnnotationSyntax(
+            colon: .colonToken(trailingTrivia: .space),
+            type: TypeSyntax(IdentifierTypeSyntax(name: .identifier("<#Type#>")))
+          )
           context.diagnose(
             Diagnostic(
               node: Syntax(binding),
               message: MacroExpansionErrorMessage(
                 "'@CustomDump' requires explicit type annotations for stored properties."
+              ),
+              fixIt: .replaceChild(
+                message: MacroExpansionFixItMessage("Insert ': <#Type#>'"),
+                parent: binding,
+                replacingChildAt: \.typeAnnotation,
+                with: typeAnnotation
               )
             )
           )
