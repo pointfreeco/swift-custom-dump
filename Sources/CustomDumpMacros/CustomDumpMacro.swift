@@ -15,6 +15,7 @@ public struct CustomDumpMacro: ExtensionMacro {
     }
 
     let properties = modelDecl.properties
+    let customDumpValueConformances = customDumpValueConformances(for: declaration)
 
     let propertyLines = properties.map { property in
       let customDumpValueSuffix = property.isCustomDumpRepresentable ? ".CustomDumpValue" : ""
@@ -41,7 +42,7 @@ public struct CustomDumpMacro: ExtensionMacro {
 
     let representation =
       """
-      public struct CustomDumpValue: Equatable {
+      public struct CustomDumpValue: \(customDumpValueConformances.joined(separator: ", ")) {
       \(propertyLines.joined(separator: "\n"))
       }
       """
@@ -363,18 +364,36 @@ private func hasMainActorAnnotation(_ declaration: some DeclGroupSyntax) -> Bool
 }
 
 private func hasCustomDumpRepresentableConformance(_ declaration: some DeclGroupSyntax) -> Bool {
+  return hasConformance(named: "CustomDumpRepresentable", in: declaration)
+}
+
+private func customDumpValueConformances(
+  for declaration: some DeclGroupSyntax
+) -> [String] {
+  var conformances = ["Equatable"]
+  if hasConformance(named: "Hashable", in: declaration) {
+    conformances.append("Hashable")
+  }
+  if hasConformance(named: "Sendable", in: declaration) {
+    conformances.append("Sendable")
+  }
+  return conformances
+}
+
+private func hasConformance(
+  named conformanceName: String,
+  in declaration: some DeclGroupSyntax
+) -> Bool {
   guard
     let inheritedTypes =
-      declaration
-      .as(ClassDeclSyntax.self)?
-      .inheritanceClause?
-      .inheritedTypes
+      declaration.as(ClassDeclSyntax.self)?.inheritanceClause?.inheritedTypes
+      ?? declaration.as(StructDeclSyntax.self)?.inheritanceClause?.inheritedTypes
   else { return false }
 
   return inheritedTypes.contains { inheritedType in
     let trimmed = inheritedType.type.trimmedDescription
     let lastToken = trimmed.split(whereSeparator: { $0 == " " || $0 == "\t" }).last
-    return lastToken?.split(separator: ".").last == "CustomDumpRepresentable"
+    return lastToken?.split(separator: ".").last == Substring(conformanceName)
   }
 }
 

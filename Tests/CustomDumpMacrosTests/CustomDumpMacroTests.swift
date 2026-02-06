@@ -275,6 +275,72 @@
       }
     }
 
+    @Test func customDumpValueInheritsHashableAndSendable() {
+      assertMacro {
+        """
+        @CustomDump
+        final class FeatureModel: Hashable, Sendable {
+          var count: Int
+
+          init(count: Int) {
+            self.count = count
+          }
+        }
+        """
+      } expansion: {
+        """
+        final class FeatureModel: Hashable, Sendable {
+          var count: Int
+
+          init(count: Int) {
+            self.count = count
+          }
+        }
+
+        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+          public struct CustomDumpValue: Equatable, Hashable, Sendable {
+            public var count: Int
+          }
+          public var customDumpValue: CustomDumpValue {
+            CustomDumpValue(count: self.count)
+          }
+          public var customDumpSubjectType: Any.Type {
+            FeatureModel.self
+          }
+        }
+        """
+      }
+    }
+
+    @Test func customDumpValueInheritsSendableOnly() {
+      assertMacro {
+        """
+        @CustomDump
+        struct FeatureModel: Sendable {
+          var count: Int
+        }
+        """
+      } expansion: {
+        """
+        struct FeatureModel: Sendable {
+          var count: Int
+        }
+
+        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+          public struct CustomDumpValue: Equatable, Sendable {
+            public var count: Int
+          }
+          public var customDumpValue: CustomDumpValue {
+            CustomDumpValue(count: self.count)
+          }
+          public var customDumpSubjectType: Any.Type {
+            FeatureModel.self
+          }
+        }
+        """
+      }
+    }
+
     @Test func customDumpPropertyMissingTypeAnnotation() {
       assertMacro {
         """
