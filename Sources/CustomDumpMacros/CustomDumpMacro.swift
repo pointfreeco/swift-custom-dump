@@ -26,10 +26,17 @@ public struct CustomDumpMacro: ExtensionMacro {
       case .type(let type):
         return "public var \(property.name): \(type)\(customDumpValueSuffix)"
       case .initializer(let defaultValue):
-        return "public var \(property.name) = \(defaultValue)"
+        if property.isCustomDumpRepresentable {
+          return "public var \(property.name) = (\(defaultValue)).customDumpValue"
+        } else {
+          return "public var \(property.name) = \(defaultValue)"
+        }
       case .pair(let type, initializer: let defaultValue):
         if property.isCustomDumpRepresentable {
-          return "public var \(property.name): \(type)\(customDumpValueSuffix)"
+          return """
+            public var \(property.name): \(type)\(customDumpValueSuffix) = \
+            (\(defaultValue)).customDumpValue
+            """
         } else {
           return "public var \(property.name): \(type) = \(defaultValue)"
         }
@@ -192,18 +199,6 @@ private struct ModelDecl {
           )
           return nil
         case (nil, let defaultValue?):
-          guard !isCustomDumpRepresentable
-          else {
-            context.diagnose(
-              Diagnostic(
-                node: Syntax(binding),
-                message: MacroExpansionErrorMessage(
-                  "'@CustomDump' requires explicit type annotations for '@CustomDump' properties."
-                )
-              )
-            )
-            return nil
-          }
           guard !isClosureInitializer(defaultValue)
           else { return nil }
 
@@ -381,8 +376,7 @@ private func customDumpValueConformances(
   if hasConformance(named: "Sendable", in: declaration) {
     conformances.append("Sendable")
   }
-  if
-    hasConformance(named: "Identifiable", in: declaration),
+  if hasConformance(named: "Identifiable", in: declaration),
     properties.contains(where: { $0.name == "id" })
   {
     conformances.append("Identifiable")
