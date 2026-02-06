@@ -2,7 +2,7 @@ import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxMacros
 
-public struct CustomDumpMacro: ExtensionMacro {
+public enum CustomDumpMacro: ExtensionMacro {
   public static func expansion(
     of node: SwiftSyntax.AttributeSyntax,
     attachedTo declaration: some SwiftSyntax.DeclGroupSyntax,
@@ -26,14 +26,24 @@ public struct CustomDumpMacro: ExtensionMacro {
       case .type(let type):
         return "public var \(property.name): \(type)\(customDumpValueSuffix)"
       case .initializer(let defaultValue):
-        let defaultValue = rewriteSelf(in: defaultValue, with: modelDecl.name).trimmedDescription
+        let defaultValue = rewriteDefaultValue(
+          defaultValue,
+          modelTypeName: modelDecl.name,
+          propertyTypeName: nil
+        )
+        .trimmedDescription
         if property.isCustomDumpRepresentable {
           return "public var \(property.name) = (\(defaultValue)).customDumpValue"
         } else {
           return "public var \(property.name) = \(defaultValue)"
         }
       case .pair(let type, initializer: let defaultValue):
-        let defaultValue = rewriteSelf(in: defaultValue, with: modelDecl.name).trimmedDescription
+        let defaultValue = rewriteDefaultValue(
+          defaultValue,
+          modelTypeName: modelDecl.name,
+          propertyTypeName: type
+        )
+        .trimmedDescription
         if property.isCustomDumpRepresentable {
           return """
             public var \(property.name): \(type)\(customDumpValueSuffix) = \
@@ -95,7 +105,7 @@ public struct CustomDumpMacro: ExtensionMacro {
   }
 }
 
-extension CustomDumpMacro: PeerMacro {
+enum CustomDumpValueMacro: PeerMacro {
   public static func expansion(
     of node: SwiftSyntax.AttributeSyntax,
     providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
@@ -105,7 +115,7 @@ extension CustomDumpMacro: PeerMacro {
   }
 }
 
-struct CustomDumpIgnoredMacro: PeerMacro {
+enum CustomDumpIgnoredMacro: PeerMacro {
   public static func expansion(
     of node: SwiftSyntax.AttributeSyntax,
     providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
@@ -274,7 +284,7 @@ private func hasCustomDump(_ varDecl: VariableDeclSyntax) -> Bool {
   return attributes(of: varDecl).contains { attribute in
     guard let attribute = attribute.as(AttributeSyntax.self) else { return false }
     let name = attribute.attributeName.trimmedDescription
-    return name.split(separator: ".").last == "CustomDump"
+    return name.split(separator: ".").last == "CustomDumpValue"
   }
 }
 
@@ -482,6 +492,18 @@ private func rewriteSelf(in expression: ExprSyntax, with typeName: String) -> Ex
   SelfRewriter(typeName: typeName).rewrite(expression).cast(ExprSyntax.self)
 }
 
+private func rewriteDefaultValue(
+  _ expression: ExprSyntax,
+  modelTypeName: String,
+  propertyTypeName: String?
+) -> ExprSyntax {
+  let expression = rewriteSelf(in: expression, with: modelTypeName)
+  guard let propertyTypeName else { return expression }
+  return ImplicitMemberRewriter(typeName: propertyTypeName)
+    .rewrite(expression)
+    .cast(ExprSyntax.self)
+}
+
 private final class SelfRewriter: SyntaxRewriter {
   let typeName: String
 
@@ -503,5 +525,20 @@ private final class SelfRewriter: SyntaxRewriter {
     var node = node
     node.name = .identifier(self.typeName)
     return TypeSyntax(node)
+  }
+}
+
+private final class ImplicitMemberRewriter: SyntaxRewriter {
+  let typeName: String
+
+  init(typeName: String) {
+    self.typeName = typeName
+  }
+
+  override func visit(_ node: MemberAccessExprSyntax) -> ExprSyntax {
+    guard node.base == nil else { return ExprSyntax(node) }
+    var node = node
+    node.base = ExprSyntax(stringLiteral: self.typeName)
+    return ExprSyntax(node)
   }
 }

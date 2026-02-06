@@ -6,5 +6,6 @@ struct CustomDumpMacrosPlugin: CompilerPlugin {
   let providingMacros: [Macro.Type] = [
     CustomDumpMacro.self,
     CustomDumpIgnoredMacro.self,
+    CustomDumpValueMacro.self,
   ]
 }

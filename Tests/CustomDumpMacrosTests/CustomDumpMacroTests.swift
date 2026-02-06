@@ -238,7 +238,7 @@
         """
         @CustomDump
         final class FeatureModel {
-          @CustomDump var child: Child
+          @CustomDumpValue var child: Child
           var count: Int
 
           init(child: Child, count: Int) {
@@ -250,7 +250,7 @@
       } expansion: {
         """
         final class FeatureModel {
-          var child: Child
+          @CustomDumpValue var child: Child
           var count: Int
 
           init(child: Child, count: Int) {
@@ -438,13 +438,13 @@
         """
         @CustomDump
         final class FeatureModel {
-          @CustomDump var child = Child()
+          @CustomDumpValue var child = Child()
         }
         """
       } expansion: {
         """
         final class FeatureModel {
-          var child = Child()
+          @CustomDumpValue var child = Child()
         }
 
         extension FeatureModel: CustomDump.CustomDumpRepresentable {
@@ -467,13 +467,13 @@
         """
         @CustomDump
         final class FeatureModel {
-          @CustomDump var child: Child = Child()
+          @CustomDumpValue var child: Child = Child()
         }
         """
       } expansion: {
         """
         final class FeatureModel {
-          var child: Child = Child()
+          @CustomDumpValue var child: Child = Child()
         }
 
         extension FeatureModel: CustomDump.CustomDumpRepresentable {
@@ -496,7 +496,7 @@
         """
         @CustomDump
         final class FeatureModel {
-          @CustomDump var child: Child = Self.makeChild()
+          @CustomDumpValue var child: Child = Self.makeChild()
 
           static func makeChild() -> Child {
             Child()
@@ -506,7 +506,7 @@
       } expansion: {
         """
         final class FeatureModel {
-          var child: Child = Self.makeChild()
+          @CustomDumpValue var child: Child = Self.makeChild()
 
           static func makeChild() -> Child {
             Child()
@@ -516,6 +516,103 @@
         extension FeatureModel: CustomDump.CustomDumpRepresentable {
           public struct CustomDumpValue: Equatable {
             public var child: Child.CustomDumpValue = (FeatureModel.makeChild()).customDumpValue
+          }
+          public var customDumpValue: CustomDumpValue {
+            CustomDumpValue(child: self.child.customDumpValue)
+          }
+          public var customDumpSubjectType: Any.Type {
+            FeatureModel.self
+          }
+        }
+        """
+      }
+    }
+
+    @Test func customDumpPropertyInitializerStaticShorthand() {
+      assertMacro {
+        """
+        @CustomDump
+        final class FeatureModel {
+          @CustomDumpValue var child: Child = .make()
+        }
+        """
+      } expansion: {
+        """
+        final class FeatureModel {
+          @CustomDumpValue var child: Child = .make()
+        }
+
+        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+          public struct CustomDumpValue: Equatable {
+            public var child: Child.CustomDumpValue = (Child.make()).customDumpValue
+          }
+          public var customDumpValue: CustomDumpValue {
+            CustomDumpValue(child: self.child.customDumpValue)
+          }
+          public var customDumpSubjectType: Any.Type {
+            FeatureModel.self
+          }
+        }
+        """
+      }
+    }
+
+    @Test func customDumpPropertyInitializerRewritesNestedSelfTypeReferences() {
+      assertMacro {
+        """
+        @CustomDump
+        final class FeatureModel {
+          @CustomDumpValue var child: Child = Factory<Self>.make()
+        }
+        """
+      } expansion: {
+        """
+        final class FeatureModel {
+          @CustomDumpValue var child: Child = Factory<Self>.make()
+        }
+
+        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+          public struct CustomDumpValue: Equatable {
+            public var child: Child.CustomDumpValue = (Factory<FeatureModel>.make()).customDumpValue
+          }
+          public var customDumpValue: CustomDumpValue {
+            CustomDumpValue(child: self.child.customDumpValue)
+          }
+          public var customDumpSubjectType: Any.Type {
+            FeatureModel.self
+          }
+        }
+        """
+      }
+    }
+
+    @Test func customDumpPropertyInitializerClosureInvocationRewritesSelf() {
+      assertMacro {
+        """
+        @CustomDump
+        final class FeatureModel {
+          @CustomDumpValue var child = { Self.makeChild() }()
+
+          static func makeChild() -> Child {
+            Child()
+          }
+        }
+        """
+      } expansion: {
+        """
+        final class FeatureModel {
+          @CustomDumpValue var child = { Self.makeChild() }()
+
+          static func makeChild() -> Child {
+            Child()
+          }
+        }
+
+        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+          public struct CustomDumpValue: Equatable {
+            public var child = ({
+                FeatureModel.makeChild()
+              }()).customDumpValue
           }
           public var customDumpValue: CustomDumpValue {
             CustomDumpValue(child: self.child.customDumpValue)

@@ -105,6 +105,15 @@ struct ExpectDifferenceTests {
       """
     )
   }
+
+  @Test func customDumpPropertyDefaultStaticShorthand() {
+    let model = StaticShorthandModel()
+
+    expectNoDifference(
+      model.customDumpValue.child.count,
+      42
+    )
+  }
 }
 
 @CustomDump
@@ -141,3 +150,17 @@ struct PW<WrappedValue> {
   var wrappedValue: WrappedValue
 }
 extension PW: Sendable where WrappedValue: Sendable {}
+
+@CustomDump
+fileprivate struct StaticShorthandChild {
+  var count = 0
+
+  static func make() -> Self {
+    Self(count: 42)
+  }
+}
+
+@CustomDump
+fileprivate final class StaticShorthandModel {
+  @CustomDumpValue var child: StaticShorthandChild = .make()
+}
