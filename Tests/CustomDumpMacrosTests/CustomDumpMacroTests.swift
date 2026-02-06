@@ -341,6 +341,35 @@
       }
     }
 
+    @Test func customDumpValueInheritsUncheckedSendable() {
+      assertMacro {
+        """
+        @CustomDump
+        final class FeatureModel: @unchecked Sendable {
+          var count: Int
+        }
+        """
+      } expansion: {
+        """
+        final class FeatureModel: @unchecked Sendable {
+          var count: Int
+        }
+
+        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+          public struct CustomDumpValue: Equatable, @unchecked Sendable {
+            public var count: Int
+          }
+          public var customDumpValue: CustomDumpValue {
+            CustomDumpValue(count: self.count)
+          }
+          public var customDumpSubjectType: Any.Type {
+            FeatureModel.self
+          }
+        }
+        """
+      }
+    }
+
     @Test func customDumpValueInheritsIdentifiableWhenIDIncluded() {
       assertMacro {
         """

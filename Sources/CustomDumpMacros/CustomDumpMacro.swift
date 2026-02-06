@@ -1,3 +1,4 @@
+import Foundation
 import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxMacros
@@ -383,8 +384,8 @@ private func customDumpValueConformances(
   if hasConformance(named: "Hashable", in: declaration) {
     conformances.append("Hashable")
   }
-  if hasConformance(named: "Sendable", in: declaration) {
-    conformances.append("Sendable")
+  if let sendableConformance = sendableConformance(in: declaration) {
+    conformances.append(sendableConformance)
   }
   if hasConformance(named: "Identifiable", in: declaration),
     properties.contains(where: { $0.name == "id" })
@@ -398,17 +399,28 @@ private func hasConformance(
   named conformanceName: String,
   in declaration: some DeclGroupSyntax
 ) -> Bool {
+  inheritedTypeDescriptions(in: declaration).contains { inheritedType in
+    let lastToken = inheritedType.split(whereSeparator: { $0 == " " || $0 == "\t" }).last
+    return lastToken?.split(separator: ".").last == Substring(conformanceName)
+  }
+}
+
+private func sendableConformance(in declaration: some DeclGroupSyntax) -> String? {
+  for inheritedType in inheritedTypeDescriptions(in: declaration) {
+    let lastToken = inheritedType.split(whereSeparator: { $0 == " " || $0 == "\t" }).last
+    guard lastToken?.split(separator: ".").last == "Sendable" else { continue }
+    return inheritedType.contains("@unchecked") ? "@unchecked Sendable" : "Sendable"
+  }
+  return nil
+}
+
+private func inheritedTypeDescriptions(in declaration: some DeclGroupSyntax) -> [String] {
   guard
     let inheritedTypes =
       declaration.as(ClassDeclSyntax.self)?.inheritanceClause?.inheritedTypes
       ?? declaration.as(StructDeclSyntax.self)?.inheritanceClause?.inheritedTypes
-  else { return false }
-
-  return inheritedTypes.contains { inheritedType in
-    let trimmed = inheritedType.type.trimmedDescription
-    let lastToken = trimmed.split(whereSeparator: { $0 == " " || $0 == "\t" }).last
-    return lastToken?.split(separator: ".").last == Substring(conformanceName)
-  }
+  else { return [] }
+  return inheritedTypes.map { $0.type.trimmedDescription }
 }
 
 private func modifiers(of declaration: some DeclGroupSyntax) -> DeclModifierListSyntax {
