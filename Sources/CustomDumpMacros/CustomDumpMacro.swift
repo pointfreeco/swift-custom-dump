@@ -17,19 +17,26 @@ public struct CustomDumpMacro: ExtensionMacro {
     let properties = modelDecl.properties
 
     let propertyLines = properties.map { property in
+      let customDumpValueSuffix = property.isCustomDumpRepresentable ? ".CustomDumpValue" : ""
       switch property.kind {
       case .type(let type):
-        return "public var \(property.name): \(type)"
+        return "public var \(property.name): \(type)\(customDumpValueSuffix)"
       case .initializer(let defaultValue):
         return "public var \(property.name) = \(defaultValue)"
-      case .pair(type: let type, initializer: let defaultValue):
-        return "public var \(property.name): \(type) = \(defaultValue)"
+      case .pair(let type, initializer: let defaultValue):
+        if property.isCustomDumpRepresentable {
+          return "public var \(property.name): \(type)\(customDumpValueSuffix)"
+        } else {
+          return "public var \(property.name): \(type) = \(defaultValue)"
+        }
       }
     }
 
     let initArguments =
       properties
-      .map { "\($0.name): self.\($0.name)" }
+      .map {
+        "\($0.name): self.\($0.name)\($0.isCustomDumpRepresentable ? ".customDumpValue" : "")"
+      }
       .joined(separator: ", ")
 
     let representation =
@@ -75,6 +82,16 @@ public struct CustomDumpMacro: ExtensionMacro {
   }
 }
 
+extension CustomDumpMacro: PeerMacro {
+  public static func expansion(
+    of node: SwiftSyntax.AttributeSyntax,
+    providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
+    in context: some SwiftSyntaxMacros.MacroExpansionContext
+  ) throws -> [SwiftSyntax.DeclSyntax] {
+    []
+  }
+}
+
 struct CustomDumpIgnoredMacro: PeerMacro {
   public static func expansion(
     of node: SwiftSyntax.AttributeSyntax,
@@ -89,6 +106,7 @@ private struct ModelDecl {
   struct Property {
     var name: String
     var kind: Kind
+    var isCustomDumpRepresentable: Bool
 
     enum Kind {
       case type(String)
@@ -146,6 +164,7 @@ private struct ModelDecl {
       else { return nil }
       guard !hasCustomDumpIgnored(varDecl)
       else { return nil }
+      let isCustomDumpRepresentable = hasCustomDump(varDecl)
 
       return varDecl.bindings.compactMap { binding in
         guard let identifier = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text
@@ -169,12 +188,25 @@ private struct ModelDecl {
           )
           return nil
         case (nil, let defaultValue?):
+          guard !isCustomDumpRepresentable
+          else {
+            context.diagnose(
+              Diagnostic(
+                node: Syntax(binding),
+                message: MacroExpansionErrorMessage(
+                  "'@CustomDump' requires explicit type annotations for '@CustomDump' properties."
+                )
+              )
+            )
+            return nil
+          }
           guard !isClosureInitializer(defaultValue)
           else { return nil }
 
           return ModelDecl.Property(
             name: identifier,
-            kind: .initializer(defaultValue)
+            kind: .initializer(defaultValue),
+            isCustomDumpRepresentable: isCustomDumpRepresentable
           )
         case (let typeAnnotation?, nil):
           guard !isClosureType(typeAnnotation)
@@ -182,12 +214,13 @@ private struct ModelDecl {
 
           return ModelDecl.Property(
             name: identifier,
-            kind: .type(typeAnnotation.trimmedDescription)
+            kind: .type(typeAnnotation.trimmedDescription),
+            isCustomDumpRepresentable: isCustomDumpRepresentable
           )
         case (let typeAnnotation?, let defaultValue?):
           guard !isClosureType(typeAnnotation)
           else { return nil }
-          guard !isClosureInitializer(defaultValue)
+          guard !isClosureInitializer(defaultValue) || isCustomDumpRepresentable
           else { return nil }
 
           return ModelDecl.Property(
@@ -195,7 +228,8 @@ private struct ModelDecl {
             kind: .pair(
               type: typeAnnotation.trimmedDescription,
               initializer: defaultValue
-            )
+            ),
+            isCustomDumpRepresentable: isCustomDumpRepresentable
           )
         }
       }
@@ -215,7 +249,6 @@ private enum DeclKind {
     }
   }
 
-
 }
 
 private func hasCustomDumpIgnored(_ varDecl: VariableDeclSyntax) -> Bool {
@@ -223,6 +256,14 @@ private func hasCustomDumpIgnored(_ varDecl: VariableDeclSyntax) -> Bool {
     guard let attribute = attribute.as(AttributeSyntax.self) else { return false }
     let name = attribute.attributeName.trimmedDescription
     return name.split(separator: ".").last == "CustomDumpIgnored"
+  }
+}
+
+private func hasCustomDump(_ varDecl: VariableDeclSyntax) -> Bool {
+  return attributes(of: varDecl).contains { attribute in
+    guard let attribute = attribute.as(AttributeSyntax.self) else { return false }
+    let name = attribute.attributeName.trimmedDescription
+    return name.split(separator: ".").last == "CustomDump"
   }
 }
 

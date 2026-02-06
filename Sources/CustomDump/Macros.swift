@@ -8,6 +8,7 @@
   conformances: CustomDumpRepresentable,
   names: named(CustomDumpValue), named(customDumpValue), named(customDumpSubjectType)
 )
+@attached(peer)
 public macro CustomDump() = #externalMacro(module: "CustomDumpMacros", type: "CustomDumpMacro")
 
 /// Flags a property to be ignored by `@CustomDump`.

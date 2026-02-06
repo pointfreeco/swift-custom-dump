@@ -233,6 +233,68 @@
       }
     }
 
+    @Test func customDumpProperty() {
+      assertMacro {
+        """
+        @CustomDump
+        final class FeatureModel {
+          @CustomDump var child: Child
+          var count: Int
+
+          init(child: Child, count: Int) {
+            self.child = child
+            self.count = count
+          }
+        }
+        """
+      } expansion: {
+        """
+        final class FeatureModel {
+          var child: Child
+          var count: Int
+
+          init(child: Child, count: Int) {
+            self.child = child
+            self.count = count
+          }
+        }
+
+        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+          public struct CustomDumpValue: Equatable {
+            public var child: Child.CustomDumpValue
+            public var count: Int
+          }
+          public var customDumpValue: CustomDumpValue {
+            CustomDumpValue(child: self.child.customDumpValue, count: self.count)
+          }
+          public var customDumpSubjectType: Any.Type {
+            FeatureModel.self
+          }
+        }
+        """
+      }
+    }
+
+    @Test func customDumpPropertyMissingTypeAnnotation() {
+      assertMacro {
+        """
+        @CustomDump
+        final class FeatureModel {
+          @CustomDump var child = Child()
+        }
+        """
+      } diagnostics: {
+        """
+        @CustomDump
+        final class FeatureModel {
+          @CustomDump var child = Child()
+                          ┬──────────────
+                          ╰─ 🛑 '@CustomDump' requires explicit type annotations for '@CustomDump' properties.
+        }
+        """
+      }
+    }
+
     @Test func missingTypeAnnotation() {
       assertMacro {
         """
