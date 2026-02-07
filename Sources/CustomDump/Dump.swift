@@ -86,6 +86,7 @@ public func customDump<T, TargetStream>(
 @discardableResult
 func _customDump<T, TargetStream>(
   _ value: T,
+  subjectType: Any.Type? = nil,
   to target: inout TargetStream,
   name: String?,
   nameSuffix: String = ":",
@@ -441,6 +442,7 @@ func _customDump<T, TargetStream>(
 
   customDumpHelp(
     value,
+    subjectType: subjectType,
     to: &target,
     name: name,
     nameSuffix: nameSuffix,
@@ -453,6 +455,7 @@ func _customDump<T, TargetStream>(
 
 func _customDump(
   _ value: Any,
+  subjectType: Any.Type? = nil,
   name: String?,
   nameSuffix: String = ":",
   indent: Int,
@@ -465,6 +468,7 @@ func _customDump(
   defer { tracker = t }
   _customDump(
     value,
+    subjectType: subjectType,
     to: &out,
     name: name,
     nameSuffix: nameSuffix,

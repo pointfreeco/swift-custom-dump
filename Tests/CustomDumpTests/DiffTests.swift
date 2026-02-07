@@ -1199,6 +1199,40 @@ final class DiffTests: XCTestCase {
     )
   }
 
+  func testCustomDumpRepresentableUsesSubjectTypeForUnchangedValues() {
+    struct Wrapped: CustomDumpRepresentable, Equatable {
+      struct Value: Equatable {
+        var value: Int
+      }
+
+      var value: Int
+      var customDumpValue: Value {
+        Value(value: self.value)
+      }
+      var customDumpSubjectType: Any.Type {
+        Self.self
+      }
+    }
+    struct State: Equatable {
+      var wrapped: Wrapped
+      var count: Int
+    }
+
+    expectNoDifference(
+      diff(
+        State(wrapped: Wrapped(value: 42), count: 1),
+        State(wrapped: Wrapped(value: 42), count: 2)
+      ),
+      """
+        DiffTests.State(
+          wrapped: DiffTests.Wrapped(…),
+      -   count: 1
+      +   count: 2
+        )
+      """
+    )
+  }
+
   func testObservationRegistrarFiltered() {
     struct ObservationRegistrar: Equatable {}
     struct Value: Equatable {

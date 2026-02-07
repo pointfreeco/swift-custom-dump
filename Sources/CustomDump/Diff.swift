@@ -40,9 +40,14 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
     isRoot: Bool
   ) -> String {
     let rhsName = rhsName ?? lhsName
+    let lhsMirror = Mirror(customDumpReflecting: lhs)
+    let rhsMirror = Mirror(customDumpReflecting: rhs)
+    let lhsSubjectType = lhsSubjectType ?? lhsMirror.subjectType
+    let rhsSubjectType = rhsSubjectType ?? rhsMirror.subjectType
     guard lhsName != rhsName || !isMirrorEqual(lhs, rhs) else {
       return _customDump(
         lhs,
+        subjectType: rhsSubjectType,
         name: rhsName,
         indent: indent,
         isRoot: isRoot,
@@ -53,15 +58,12 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
       .indenting(with: format.both + " ")
     }
 
-    let lhsMirror = Mirror(customDumpReflecting: lhs)
-    let rhsMirror = Mirror(customDumpReflecting: rhs)
-    let lhsSubjectType = lhsSubjectType ?? lhsMirror.subjectType
-    let rhsSubjectType = rhsSubjectType ?? rhsMirror.subjectType
     var out = ""
 
     func diffEverything() {
       var lhs = _customDump(
         lhs,
+        subjectType: lhsSubjectType,
         name: lhsName,
         indent: indent,
         isRoot: isRoot,
@@ -70,6 +72,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
       )
       var rhs = _customDump(
         rhs,
+        subjectType: rhsSubjectType,
         name: rhsName,
         indent: indent,
         isRoot: isRoot,
@@ -169,25 +172,27 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
 
       guard !lhsMirror.isSingleValueContainer && !rhsMirror.isSingleValueContainer
       else {
-        print(
-          _customDump(
-            lhs,
-            name: lhsName,
-            nameSuffix: nameSuffix,
-            indent: indent,
-            isRoot: isRoot,
+          print(
+            _customDump(
+              lhs,
+              subjectType: lhsSubjectType,
+              name: lhsName,
+              nameSuffix: nameSuffix,
+              indent: indent,
+              isRoot: isRoot,
             maxDepth: .max,
             tracker: &tracker
           )
           .indenting(with: format.first + " "),
           to: &out
         )
-        print(
-          _customDump(
-            rhs,
-            name: rhsName,
-            nameSuffix: nameSuffix,
-            indent: indent,
+          print(
+            _customDump(
+              rhs,
+              subjectType: rhsSubjectType,
+              name: rhsName,
+              nameSuffix: nameSuffix,
+              indent: indent,
             isRoot: isRoot,
             maxDepth: .max,
             tracker: &tracker
