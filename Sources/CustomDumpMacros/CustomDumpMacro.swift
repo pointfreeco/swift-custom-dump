@@ -64,9 +64,12 @@ public enum CustomDumpMacro: ExtensionMacro {
       }
       .joined(separator: ", ")
 
+    let conformancesDescription = customDumpValueConformances.isEmpty
+      ? ""
+      : ": \(customDumpValueConformances.joined(separator: ", "))"
     let representation =
       """
-      \(declarationAccessModifier)struct CustomDumpValue: \(customDumpValueConformances.joined(separator: ", ")) {
+      \(declarationAccessModifier)struct CustomDumpValue\(conformancesDescription) {
       \(propertyLines.joined(separator: "\n"))
       }
       """
@@ -423,7 +426,7 @@ private func customDumpValueConformances(
   for declaration: some DeclGroupSyntax,
   properties: [ModelDecl.Property]
 ) -> [String] {
-  var conformances = ["Equatable"]
+  var conformances: [String] = []
   if let sendableConformance = sendableConformance(in: declaration) {
     conformances.append(sendableConformance)
   }
