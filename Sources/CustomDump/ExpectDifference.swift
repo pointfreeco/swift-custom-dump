@@ -229,23 +229,23 @@ public func expectDifference<T: Equatable>(
     }
   }
 
-  public func expectDifference<T: CustomDumpRepresentable & Sendable>(
+  public func expectDifference<T: DebugSnapshotRepresentable & Sendable>(
     _ expression: @autoclosure @Sendable () throws -> T,
     _ message: @autoclosure @Sendable () -> String? = nil,
     operation: @Sendable () async throws -> Void,
-    changes updateExpectingResult: @Sendable (inout T.CustomDumpValue) throws -> Void,
+    changes updateExpectingResult: @Sendable (inout T.DebugSnapshot) throws -> Void,
     fileID: StaticString = #fileID,
     filePath: StaticString = #filePath,
     line: UInt = #line,
     column: UInt = #column
-  ) async where T.CustomDumpValue: Equatable {
+  ) async where T.DebugSnapshot: Equatable {
     do {
       let originalModel = try expression()
-      let original = originalModel.customDumpValue
+      let original = originalModel._debugSnapshot
       try await operation()
       var expected = original
       try updateExpectingResult(&expected)
-      let actual = try expression().customDumpValue
+      let actual = try expression()._debugSnapshot
       expectDifferenceHelp(
         original: original,
         expected: expected,

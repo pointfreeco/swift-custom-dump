@@ -2,7 +2,7 @@ import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxMacros
 
-public enum CustomDumpMacro: ExtensionMacro, MemberMacro {
+public enum DebugSnapshotMacro: ExtensionMacro, MemberMacro {
   public static func expansion(
     of node: SwiftSyntax.AttributeSyntax,
     providingMembersOf declaration: some SwiftSyntax.DeclGroupSyntax,
@@ -29,9 +29,9 @@ public enum CustomDumpMacro: ExtensionMacro, MemberMacro {
       conformanceIsolation = ""
     #endif
     let conformance =
-      hasCustomDumpRepresentableConformance(declaration)
+      hasDebugSnapshotRepresentableConformance(declaration)
       ? ""
-      : ": \(conformanceIsolation)CustomDump.CustomDumpRepresentable"
+      : ": \(conformanceIsolation)CustomDump.DebugSnapshotRepresentable"
     return [
       DeclSyntax(
         """
@@ -48,16 +48,16 @@ private func memberDeclarations(
   declaration: some DeclGroupSyntax
 ) -> [DeclSyntax] {
   let properties = modelDecl.properties
-  let customDumpValueConformances = customDumpValueConformances(
+  let debugSnapshotConformances = debugSnapshotConformances(
     for: declaration,
     properties: properties
   )
 
   let propertyLines = properties.map { property in
-    let customDumpValueSuffix = property.isCustomDumpRepresentable ? ".CustomDumpValue" : ""
+    let debugSnapshotSuffix = property.isDebugSnapshotRepresentable ? ".DebugSnapshot" : ""
     switch property.kind {
     case .type(let type):
-      return "public var \(property.name): \(type)\(customDumpValueSuffix)"
+      return "public var \(property.name): \(type)\(debugSnapshotSuffix)"
     case .initializer(let defaultValue):
       let defaultValue = rewriteDefaultValue(
         defaultValue,
@@ -65,8 +65,8 @@ private func memberDeclarations(
         propertyTypeName: nil
       )
       .trimmedDescription
-      if property.isCustomDumpRepresentable {
-        return "public var \(property.name) = (\(defaultValue)).customDumpValue"
+      if property.isDebugSnapshotRepresentable {
+        return "public var \(property.name) = (\(defaultValue))._debugSnapshot"
       } else {
         return "public var \(property.name) = \(defaultValue)"
       }
@@ -77,10 +77,10 @@ private func memberDeclarations(
         propertyTypeName: type
       )
       .trimmedDescription
-      if property.isCustomDumpRepresentable {
+      if property.isDebugSnapshotRepresentable {
         return """
-          public var \(property.name): \(type)\(customDumpValueSuffix) = \
-          (\(defaultValue)).customDumpValue
+          public var \(property.name): \(type)\(debugSnapshotSuffix) = \
+          (\(defaultValue))._debugSnapshot
           """
       } else {
         return "public var \(property.name): \(type) = \(defaultValue)"
@@ -91,43 +91,34 @@ private func memberDeclarations(
   let initArguments =
     properties
     .map {
-      "\($0.name): self.\($0.name)\($0.isCustomDumpRepresentable ? ".customDumpValue" : "")"
+      "\($0.name): self.\($0.name)\($0.isDebugSnapshotRepresentable ? "._debugSnapshot" : "")"
     }
     .joined(separator: ", ")
 
-  let conformancesDescription = customDumpValueConformances.isEmpty
+  let conformancesDescription = debugSnapshotConformances.isEmpty
     ? ""
-    : ": \(customDumpValueConformances.joined(separator: ", "))"
+    : ": \(debugSnapshotConformances.joined(separator: ", "))"
   let representation =
     DeclSyntax(
       """
-      public struct CustomDumpValue\(raw: conformancesDescription) {
+      public struct DebugSnapshot\(raw: conformancesDescription) {
       \(raw: propertyLines.joined(separator: "\n"))
       }
       """
     )
 
-  let customDumpValue =
+  let _debugSnapshot =
     DeclSyntax(
       """
-      public var customDumpValue: CustomDumpValue {
-      CustomDumpValue(\(raw: initArguments))
+      public var _debugSnapshot: DebugSnapshot {
+      DebugSnapshot(\(raw: initArguments))
       }
       """
     )
-  let customDumpSubjectType =
-    DeclSyntax(
-      """
-      public var customDumpSubjectType: Any.Type {
-      Self.self
-      }
-      """
-    )
-
-  return [representation, customDumpValue, customDumpSubjectType]
+  return [representation, _debugSnapshot]
 }
 
-enum CustomDumpValueMacro: PeerMacro {
+enum DebugSnapshotValueMacro: PeerMacro {
   public static func expansion(
     of node: SwiftSyntax.AttributeSyntax,
     providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
@@ -137,7 +128,7 @@ enum CustomDumpValueMacro: PeerMacro {
   }
 }
 
-enum CustomDumpIgnoredMacro: PeerMacro {
+enum DebugSnapshotIgnoredMacro: PeerMacro {
   public static func expansion(
     of node: SwiftSyntax.AttributeSyntax,
     providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
@@ -151,7 +142,7 @@ private struct ModelDecl {
   struct Property {
     var name: String
     var kind: Kind
-    var isCustomDumpRepresentable: Bool
+    var isDebugSnapshotRepresentable: Bool
 
     enum Kind {
       case type(String)
@@ -175,7 +166,7 @@ private struct ModelDecl {
         Diagnostic(
           node: Syntax(declaration),
           message: MacroExpansionErrorMessage(
-            "'@CustomDump' can only be applied to classes and structs."
+            "'@DebugSnapshot' can only be applied to classes and structs."
           )
         )
       )
@@ -206,9 +197,9 @@ private struct ModelDecl {
       else { return nil }
       guard accessControl(for: varDecl).effectiveAccessLevel >= requiredAccess
       else { return nil }
-      guard !hasCustomDumpIgnored(varDecl)
+      guard !hasDebugSnapshotIgnored(varDecl)
       else { return nil }
-      let isCustomDumpRepresentable = hasCustomDump(varDecl)
+      let isDebugSnapshotRepresentable = hasDebugSnapshot(varDecl)
 
       return varDecl.bindings.compactMap { binding in
         guard let identifier = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text
@@ -230,7 +221,7 @@ private struct ModelDecl {
             Diagnostic(
               node: Syntax(binding),
               message: MacroExpansionErrorMessage(
-                "'@CustomDump' requires explicit type annotations for stored properties."
+                "'@DebugSnapshot' requires explicit type annotations for stored properties."
               ),
               fixIt: .replaceChild(
                 message: MacroExpansionFixItMessage("Insert ': <#Type#>'"),
@@ -248,7 +239,7 @@ private struct ModelDecl {
           return ModelDecl.Property(
             name: identifier,
             kind: .initializer(defaultValue),
-            isCustomDumpRepresentable: isCustomDumpRepresentable
+            isDebugSnapshotRepresentable: isDebugSnapshotRepresentable
           )
         case (let typeAnnotation?, nil):
           guard !isClosureType(typeAnnotation)
@@ -257,12 +248,12 @@ private struct ModelDecl {
           return ModelDecl.Property(
             name: identifier,
             kind: .type(typeAnnotation.trimmedDescription),
-            isCustomDumpRepresentable: isCustomDumpRepresentable
+            isDebugSnapshotRepresentable: isDebugSnapshotRepresentable
           )
         case (let typeAnnotation?, let defaultValue?):
           guard !isClosureType(typeAnnotation)
           else { return nil }
-          guard !isClosureInitializer(defaultValue) || isCustomDumpRepresentable
+          guard !isClosureInitializer(defaultValue) || isDebugSnapshotRepresentable
           else { return nil }
 
           return ModelDecl.Property(
@@ -271,7 +262,7 @@ private struct ModelDecl {
               type: typeAnnotation.trimmedDescription,
               initializer: defaultValue
             ),
-            isCustomDumpRepresentable: isCustomDumpRepresentable
+            isDebugSnapshotRepresentable: isDebugSnapshotRepresentable
           )
         }
       }
@@ -280,19 +271,19 @@ private struct ModelDecl {
   }
 }
 
-private func hasCustomDumpIgnored(_ varDecl: VariableDeclSyntax) -> Bool {
+private func hasDebugSnapshotIgnored(_ varDecl: VariableDeclSyntax) -> Bool {
   return attributes(of: varDecl).contains { attribute in
     guard let attribute = attribute.as(AttributeSyntax.self) else { return false }
     let name = attribute.attributeName.trimmedDescription
-    return name.split(separator: ".").last == "CustomDumpIgnored"
+    return name.split(separator: ".").last == "DebugSnapshotIgnored"
   }
 }
 
-private func hasCustomDump(_ varDecl: VariableDeclSyntax) -> Bool {
+private func hasDebugSnapshot(_ varDecl: VariableDeclSyntax) -> Bool {
   return attributes(of: varDecl).contains { attribute in
     guard let attribute = attribute.as(AttributeSyntax.self) else { return false }
     let name = attribute.attributeName.trimmedDescription
-    return name.split(separator: ".").last == "CustomDumpValue"
+    return name.split(separator: ".").last == "DebugSnapshotValue"
   }
 }
 
@@ -421,11 +412,11 @@ private func hasMainActorAnnotation(_ declaration: some DeclGroupSyntax) -> Bool
   }
 }
 
-private func hasCustomDumpRepresentableConformance(_ declaration: some DeclGroupSyntax) -> Bool {
-  return hasConformance(named: "CustomDumpRepresentable", in: declaration)
+private func hasDebugSnapshotRepresentableConformance(_ declaration: some DeclGroupSyntax) -> Bool {
+  return hasConformance(named: "DebugSnapshotRepresentable", in: declaration)
 }
 
-private func customDumpValueConformances(
+private func debugSnapshotConformances(
   for declaration: some DeclGroupSyntax,
   properties: [ModelDecl.Property]
 ) -> [String] {

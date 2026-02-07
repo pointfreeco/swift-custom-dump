@@ -31,8 +31,6 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
   func diffHelp(
     _ lhs: Any,
     _ rhs: Any,
-    lhsSubjectType: Any.Type? = nil,
-    rhsSubjectType: Any.Type? = nil,
     lhsName: String?,
     rhsName: String?,
     separator: String,
@@ -42,12 +40,11 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
     let rhsName = rhsName ?? lhsName
     let lhsMirror = Mirror(customDumpReflecting: lhs)
     let rhsMirror = Mirror(customDumpReflecting: rhs)
-    let lhsSubjectType = lhsSubjectType ?? lhsMirror.subjectType
-    let rhsSubjectType = rhsSubjectType ?? rhsMirror.subjectType
+    let lhsSubjectType = lhsMirror.subjectType
+    let rhsSubjectType = rhsMirror.subjectType
     guard lhsName != rhsName || !isMirrorEqual(lhs, rhs) else {
       return _customDump(
         lhs,
-        subjectType: rhsSubjectType,
         name: rhsName,
         indent: indent,
         isRoot: isRoot,
@@ -63,7 +60,6 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
     func diffEverything() {
       var lhs = _customDump(
         lhs,
-        subjectType: lhsSubjectType,
         name: lhsName,
         indent: indent,
         isRoot: isRoot,
@@ -72,7 +68,6 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
       )
       var rhs = _customDump(
         rhs,
-        subjectType: rhsSubjectType,
         name: rhsName,
         indent: indent,
         isRoot: isRoot,
@@ -175,7 +170,6 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
           print(
             _customDump(
               lhs,
-              subjectType: lhsSubjectType,
               name: lhsName,
               nameSuffix: nameSuffix,
               indent: indent,
@@ -189,7 +183,6 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
           print(
             _customDump(
               rhs,
-              subjectType: rhsSubjectType,
               name: rhsName,
               nameSuffix: nameSuffix,
               indent: indent,
@@ -409,13 +402,27 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         diffEverything()
       }
 
+    case (
+      let lhs as any DebugSnapshotRepresentable, _,
+      let rhs as any DebugSnapshotRepresentable, _
+    ):
+      out.write(
+        diffHelp(
+          lhs._debugSnapshot,
+          rhs._debugSnapshot,
+          lhsName: lhsName,
+          rhsName: rhsName,
+          separator: separator,
+          indent: indent,
+          isRoot: isRoot
+        )
+      )
+
     case (let lhs as any CustomDumpRepresentable, _, let rhs as any CustomDumpRepresentable, _):
       out.write(
         diffHelp(
           lhs.customDumpValue,
           rhs.customDumpValue,
-          lhsSubjectType: lhs.customDumpSubjectType,
-          rhsSubjectType: rhs.customDumpSubjectType,
           lhsName: lhsName,
           rhsName: rhsName,
           separator: separator,

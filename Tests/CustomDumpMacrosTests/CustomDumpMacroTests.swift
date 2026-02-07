@@ -6,7 +6,7 @@
 
   @Suite(
     .macros(
-      [CustomDumpMacro.self],
+      [DebugSnapshotMacro.self],
       record: .missing
     )
   )
@@ -14,12 +14,12 @@
     @Test func basics() {
       assertMacro {
         """
-        @CustomDump
+        @DebugSnapshot
         final class FeatureModel {
           private var count: Int
           var title: String
           var onChange: (Int) -> Void
-          @CustomDumpIgnored var ignored: UUID
+          @DebugSnapshotIgnored var ignored: UUID
 
           init(count: Int, title: String, onChange: @escaping (Int) -> Void, ignored: UUID) {
             self.count = count
@@ -35,7 +35,7 @@
           private var count: Int
           var title: String
           var onChange: (Int) -> Void
-          @CustomDumpIgnored var ignored: UUID
+          @DebugSnapshotIgnored var ignored: UUID
 
           init(count: Int, title: String, onChange: @escaping (Int) -> Void, ignored: UUID) {
             self.count = count
@@ -44,20 +44,16 @@
             self.ignored = ignored
           }
 
-          public struct CustomDumpValue {
+          public struct DebugSnapshot {
             public var title: String
           }
 
-          public var customDumpValue: CustomDumpValue {
-            CustomDumpValue(title: self.title)
-          }
-
-          public var customDumpSubjectType: Any.Type {
-            Self.self
+          public var _debugSnapshot: DebugSnapshot {
+            DebugSnapshot(title: self.title)
           }
         }
 
-        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+        extension FeatureModel: CustomDump.DebugSnapshotRepresentable {
         }
         """
       }
@@ -67,7 +63,7 @@
       assertMacro {
         """
         @MainActor
-        @CustomDump
+        @DebugSnapshot
         final class FeatureModel {
           var count: Int
 
@@ -86,20 +82,16 @@
             self.count = count
           }
 
-          public struct CustomDumpValue {
+          public struct DebugSnapshot {
             public var count: Int
           }
 
-          public var customDumpValue: CustomDumpValue {
-            CustomDumpValue(count: self.count)
-          }
-
-          public var customDumpSubjectType: Any.Type {
-            Self.self
+          public var _debugSnapshot: DebugSnapshot {
+            DebugSnapshot(count: self.count)
           }
         }
 
-        extension FeatureModel: @MainActor CustomDump.CustomDumpRepresentable {
+        extension FeatureModel: @MainActor CustomDump.DebugSnapshotRepresentable {
         }
         """
       }
@@ -108,8 +100,8 @@
     @Test func alreadyConforms() {
       assertMacro {
         """
-        @CustomDump
-        final class FeatureModel: CustomDumpRepresentable {
+        @DebugSnapshot
+        final class FeatureModel: DebugSnapshotRepresentable {
           var count: Int
 
           init(count: Int) {
@@ -119,23 +111,19 @@
         """
       } expansion: {
         """
-        final class FeatureModel: CustomDumpRepresentable {
+        final class FeatureModel: DebugSnapshotRepresentable {
           var count: Int
 
           init(count: Int) {
             self.count = count
           }
 
-          public struct CustomDumpValue {
+          public struct DebugSnapshot {
             public var count: Int
           }
 
-          public var customDumpValue: CustomDumpValue {
-            CustomDumpValue(count: self.count)
-          }
-
-          public var customDumpSubjectType: Any.Type {
-            Self.self
+          public var _debugSnapshot: DebugSnapshot {
+            DebugSnapshot(count: self.count)
           }
         }
 
@@ -148,9 +136,9 @@
     @Test func alreadyConformsMainActor() {
       assertMacro {
         """
-        @CustomDump
+        @DebugSnapshot
         @MainActor
-        final class FeatureModel: @MainActor CustomDumpRepresentable {
+        final class FeatureModel: @MainActor DebugSnapshotRepresentable {
           var count: Int
 
           init(count: Int) {
@@ -161,23 +149,19 @@
       } expansion: {
         """
         @MainActor
-        final class FeatureModel: @MainActor CustomDumpRepresentable {
+        final class FeatureModel: @MainActor DebugSnapshotRepresentable {
           var count: Int
 
           init(count: Int) {
             self.count = count
           }
 
-          public struct CustomDumpValue {
+          public struct DebugSnapshot {
             public var count: Int
           }
 
-          public var customDumpValue: CustomDumpValue {
-            CustomDumpValue(count: self.count)
-          }
-
-          public var customDumpSubjectType: Any.Type {
-            Self.self
+          public var _debugSnapshot: DebugSnapshot {
+            DebugSnapshot(count: self.count)
           }
         }
 
@@ -190,7 +174,7 @@
     @Test func emptyClass() {
       assertMacro {
         """
-        @CustomDump
+        @DebugSnapshot
         final class EmptyModel {
           init() {}
         }
@@ -200,20 +184,16 @@
         final class EmptyModel {
           init() {}
 
-          public struct CustomDumpValue {
+          public struct DebugSnapshot {
 
           }
 
-          public var customDumpValue: CustomDumpValue {
-            CustomDumpValue()
-          }
-
-          public var customDumpSubjectType: Any.Type {
-            Self.self
+          public var _debugSnapshot: DebugSnapshot {
+            DebugSnapshot()
           }
         }
 
-        extension EmptyModel: CustomDump.CustomDumpRepresentable {
+        extension EmptyModel: CustomDump.DebugSnapshotRepresentable {
         }
         """
       }
@@ -222,7 +202,7 @@
     @Test func privateTypeUsesFileprivateMembers() {
       assertMacro {
         """
-        @CustomDump
+        @DebugSnapshot
         private final class FeatureModel {
           var count: Int
 
@@ -240,20 +220,16 @@
             self.count = count
           }
 
-          public struct CustomDumpValue {
+          public struct DebugSnapshot {
             public var count: Int
           }
 
-          public var customDumpValue: CustomDumpValue {
-            CustomDumpValue(count: self.count)
-          }
-
-          public var customDumpSubjectType: Any.Type {
-            Self.self
+          public var _debugSnapshot: DebugSnapshot {
+            DebugSnapshot(count: self.count)
           }
         }
 
-        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+        extension FeatureModel: CustomDump.DebugSnapshotRepresentable {
         }
         """
       }
@@ -263,7 +239,7 @@
       assertMacro {
         """
         private struct Parent {
-          @CustomDump
+          @DebugSnapshot
           final class FeatureModel {
             var count: Int
 
@@ -283,21 +259,17 @@
               self.count = count
             }
 
-            public struct CustomDumpValue {
+            public struct DebugSnapshot {
               public var count: Int
             }
 
-            public var customDumpValue: CustomDumpValue {
-              CustomDumpValue(count: self.count)
-            }
-
-            public var customDumpSubjectType: Any.Type {
-              Self.self
+            public var _debugSnapshot: DebugSnapshot {
+              DebugSnapshot(count: self.count)
             }
           }
         }
 
-        extension Parent.FeatureModel: CustomDump.CustomDumpRepresentable {
+        extension Parent.FeatureModel: CustomDump.DebugSnapshotRepresentable {
         }
         """
       }
@@ -306,7 +278,7 @@
     @Test func defaultLiteral() {
       assertMacro {
         """
-        @CustomDump
+        @DebugSnapshot
         final class FeatureModel {
           var count = 0
         }
@@ -316,20 +288,16 @@
         final class FeatureModel {
           var count = 0
 
-          public struct CustomDumpValue {
+          public struct DebugSnapshot {
             public var count = 0
           }
 
-          public var customDumpValue: CustomDumpValue {
-            CustomDumpValue(count: self.count)
-          }
-
-          public var customDumpSubjectType: Any.Type {
-            Self.self
+          public var _debugSnapshot: DebugSnapshot {
+            DebugSnapshot(count: self.count)
           }
         }
 
-        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+        extension FeatureModel: CustomDump.DebugSnapshotRepresentable {
         }
         """
       }
@@ -338,9 +306,9 @@
     @Test func customDumpProperty() {
       assertMacro {
         """
-        @CustomDump
+        @DebugSnapshot
         final class FeatureModel {
-          @CustomDumpValue var child: Child
+          @DebugSnapshotValue var child: Child
           var count: Int
 
           init(child: Child, count: Int) {
@@ -352,7 +320,7 @@
       } expansion: {
         """
         final class FeatureModel {
-          @CustomDumpValue var child: Child
+          @DebugSnapshotValue var child: Child
           var count: Int
 
           init(child: Child, count: Int) {
@@ -360,21 +328,17 @@
             self.count = count
           }
 
-          public struct CustomDumpValue {
-            public var child: Child.CustomDumpValue
+          public struct DebugSnapshot {
+            public var child: Child.DebugSnapshot
             public var count: Int
           }
 
-          public var customDumpValue: CustomDumpValue {
-            CustomDumpValue(child: self.child.customDumpValue, count: self.count)
-          }
-
-          public var customDumpSubjectType: Any.Type {
-            Self.self
+          public var _debugSnapshot: DebugSnapshot {
+            DebugSnapshot(child: self.child._debugSnapshot, count: self.count)
           }
         }
 
-        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+        extension FeatureModel: CustomDump.DebugSnapshotRepresentable {
         }
         """
       }
@@ -383,7 +347,7 @@
     @Test func customDumpValueInheritsSendableNotHashable() {
       assertMacro {
         """
-        @CustomDump
+        @DebugSnapshot
         final class FeatureModel: Hashable, Sendable {
           var count: Int
 
@@ -401,20 +365,16 @@
             self.count = count
           }
 
-          public struct CustomDumpValue: Sendable {
+          public struct DebugSnapshot: Sendable {
             public var count: Int
           }
 
-          public var customDumpValue: CustomDumpValue {
-            CustomDumpValue(count: self.count)
-          }
-
-          public var customDumpSubjectType: Any.Type {
-            Self.self
+          public var _debugSnapshot: DebugSnapshot {
+            DebugSnapshot(count: self.count)
           }
         }
 
-        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+        extension FeatureModel: CustomDump.DebugSnapshotRepresentable {
         }
         """
       }
@@ -423,7 +383,7 @@
     @Test func customDumpValueInheritsSendableOnly() {
       assertMacro {
         """
-        @CustomDump
+        @DebugSnapshot
         struct FeatureModel: Sendable {
           var count: Int
         }
@@ -433,20 +393,16 @@
         struct FeatureModel: Sendable {
           var count: Int
 
-          public struct CustomDumpValue: Sendable {
+          public struct DebugSnapshot: Sendable {
             public var count: Int
           }
 
-          public var customDumpValue: CustomDumpValue {
-            CustomDumpValue(count: self.count)
-          }
-
-          public var customDumpSubjectType: Any.Type {
-            Self.self
+          public var _debugSnapshot: DebugSnapshot {
+            DebugSnapshot(count: self.count)
           }
         }
 
-        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+        extension FeatureModel: CustomDump.DebugSnapshotRepresentable {
         }
         """
       }
@@ -455,7 +411,7 @@
     @Test func customDumpValueInheritsUncheckedSendable() {
       assertMacro {
         """
-        @CustomDump
+        @DebugSnapshot
         final class FeatureModel: @unchecked Sendable {
           var count: Int
         }
@@ -465,20 +421,16 @@
         final class FeatureModel: @unchecked Sendable {
           var count: Int
 
-          public struct CustomDumpValue: @unchecked Sendable {
+          public struct DebugSnapshot: @unchecked Sendable {
             public var count: Int
           }
 
-          public var customDumpValue: CustomDumpValue {
-            CustomDumpValue(count: self.count)
-          }
-
-          public var customDumpSubjectType: Any.Type {
-            Self.self
+          public var _debugSnapshot: DebugSnapshot {
+            DebugSnapshot(count: self.count)
           }
         }
 
-        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+        extension FeatureModel: CustomDump.DebugSnapshotRepresentable {
         }
         """
       }
@@ -487,7 +439,7 @@
     @Test func customDumpValueInheritsIdentifiableWhenIDIncluded() {
       assertMacro {
         """
-        @CustomDump
+        @DebugSnapshot
         struct FeatureModel: Identifiable {
           var id: UUID
           var count: Int
@@ -499,21 +451,17 @@
           var id: UUID
           var count: Int
 
-          public struct CustomDumpValue: Identifiable {
+          public struct DebugSnapshot: Identifiable {
             public var id: UUID
             public var count: Int
           }
 
-          public var customDumpValue: CustomDumpValue {
-            CustomDumpValue(id: self.id, count: self.count)
-          }
-
-          public var customDumpSubjectType: Any.Type {
-            Self.self
+          public var _debugSnapshot: DebugSnapshot {
+            DebugSnapshot(id: self.id, count: self.count)
           }
         }
 
-        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+        extension FeatureModel: CustomDump.DebugSnapshotRepresentable {
         }
         """
       }
@@ -522,32 +470,28 @@
     @Test func customDumpValueDoesNotInheritIdentifiableWhenIDExcluded() {
       assertMacro {
         """
-        @CustomDump
+        @DebugSnapshot
         struct FeatureModel: Identifiable {
-          @CustomDumpIgnored var id: UUID
+          @DebugSnapshotIgnored var id: UUID
           var count: Int
         }
         """
       } expansion: {
         """
         struct FeatureModel: Identifiable {
-          @CustomDumpIgnored var id: UUID
+          @DebugSnapshotIgnored var id: UUID
           var count: Int
 
-          public struct CustomDumpValue {
+          public struct DebugSnapshot {
             public var count: Int
           }
 
-          public var customDumpValue: CustomDumpValue {
-            CustomDumpValue(count: self.count)
-          }
-
-          public var customDumpSubjectType: Any.Type {
-            Self.self
+          public var _debugSnapshot: DebugSnapshot {
+            DebugSnapshot(count: self.count)
           }
         }
 
-        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+        extension FeatureModel: CustomDump.DebugSnapshotRepresentable {
         }
         """
       }
@@ -556,30 +500,26 @@
     @Test func customDumpPropertyInferredTypeFromInitializer() {
       assertMacro {
         """
-        @CustomDump
+        @DebugSnapshot
         final class FeatureModel {
-          @CustomDumpValue var child = Child()
+          @DebugSnapshotValue var child = Child()
         }
         """
       } expansion: {
         """
         final class FeatureModel {
-          @CustomDumpValue var child = Child()
+          @DebugSnapshotValue var child = Child()
 
-          public struct CustomDumpValue {
-            public var child = (Child()).customDumpValue
+          public struct DebugSnapshot {
+            public var child = (Child())._debugSnapshot
           }
 
-          public var customDumpValue: CustomDumpValue {
-            CustomDumpValue(child: self.child.customDumpValue)
-          }
-
-          public var customDumpSubjectType: Any.Type {
-            Self.self
+          public var _debugSnapshot: DebugSnapshot {
+            DebugSnapshot(child: self.child._debugSnapshot)
           }
         }
 
-        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+        extension FeatureModel: CustomDump.DebugSnapshotRepresentable {
         }
         """
       }
@@ -588,30 +528,26 @@
     @Test func customDumpPropertyInitializerWithExplicitType() {
       assertMacro {
         """
-        @CustomDump
+        @DebugSnapshot
         final class FeatureModel {
-          @CustomDumpValue var child: Child = Child()
+          @DebugSnapshotValue var child: Child = Child()
         }
         """
       } expansion: {
         """
         final class FeatureModel {
-          @CustomDumpValue var child: Child = Child()
+          @DebugSnapshotValue var child: Child = Child()
 
-          public struct CustomDumpValue {
-            public var child: Child.CustomDumpValue = (Child()).customDumpValue
+          public struct DebugSnapshot {
+            public var child: Child.DebugSnapshot = (Child())._debugSnapshot
           }
 
-          public var customDumpValue: CustomDumpValue {
-            CustomDumpValue(child: self.child.customDumpValue)
-          }
-
-          public var customDumpSubjectType: Any.Type {
-            Self.self
+          public var _debugSnapshot: DebugSnapshot {
+            DebugSnapshot(child: self.child._debugSnapshot)
           }
         }
 
-        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+        extension FeatureModel: CustomDump.DebugSnapshotRepresentable {
         }
         """
       }
@@ -620,9 +556,9 @@
     @Test func customDumpPropertyInitializerRewritesSelf() {
       assertMacro {
         """
-        @CustomDump
+        @DebugSnapshot
         final class FeatureModel {
-          @CustomDumpValue var child: Child = Self.makeChild()
+          @DebugSnapshotValue var child: Child = Self.makeChild()
 
           static func makeChild() -> Child {
             Child()
@@ -632,26 +568,22 @@
       } expansion: {
         """
         final class FeatureModel {
-          @CustomDumpValue var child: Child = Self.makeChild()
+          @DebugSnapshotValue var child: Child = Self.makeChild()
 
           static func makeChild() -> Child {
             Child()
           }
 
-          public struct CustomDumpValue {
-            public var child: Child.CustomDumpValue = (FeatureModel.makeChild()).customDumpValue
+          public struct DebugSnapshot {
+            public var child: Child.DebugSnapshot = (FeatureModel.makeChild())._debugSnapshot
           }
 
-          public var customDumpValue: CustomDumpValue {
-            CustomDumpValue(child: self.child.customDumpValue)
-          }
-
-          public var customDumpSubjectType: Any.Type {
-            Self.self
+          public var _debugSnapshot: DebugSnapshot {
+            DebugSnapshot(child: self.child._debugSnapshot)
           }
         }
 
-        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+        extension FeatureModel: CustomDump.DebugSnapshotRepresentable {
         }
         """
       }
@@ -660,30 +592,26 @@
     @Test func customDumpPropertyInitializerStaticShorthand() {
       assertMacro {
         """
-        @CustomDump
+        @DebugSnapshot
         final class FeatureModel {
-          @CustomDumpValue var child: Child = .make()
+          @DebugSnapshotValue var child: Child = .make()
         }
         """
       } expansion: {
         """
         final class FeatureModel {
-          @CustomDumpValue var child: Child = .make()
+          @DebugSnapshotValue var child: Child = .make()
 
-          public struct CustomDumpValue {
-            public var child: Child.CustomDumpValue = (Child.make()).customDumpValue
+          public struct DebugSnapshot {
+            public var child: Child.DebugSnapshot = (Child.make())._debugSnapshot
           }
 
-          public var customDumpValue: CustomDumpValue {
-            CustomDumpValue(child: self.child.customDumpValue)
-          }
-
-          public var customDumpSubjectType: Any.Type {
-            Self.self
+          public var _debugSnapshot: DebugSnapshot {
+            DebugSnapshot(child: self.child._debugSnapshot)
           }
         }
 
-        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+        extension FeatureModel: CustomDump.DebugSnapshotRepresentable {
         }
         """
       }
@@ -692,30 +620,26 @@
     @Test func customDumpPropertyInitializerRewritesNestedSelfTypeReferences() {
       assertMacro {
         """
-        @CustomDump
+        @DebugSnapshot
         final class FeatureModel {
-          @CustomDumpValue var child: Child = Factory<Self>.make()
+          @DebugSnapshotValue var child: Child = Factory<Self>.make()
         }
         """
       } expansion: {
         """
         final class FeatureModel {
-          @CustomDumpValue var child: Child = Factory<Self>.make()
+          @DebugSnapshotValue var child: Child = Factory<Self>.make()
 
-          public struct CustomDumpValue {
-            public var child: Child.CustomDumpValue = (Factory<FeatureModel>.make()).customDumpValue
+          public struct DebugSnapshot {
+            public var child: Child.DebugSnapshot = (Factory<FeatureModel>.make())._debugSnapshot
           }
 
-          public var customDumpValue: CustomDumpValue {
-            CustomDumpValue(child: self.child.customDumpValue)
-          }
-
-          public var customDumpSubjectType: Any.Type {
-            Self.self
+          public var _debugSnapshot: DebugSnapshot {
+            DebugSnapshot(child: self.child._debugSnapshot)
           }
         }
 
-        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+        extension FeatureModel: CustomDump.DebugSnapshotRepresentable {
         }
         """
       }
@@ -724,30 +648,26 @@
     @Test func customDumpPropertyInitializerNestedImplicitMemberUnchanged() {
       assertMacro {
         """
-        @CustomDump
+        @DebugSnapshot
         final class FeatureModel {
-          @CustomDumpValue var child: ChildContainer = ChildContainer(child: .make())
+          @DebugSnapshotValue var child: ChildContainer = ChildContainer(child: .make())
         }
         """
       } expansion: {
         """
         final class FeatureModel {
-          @CustomDumpValue var child: ChildContainer = ChildContainer(child: .make())
+          @DebugSnapshotValue var child: ChildContainer = ChildContainer(child: .make())
 
-          public struct CustomDumpValue {
-            public var child: ChildContainer.CustomDumpValue = (ChildContainer(child: .make())).customDumpValue
+          public struct DebugSnapshot {
+            public var child: ChildContainer.DebugSnapshot = (ChildContainer(child: .make()))._debugSnapshot
           }
 
-          public var customDumpValue: CustomDumpValue {
-            CustomDumpValue(child: self.child.customDumpValue)
-          }
-
-          public var customDumpSubjectType: Any.Type {
-            Self.self
+          public var _debugSnapshot: DebugSnapshot {
+            DebugSnapshot(child: self.child._debugSnapshot)
           }
         }
 
-        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+        extension FeatureModel: CustomDump.DebugSnapshotRepresentable {
         }
         """
       }
@@ -756,9 +676,9 @@
     @Test func customDumpPropertyInitializerClosureInvocationRewritesSelf() {
       assertMacro {
         """
-        @CustomDump
+        @DebugSnapshot
         final class FeatureModel {
-          @CustomDumpValue var child = { Self.makeChild() }()
+          @DebugSnapshotValue var child = { Self.makeChild() }()
 
           static func makeChild() -> Child {
             Child()
@@ -768,28 +688,24 @@
       } expansion: {
         """
         final class FeatureModel {
-          @CustomDumpValue var child = { Self.makeChild() }()
+          @DebugSnapshotValue var child = { Self.makeChild() }()
 
           static func makeChild() -> Child {
             Child()
           }
 
-          public struct CustomDumpValue {
+          public struct DebugSnapshot {
             public var child = ({
                 FeatureModel.makeChild()
-              }()).customDumpValue
+              }())._debugSnapshot
           }
 
-          public var customDumpValue: CustomDumpValue {
-            CustomDumpValue(child: self.child.customDumpValue)
-          }
-
-          public var customDumpSubjectType: Any.Type {
-            Self.self
+          public var _debugSnapshot: DebugSnapshot {
+            DebugSnapshot(child: self.child._debugSnapshot)
           }
         }
 
-        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+        extension FeatureModel: CustomDump.DebugSnapshotRepresentable {
         }
         """
       }
@@ -798,24 +714,24 @@
     @Test func missingTypeAnnotation() {
       assertMacro {
         """
-        @CustomDump
+        @DebugSnapshot
         final class FeatureModel {
           @FetchAll(Reminder.all) var reminders
         }
         """
       } diagnostics: {
         """
-        @CustomDump
+        @DebugSnapshot
         final class FeatureModel {
           @FetchAll(Reminder.all) var reminders
                                       ┬────────
-                                      ╰─ 🛑 '@CustomDump' requires explicit type annotations for stored properties.
+                                      ╰─ 🛑 '@DebugSnapshot' requires explicit type annotations for stored properties.
                                          ✏️ Insert ': <#Type#>'
         }
         """
       } fixes: {
         """
-        @CustomDump
+        @DebugSnapshot
         final class FeatureModel {
           @FetchAll(Reminder.all) var reminders: <#Type#>
         }
@@ -825,20 +741,16 @@
         final class FeatureModel {
           @FetchAll(Reminder.all) var reminders: <#Type#>
 
-          public struct CustomDumpValue {
+          public struct DebugSnapshot {
             public var reminders: <#Type#>
           }
 
-          public var customDumpValue: CustomDumpValue {
-            CustomDumpValue(reminders: self.reminders)
-          }
-
-          public var customDumpSubjectType: Any.Type {
-            Self.self
+          public var _debugSnapshot: DebugSnapshot {
+            DebugSnapshot(reminders: self.reminders)
           }
         }
 
-        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+        extension FeatureModel: CustomDump.DebugSnapshotRepresentable {
         }
         """
       }

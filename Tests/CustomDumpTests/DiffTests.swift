@@ -1199,18 +1199,15 @@ final class DiffTests: XCTestCase {
     )
   }
 
-  func testCustomDumpRepresentableUsesSubjectTypeForUnchangedValues() {
-    struct Wrapped: CustomDumpRepresentable, Equatable {
+  func testDebugSnapshotRepresentableUsesSubjectTypeForUnchangedValues() {
+    struct Wrapped: DebugSnapshotRepresentable, Equatable {
       struct Value: Equatable {
         var value: Int
       }
 
       var value: Int
-      var customDumpValue: Value {
+      var _debugSnapshot: Value {
         Value(value: self.value)
-      }
-      var customDumpSubjectType: Any.Type {
-        Self.self
       }
     }
     struct State: Equatable {
@@ -1225,7 +1222,7 @@ final class DiffTests: XCTestCase {
       ),
       """
         DiffTests.State(
-          wrapped: DiffTests.Wrapped(…),
+          wrapped: DiffTests.Wrapped.Value(value: 42),
       -   count: 1
       +   count: 2
         )

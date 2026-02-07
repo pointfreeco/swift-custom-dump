@@ -20,17 +20,7 @@
 /// ```text
 /// "deadbeef"
 /// ```
-public protocol CustomDumpRepresentable<CustomDumpValue> {
-  /// A type representing the contents of the custom dump.
-  associatedtype CustomDumpValue = Any
-
+public protocol CustomDumpRepresentable {
   /// The custom dump value for this instance.
-  var customDumpValue: CustomDumpValue { get }
-
-  /// A type representing the custom dump.
-  var customDumpSubjectType: Any.Type { get }
-}
-
-extension CustomDumpRepresentable {
-  public var customDumpSubjectType: Any.Type { type(of: customDumpValue as Any) }
+  var customDumpValue: Any { get }
 }

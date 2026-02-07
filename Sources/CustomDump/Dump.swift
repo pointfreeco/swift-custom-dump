@@ -86,7 +86,6 @@ public func customDump<T, TargetStream>(
 @discardableResult
 func _customDump<T, TargetStream>(
   _ value: T,
-  subjectType: Any.Type? = nil,
   to target: inout TargetStream,
   name: String?,
   nameSuffix: String = ":",
@@ -97,7 +96,6 @@ func _customDump<T, TargetStream>(
 ) -> T where TargetStream: TextOutputStream {
   func customDumpHelp<InnerT, InnerTargetStream>(
     _ value: InnerT,
-    subjectType: Any.Type? = nil,
     to target: inout InnerTargetStream,
     name: String?,
     nameSuffix: String,
@@ -115,7 +113,7 @@ func _customDump<T, TargetStream>(
     }
 
     let mirror = Mirror(customDumpReflecting: value)
-    let subjectType = subjectType ?? mirror.subjectType
+    let subjectType = mirror.subjectType
     var out = ""
 
     func dumpChildren(
@@ -222,10 +220,20 @@ func _customDump<T, TargetStream>(
         )
       }
 
+    case (let value as any DebugSnapshotRepresentable, _):
+      customDumpHelp(
+        value._debugSnapshot,
+        to: &out,
+        name: nil,
+        nameSuffix: "",
+        indent: 0,
+        isRoot: false,
+        maxDepth: maxDepth
+      )
+
     case (let value as any CustomDumpRepresentable, _):
       customDumpHelp(
         value.customDumpValue,
-        subjectType: value.customDumpSubjectType,
         to: &out,
         name: nil,
         nameSuffix: "",
@@ -442,7 +450,6 @@ func _customDump<T, TargetStream>(
 
   customDumpHelp(
     value,
-    subjectType: subjectType,
     to: &target,
     name: name,
     nameSuffix: nameSuffix,
@@ -455,7 +462,6 @@ func _customDump<T, TargetStream>(
 
 func _customDump(
   _ value: Any,
-  subjectType: Any.Type? = nil,
   name: String?,
   nameSuffix: String = ":",
   indent: Int,
@@ -468,7 +474,6 @@ func _customDump(
   defer { tracker = t }
   _customDump(
     value,
-    subjectType: subjectType,
     to: &out,
     name: name,
     nameSuffix: nameSuffix,

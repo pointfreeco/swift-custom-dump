@@ -4,8 +4,8 @@ import SwiftSyntaxMacros
 @main
 struct CustomDumpMacrosPlugin: CompilerPlugin {
   let providingMacros: [Macro.Type] = [
-    CustomDumpMacro.self,
-    CustomDumpIgnoredMacro.self,
-    CustomDumpValueMacro.self,
+    DebugSnapshotMacro.self,
+    DebugSnapshotIgnoredMacro.self,
+    DebugSnapshotValueMacro.self,
   ]
 }

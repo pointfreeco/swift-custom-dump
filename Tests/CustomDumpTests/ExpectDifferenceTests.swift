@@ -66,7 +66,7 @@ struct ExpectDifferenceTests {
 //    }
 
     expectNoDifference(
-      String(customDumping: model),
+      String(customDumping: model._debugSnapshot),
       """
       FeatureModel(
         count: 0,
@@ -110,7 +110,7 @@ struct ExpectDifferenceTests {
     let model = StaticShorthandModel()
 
     expectNoDifference(
-      model.customDumpValue.child.count,
+      model._debugSnapshot.child.count,
       42
     )
   }
@@ -119,7 +119,7 @@ struct ExpectDifferenceTests {
     let model = NestedStaticShorthandModel()
 
     expectNoDifference(
-      model.customDumpValue.container.child.count,
+      model._debugSnapshot.container.child.count,
       42
     )
   }
@@ -128,18 +128,18 @@ struct ExpectDifferenceTests {
     let model = StaticShorthandValueModel()
 
     expectNoDifference(
-      model.customDumpValue.child.count,
+      model._debugSnapshot.child.count,
       7
     )
   }
 }
 
-@CustomDump
+@DebugSnapshot
 fileprivate struct FeatureState {
   var count = 0
   @PW var fact: String?
   var isEven: Bool { count.isMultiple(of: 2) }
-  @CustomDumpIgnored
+  @DebugSnapshotIgnored
   var task: Task<Void, Never>?
   mutating func factButtonTapped() async throws {
     await Task.yield()
@@ -148,12 +148,12 @@ fileprivate struct FeatureState {
 }
 
 @MainActor
-@CustomDump
+@DebugSnapshot
 fileprivate class FeatureModel {
   var count = 0
   var fact: String?
   var isEven: Bool { count.isMultiple(of: 2) }
-  @CustomDumpIgnored
+  @DebugSnapshotIgnored
   var task: Task<Void, Never>?
   func increment() { count += 1 }
   func factButtonTapped() async throws {
@@ -169,7 +169,7 @@ struct PW<WrappedValue> {
 }
 extension PW: Sendable where WrappedValue: Sendable {}
 
-@CustomDump
+@DebugSnapshot
 fileprivate struct StaticShorthandChild {
   var count = 0
 
@@ -178,22 +178,22 @@ fileprivate struct StaticShorthandChild {
   }
 }
 
-@CustomDump
+@DebugSnapshot
 fileprivate final class StaticShorthandModel {
-  @CustomDumpValue var child: StaticShorthandChild = .make()
+  @DebugSnapshotValue var child: StaticShorthandChild = .make()
 }
 
-@CustomDump
+@DebugSnapshot
 fileprivate struct ChildContainer {
-  @CustomDumpValue var child: StaticShorthandChild
+  @DebugSnapshotValue var child: StaticShorthandChild
 }
 
-@CustomDump
+@DebugSnapshot
 fileprivate final class NestedStaticShorthandModel {
-  @CustomDumpValue var container: ChildContainer = ChildContainer(child: .make())
+  @DebugSnapshotValue var container: ChildContainer = ChildContainer(child: .make())
 }
 
-@CustomDump
+@DebugSnapshot
 fileprivate struct StaticShorthandValueChild {
   var count: Int
 
@@ -202,7 +202,7 @@ fileprivate struct StaticShorthandValueChild {
   }
 }
 
-@CustomDump
+@DebugSnapshot
 fileprivate final class StaticShorthandValueModel {
-  @CustomDumpValue var child: StaticShorthandValueChild = .prepared
+  @DebugSnapshotValue var child: StaticShorthandValueChild = .prepared
 }
