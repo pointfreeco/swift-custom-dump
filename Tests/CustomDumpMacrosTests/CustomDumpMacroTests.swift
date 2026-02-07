@@ -241,6 +241,47 @@
       }
     }
 
+    @Test func privateContainerUsesFileprivateMembers() {
+      assertMacro {
+        """
+        private struct Parent {
+          @CustomDump
+          final class FeatureModel {
+            var count: Int
+
+            init(count: Int) {
+              self.count = count
+            }
+          }
+        }
+        """
+      } expansion: {
+        """
+        private struct Parent {
+          final class FeatureModel {
+            var count: Int
+
+            init(count: Int) {
+              self.count = count
+            }
+          }
+        }
+
+        extension Parent.FeatureModel: CustomDump.CustomDumpRepresentable {
+          fileprivate struct CustomDumpValue: Equatable {
+            var count: Int
+          }
+          fileprivate var customDumpValue: CustomDumpValue {
+            CustomDumpValue(count: self.count)
+          }
+          fileprivate var customDumpSubjectType: Any.Type {
+            Parent.FeatureModel.self
+          }
+        }
+        """
+      }
+    }
+
     @Test func defaultLiteral() {
       assertMacro {
         """

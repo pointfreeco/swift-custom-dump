@@ -2,7 +2,19 @@ import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxMacros
 
-public enum CustomDumpMacro: ExtensionMacro {
+public enum CustomDumpMacro: ExtensionMacro, MemberMacro {
+  public static func expansion(
+    of node: SwiftSyntax.AttributeSyntax,
+    providingMembersOf declaration: some SwiftSyntax.DeclGroupSyntax,
+    in context: some SwiftSyntaxMacros.MacroExpansionContext
+  ) throws -> [SwiftSyntax.DeclSyntax] {
+    guard let modelDecl = ModelDecl(declaration: declaration, context: context) else {
+      return []
+    }
+
+    return memberDeclarations(for: modelDecl, declaration: declaration)
+  }
+
   public static func expansion(
     of node: SwiftSyntax.AttributeSyntax,
     attachedTo declaration: some SwiftSyntax.DeclGroupSyntax,
@@ -10,83 +22,6 @@ public enum CustomDumpMacro: ExtensionMacro {
     conformingTo protocols: [SwiftSyntax.TypeSyntax],
     in context: some SwiftSyntaxMacros.MacroExpansionContext
   ) throws -> [SwiftSyntax.ExtensionDeclSyntax] {
-    guard let modelDecl = ModelDecl(declaration: declaration, context: context) else {
-      return []
-    }
-
-    let properties = modelDecl.properties
-    let declarationAccessModifier = modelDecl.access.extensionMemberModifier
-    let customDumpValueConformances = customDumpValueConformances(
-      for: declaration,
-      properties: properties
-    )
-
-    let propertyLines = properties.map { property in
-      let customDumpValueSuffix = property.isCustomDumpRepresentable ? ".CustomDumpValue" : ""
-      let propertyAccessModifier = property.access.modifier
-      switch property.kind {
-      case .type(let type):
-        return "\(propertyAccessModifier)var \(property.name): \(type)\(customDumpValueSuffix)"
-      case .initializer(let defaultValue):
-        let defaultValue = rewriteDefaultValue(
-          defaultValue,
-          modelTypeName: modelDecl.name,
-          propertyTypeName: nil
-        )
-        .trimmedDescription
-        if property.isCustomDumpRepresentable {
-          return "\(propertyAccessModifier)var \(property.name) = (\(defaultValue)).customDumpValue"
-        } else {
-          return "\(propertyAccessModifier)var \(property.name) = \(defaultValue)"
-        }
-      case .pair(let type, initializer: let defaultValue):
-        let defaultValue = rewriteDefaultValue(
-          defaultValue,
-          modelTypeName: modelDecl.name,
-          propertyTypeName: type
-        )
-        .trimmedDescription
-        if property.isCustomDumpRepresentable {
-          return """
-            \(propertyAccessModifier)var \(property.name): \(type)\(customDumpValueSuffix) = \
-            (\(defaultValue)).customDumpValue
-            """
-        } else {
-          return "\(propertyAccessModifier)var \(property.name): \(type) = \(defaultValue)"
-        }
-      }
-    }
-
-    let initArguments =
-      properties
-      .map {
-        "\($0.name): self.\($0.name)\($0.isCustomDumpRepresentable ? ".customDumpValue" : "")"
-      }
-      .joined(separator: ", ")
-
-    let conformancesDescription = customDumpValueConformances.isEmpty
-      ? ""
-      : ": \(customDumpValueConformances.joined(separator: ", "))"
-    let representation =
-      """
-      \(declarationAccessModifier)struct CustomDumpValue\(conformancesDescription) {
-      \(propertyLines.joined(separator: "\n"))
-      }
-      """
-
-    let customDumpValue =
-      """
-      \(declarationAccessModifier)var customDumpValue: CustomDumpValue {
-      CustomDumpValue(\(initArguments))
-      }
-      """
-    let customDumpSubjectType = """
-      \(declarationAccessModifier)var customDumpSubjectType: Any.Type {
-      \(type.trimmedDescription).self
-      }
-      """
-
-    let members = [representation, customDumpValue, customDumpSubjectType].joined(separator: "\n")
     let conformanceIsolation: String
     #if compiler(>=6.2)
       conformanceIsolation = hasMainActorAnnotation(declaration) ? "@MainActor " : ""
@@ -100,14 +35,98 @@ public enum CustomDumpMacro: ExtensionMacro {
     return [
       DeclSyntax(
         """
-        extension \(type.trimmed)\(raw: conformance) {
-        \(raw: members)
-        }
+        extension \(type.trimmed)\(raw: conformance) {}
         """
       )
       .cast(ExtensionDeclSyntax.self)
     ]
   }
+}
+
+private func memberDeclarations(
+  for modelDecl: ModelDecl,
+  declaration: some DeclGroupSyntax
+) -> [DeclSyntax] {
+  let properties = modelDecl.properties
+  let declarationAccessModifier = modelDecl.access.extensionMemberModifier
+  let customDumpValueConformances = customDumpValueConformances(
+    for: declaration,
+    properties: properties
+  )
+
+  let propertyLines = properties.map { property in
+    let customDumpValueSuffix = property.isCustomDumpRepresentable ? ".CustomDumpValue" : ""
+    let propertyAccessModifier = property.access.modifier
+    switch property.kind {
+    case .type(let type):
+      return "\(propertyAccessModifier)var \(property.name): \(type)\(customDumpValueSuffix)"
+    case .initializer(let defaultValue):
+      let defaultValue = rewriteDefaultValue(
+        defaultValue,
+        modelTypeName: modelDecl.name,
+        propertyTypeName: nil
+      )
+      .trimmedDescription
+      if property.isCustomDumpRepresentable {
+        return "\(propertyAccessModifier)var \(property.name) = (\(defaultValue)).customDumpValue"
+      } else {
+        return "\(propertyAccessModifier)var \(property.name) = \(defaultValue)"
+      }
+    case .pair(let type, initializer: let defaultValue):
+      let defaultValue = rewriteDefaultValue(
+        defaultValue,
+        modelTypeName: modelDecl.name,
+        propertyTypeName: type
+      )
+      .trimmedDescription
+      if property.isCustomDumpRepresentable {
+        return """
+          \(propertyAccessModifier)var \(property.name): \(type)\(customDumpValueSuffix) = \
+          (\(defaultValue)).customDumpValue
+          """
+      } else {
+        return "\(propertyAccessModifier)var \(property.name): \(type) = \(defaultValue)"
+      }
+    }
+  }
+
+  let initArguments =
+    properties
+    .map {
+      "\($0.name): self.\($0.name)\($0.isCustomDumpRepresentable ? ".customDumpValue" : "")"
+    }
+    .joined(separator: ", ")
+
+  let conformancesDescription = customDumpValueConformances.isEmpty
+    ? ""
+    : ": \(customDumpValueConformances.joined(separator: ", "))"
+  let representation =
+    DeclSyntax(
+      """
+      \(raw: declarationAccessModifier)struct CustomDumpValue\(raw: conformancesDescription) {
+      \(raw: propertyLines.joined(separator: "\n"))
+      }
+      """
+    )
+
+  let customDumpValue =
+    DeclSyntax(
+      """
+      \(raw: declarationAccessModifier)var customDumpValue: CustomDumpValue {
+      CustomDumpValue(\(raw: initArguments))
+      }
+      """
+    )
+  let customDumpSubjectType =
+    DeclSyntax(
+      """
+      \(raw: declarationAccessModifier)var customDumpSubjectType: Any.Type {
+      Self.self
+      }
+      """
+    )
+
+  return [representation, customDumpValue, customDumpSubjectType]
 }
 
 enum CustomDumpValueMacro: PeerMacro {
@@ -145,6 +164,7 @@ private struct ModelDecl {
   }
 
   var access: AccessLevel?
+  var requiredAccess: AccessLevel
   var name: String
   var properties: [Property]
 
@@ -167,19 +187,21 @@ private struct ModelDecl {
       return nil
     }
 
-    self.access = accessControl(for: declaration)
+    let effectiveAccess = effectiveAccessLevel(for: declaration, in: context)
+    self.access = generatedAccessLevel(for: declaration, effectiveAccess: effectiveAccess)
+    self.requiredAccess = effectiveAccess
     self.name = name.text
     self.properties = Self.storedProperties(
       from: declaration,
       context: context,
-      requiredAccess: self.access
+      requiredAccess: self.requiredAccess
     )
   }
 
   static func storedProperties(
     from declaration: some DeclGroupSyntax,
     context: some MacroExpansionContext,
-    requiredAccess: AccessLevel?
+    requiredAccess: AccessLevel
   ) -> [ModelDecl.Property] {
     declaration.memberBlock.members.compactMap { member -> [ModelDecl.Property]? in
       guard let varDecl = member.decl.as(VariableDeclSyntax.self)
@@ -190,13 +212,13 @@ private struct ModelDecl {
         }) != true
       else { return nil }
       let varDeclAccess = accessControl(for: varDecl)
-      guard varDeclAccess.effectiveAccessLevel >= requiredAccess.effectiveAccessLevel
+      guard varDeclAccess.effectiveAccessLevel >= requiredAccess
       else { return nil }
       guard !hasCustomDumpIgnored(varDecl)
       else { return nil }
       let isCustomDumpRepresentable = hasCustomDump(varDecl)
       let effectivePropertyAccess =
-        varDeclAccess.map { _ in min(varDeclAccess.effectiveAccessLevel, requiredAccess.effectiveAccessLevel) }
+        varDeclAccess.map { _ in min(varDeclAccess.effectiveAccessLevel, requiredAccess) }
 
       return varDecl.bindings.compactMap { binding in
         guard let identifier = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text
@@ -408,6 +430,44 @@ private func accessControl(from modifiers: DeclModifierListSyntax) -> AccessLeve
     }
   }
   return nil
+}
+
+private func effectiveAccessLevel(
+  for declaration: some DeclGroupSyntax,
+  in context: some MacroExpansionContext
+) -> AccessLevel {
+  let declarationAccess = accessControl(for: declaration).effectiveAccessLevel
+  let enclosingAccess = enclosingAccessLevel(in: context)
+  return min(declarationAccess, enclosingAccess)
+}
+
+private func generatedAccessLevel(
+  for declaration: some DeclGroupSyntax,
+  effectiveAccess: AccessLevel
+) -> AccessLevel? {
+  let declarationAccess = accessControl(for: declaration)
+  if declarationAccess != nil {
+    return effectiveAccess
+  }
+  return effectiveAccess < .internal ? effectiveAccess : nil
+}
+
+private func enclosingAccessLevel(in context: some MacroExpansionContext) -> AccessLevel {
+  var access: AccessLevel = .internal
+
+  for node in context.lexicalContext {
+    if let decl = node.as(ClassDeclSyntax.self) {
+      access = min(access, accessControl(for: decl).effectiveAccessLevel)
+    } else if let decl = node.as(StructDeclSyntax.self) {
+      access = min(access, accessControl(for: decl).effectiveAccessLevel)
+    } else if let decl = node.as(EnumDeclSyntax.self) {
+      access = min(access, accessControl(for: decl).effectiveAccessLevel)
+    } else if let decl = node.as(ActorDeclSyntax.self) {
+      access = min(access, accessControl(for: decl).effectiveAccessLevel)
+    }
+  }
+
+  return access
 }
 
 private func hasMainActorAnnotation(_ declaration: some DeclGroupSyntax) -> Bool {

@@ -4,9 +4,12 @@
 /// enhance the exhaustive testability of an object through
 /// ``expectDifference(_:_:operation:changes:fileID:filePath:line:column:)``.
 @attached(
-  extension,
-  conformances: CustomDumpRepresentable,
+  member,
   names: named(CustomDumpValue), named(customDumpValue), named(customDumpSubjectType)
+)
+@attached(
+  extension,
+  conformances: CustomDumpRepresentable
 )
 public macro CustomDump() = #externalMacro(module: "CustomDumpMacros", type: "CustomDumpMacro")
 
