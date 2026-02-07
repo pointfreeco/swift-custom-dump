@@ -46,13 +46,13 @@
         }
 
         extension FeatureModel: CustomDump.CustomDumpRepresentable {
-          public struct CustomDumpValue: Equatable {
-            public var title: String
+          struct CustomDumpValue: Equatable {
+            var title: String
           }
-          public var customDumpValue: CustomDumpValue {
+          var customDumpValue: CustomDumpValue {
             CustomDumpValue(title: self.title)
           }
-          public var customDumpSubjectType: Any.Type {
+          var customDumpSubjectType: Any.Type {
             FeatureModel.self
           }
         }
@@ -85,13 +85,13 @@
         }
 
         extension FeatureModel: @MainActor CustomDump.CustomDumpRepresentable {
-          public struct CustomDumpValue: Equatable {
-            public var count: Int
+          struct CustomDumpValue: Equatable {
+            var count: Int
           }
-          public var customDumpValue: CustomDumpValue {
+          var customDumpValue: CustomDumpValue {
             CustomDumpValue(count: self.count)
           }
-          public var customDumpSubjectType: Any.Type {
+          var customDumpSubjectType: Any.Type {
             FeatureModel.self
           }
         }
@@ -122,13 +122,13 @@
         }
 
         extension FeatureModel {
-          public struct CustomDumpValue: Equatable {
-            public var count: Int
+          struct CustomDumpValue: Equatable {
+            var count: Int
           }
-          public var customDumpValue: CustomDumpValue {
+          var customDumpValue: CustomDumpValue {
             CustomDumpValue(count: self.count)
           }
-          public var customDumpSubjectType: Any.Type {
+          var customDumpSubjectType: Any.Type {
             FeatureModel.self
           }
         }
@@ -161,13 +161,13 @@
         }
 
         extension FeatureModel {
-          public struct CustomDumpValue: Equatable {
-            public var count: Int
+          struct CustomDumpValue: Equatable {
+            var count: Int
           }
-          public var customDumpValue: CustomDumpValue {
+          var customDumpValue: CustomDumpValue {
             CustomDumpValue(count: self.count)
           }
-          public var customDumpSubjectType: Any.Type {
+          var customDumpSubjectType: Any.Type {
             FeatureModel.self
           }
         }
@@ -190,14 +190,51 @@
         }
 
         extension EmptyModel: CustomDump.CustomDumpRepresentable {
-          public struct CustomDumpValue: Equatable {
+          struct CustomDumpValue: Equatable {
 
           }
-          public var customDumpValue: CustomDumpValue {
+          var customDumpValue: CustomDumpValue {
             CustomDumpValue()
           }
-          public var customDumpSubjectType: Any.Type {
+          var customDumpSubjectType: Any.Type {
             EmptyModel.self
+          }
+        }
+        """
+      }
+    }
+
+    @Test func privateTypeUsesFileprivateMembers() {
+      assertMacro {
+        """
+        @CustomDump
+        private final class FeatureModel {
+          var count: Int
+
+          init(count: Int) {
+            self.count = count
+          }
+        }
+        """
+      } expansion: {
+        """
+        private final class FeatureModel {
+          var count: Int
+
+          init(count: Int) {
+            self.count = count
+          }
+        }
+
+        extension FeatureModel: CustomDump.CustomDumpRepresentable {
+          fileprivate struct CustomDumpValue: Equatable {
+            var count: Int
+          }
+          fileprivate var customDumpValue: CustomDumpValue {
+            CustomDumpValue(count: self.count)
+          }
+          fileprivate var customDumpSubjectType: Any.Type {
+            FeatureModel.self
           }
         }
         """
@@ -219,13 +256,13 @@
         }
 
         extension FeatureModel: CustomDump.CustomDumpRepresentable {
-          public struct CustomDumpValue: Equatable {
-            public var count = 0
+          struct CustomDumpValue: Equatable {
+            var count = 0
           }
-          public var customDumpValue: CustomDumpValue {
+          var customDumpValue: CustomDumpValue {
             CustomDumpValue(count: self.count)
           }
-          public var customDumpSubjectType: Any.Type {
+          var customDumpSubjectType: Any.Type {
             FeatureModel.self
           }
         }
@@ -260,14 +297,14 @@
         }
 
         extension FeatureModel: CustomDump.CustomDumpRepresentable {
-          public struct CustomDumpValue: Equatable {
-            public var child: Child.CustomDumpValue
-            public var count: Int
+          struct CustomDumpValue: Equatable {
+            var child: Child.CustomDumpValue
+            var count: Int
           }
-          public var customDumpValue: CustomDumpValue {
+          var customDumpValue: CustomDumpValue {
             CustomDumpValue(child: self.child.customDumpValue, count: self.count)
           }
-          public var customDumpSubjectType: Any.Type {
+          var customDumpSubjectType: Any.Type {
             FeatureModel.self
           }
         }
@@ -298,13 +335,13 @@
         }
 
         extension FeatureModel: CustomDump.CustomDumpRepresentable {
-          public struct CustomDumpValue: Equatable, Sendable {
-            public var count: Int
+          struct CustomDumpValue: Equatable, Sendable {
+            var count: Int
           }
-          public var customDumpValue: CustomDumpValue {
+          var customDumpValue: CustomDumpValue {
             CustomDumpValue(count: self.count)
           }
-          public var customDumpSubjectType: Any.Type {
+          var customDumpSubjectType: Any.Type {
             FeatureModel.self
           }
         }
@@ -327,13 +364,13 @@
         }
 
         extension FeatureModel: CustomDump.CustomDumpRepresentable {
-          public struct CustomDumpValue: Equatable, Sendable {
-            public var count: Int
+          struct CustomDumpValue: Equatable, Sendable {
+            var count: Int
           }
-          public var customDumpValue: CustomDumpValue {
+          var customDumpValue: CustomDumpValue {
             CustomDumpValue(count: self.count)
           }
-          public var customDumpSubjectType: Any.Type {
+          var customDumpSubjectType: Any.Type {
             FeatureModel.self
           }
         }
@@ -356,13 +393,13 @@
         }
 
         extension FeatureModel: CustomDump.CustomDumpRepresentable {
-          public struct CustomDumpValue: Equatable, @unchecked Sendable {
-            public var count: Int
+          struct CustomDumpValue: Equatable, @unchecked Sendable {
+            var count: Int
           }
-          public var customDumpValue: CustomDumpValue {
+          var customDumpValue: CustomDumpValue {
             CustomDumpValue(count: self.count)
           }
-          public var customDumpSubjectType: Any.Type {
+          var customDumpSubjectType: Any.Type {
             FeatureModel.self
           }
         }
@@ -387,14 +424,14 @@
         }
 
         extension FeatureModel: CustomDump.CustomDumpRepresentable {
-          public struct CustomDumpValue: Equatable, Identifiable {
-            public var id: UUID
-            public var count: Int
+          struct CustomDumpValue: Equatable, Identifiable {
+            var id: UUID
+            var count: Int
           }
-          public var customDumpValue: CustomDumpValue {
+          var customDumpValue: CustomDumpValue {
             CustomDumpValue(id: self.id, count: self.count)
           }
-          public var customDumpSubjectType: Any.Type {
+          var customDumpSubjectType: Any.Type {
             FeatureModel.self
           }
         }
@@ -419,13 +456,13 @@
         }
 
         extension FeatureModel: CustomDump.CustomDumpRepresentable {
-          public struct CustomDumpValue: Equatable {
-            public var count: Int
+          struct CustomDumpValue: Equatable {
+            var count: Int
           }
-          public var customDumpValue: CustomDumpValue {
+          var customDumpValue: CustomDumpValue {
             CustomDumpValue(count: self.count)
           }
-          public var customDumpSubjectType: Any.Type {
+          var customDumpSubjectType: Any.Type {
             FeatureModel.self
           }
         }
@@ -448,13 +485,13 @@
         }
 
         extension FeatureModel: CustomDump.CustomDumpRepresentable {
-          public struct CustomDumpValue: Equatable {
-            public var child = (Child()).customDumpValue
+          struct CustomDumpValue: Equatable {
+            var child = (Child()).customDumpValue
           }
-          public var customDumpValue: CustomDumpValue {
+          var customDumpValue: CustomDumpValue {
             CustomDumpValue(child: self.child.customDumpValue)
           }
-          public var customDumpSubjectType: Any.Type {
+          var customDumpSubjectType: Any.Type {
             FeatureModel.self
           }
         }
@@ -477,13 +514,13 @@
         }
 
         extension FeatureModel: CustomDump.CustomDumpRepresentable {
-          public struct CustomDumpValue: Equatable {
-            public var child: Child.CustomDumpValue = (Child()).customDumpValue
+          struct CustomDumpValue: Equatable {
+            var child: Child.CustomDumpValue = (Child()).customDumpValue
           }
-          public var customDumpValue: CustomDumpValue {
+          var customDumpValue: CustomDumpValue {
             CustomDumpValue(child: self.child.customDumpValue)
           }
-          public var customDumpSubjectType: Any.Type {
+          var customDumpSubjectType: Any.Type {
             FeatureModel.self
           }
         }
@@ -514,13 +551,13 @@
         }
 
         extension FeatureModel: CustomDump.CustomDumpRepresentable {
-          public struct CustomDumpValue: Equatable {
-            public var child: Child.CustomDumpValue = (FeatureModel.makeChild()).customDumpValue
+          struct CustomDumpValue: Equatable {
+            var child: Child.CustomDumpValue = (FeatureModel.makeChild()).customDumpValue
           }
-          public var customDumpValue: CustomDumpValue {
+          var customDumpValue: CustomDumpValue {
             CustomDumpValue(child: self.child.customDumpValue)
           }
-          public var customDumpSubjectType: Any.Type {
+          var customDumpSubjectType: Any.Type {
             FeatureModel.self
           }
         }
@@ -543,13 +580,13 @@
         }
 
         extension FeatureModel: CustomDump.CustomDumpRepresentable {
-          public struct CustomDumpValue: Equatable {
-            public var child: Child.CustomDumpValue = (Child.make()).customDumpValue
+          struct CustomDumpValue: Equatable {
+            var child: Child.CustomDumpValue = (Child.make()).customDumpValue
           }
-          public var customDumpValue: CustomDumpValue {
+          var customDumpValue: CustomDumpValue {
             CustomDumpValue(child: self.child.customDumpValue)
           }
-          public var customDumpSubjectType: Any.Type {
+          var customDumpSubjectType: Any.Type {
             FeatureModel.self
           }
         }
@@ -572,13 +609,13 @@
         }
 
         extension FeatureModel: CustomDump.CustomDumpRepresentable {
-          public struct CustomDumpValue: Equatable {
-            public var child: Child.CustomDumpValue = (Factory<FeatureModel>.make()).customDumpValue
+          struct CustomDumpValue: Equatable {
+            var child: Child.CustomDumpValue = (Factory<FeatureModel>.make()).customDumpValue
           }
-          public var customDumpValue: CustomDumpValue {
+          var customDumpValue: CustomDumpValue {
             CustomDumpValue(child: self.child.customDumpValue)
           }
-          public var customDumpSubjectType: Any.Type {
+          var customDumpSubjectType: Any.Type {
             FeatureModel.self
           }
         }
@@ -601,13 +638,13 @@
         }
 
         extension FeatureModel: CustomDump.CustomDumpRepresentable {
-          public struct CustomDumpValue: Equatable {
-            public var child: ChildContainer.CustomDumpValue = (ChildContainer(child: .make())).customDumpValue
+          struct CustomDumpValue: Equatable {
+            var child: ChildContainer.CustomDumpValue = (ChildContainer(child: .make())).customDumpValue
           }
-          public var customDumpValue: CustomDumpValue {
+          var customDumpValue: CustomDumpValue {
             CustomDumpValue(child: self.child.customDumpValue)
           }
-          public var customDumpSubjectType: Any.Type {
+          var customDumpSubjectType: Any.Type {
             FeatureModel.self
           }
         }
@@ -638,15 +675,15 @@
         }
 
         extension FeatureModel: CustomDump.CustomDumpRepresentable {
-          public struct CustomDumpValue: Equatable {
-            public var child = ({
+          struct CustomDumpValue: Equatable {
+            var child = ({
                 FeatureModel.makeChild()
               }()).customDumpValue
           }
-          public var customDumpValue: CustomDumpValue {
+          var customDumpValue: CustomDumpValue {
             CustomDumpValue(child: self.child.customDumpValue)
           }
-          public var customDumpSubjectType: Any.Type {
+          var customDumpSubjectType: Any.Type {
             FeatureModel.self
           }
         }
@@ -686,13 +723,13 @@
         }
 
         extension FeatureModel: CustomDump.CustomDumpRepresentable {
-          public struct CustomDumpValue: Equatable {
-            public var reminders: <#Type#>
+          struct CustomDumpValue: Equatable {
+            var reminders: <#Type#>
           }
-          public var customDumpValue: CustomDumpValue {
+          var customDumpValue: CustomDumpValue {
             CustomDumpValue(reminders: self.reminders)
           }
-          public var customDumpSubjectType: Any.Type {
+          var customDumpSubjectType: Any.Type {
             FeatureModel.self
           }
         }
