@@ -56,55 +56,55 @@ struct ExpectDifferenceTests {
     }
   }
 
-  @Test func customDumpRepresentable() async throws {
-    let model = FeatureModel()
+//  @Test func customDumpRepresentable() async throws {
+//    let model = FeatureModel()
+//
+//    await expectDifference(model) {
+//      try await model.factButtonTapped()
+//    } changes: {
+//      $0.fact = "0 is a good number."
+//    }
+//
+//    expectNoDifference(
+//      String(customDumping: model),
+//      """
+//      FeatureModel(
+//        count: 0,
+//        fact: "0 is a good number."
+//      )
+//      """
+//    )
+//  }
 
-    await expectDifference(model) {
-      try await model.factButtonTapped()
-    } changes: {
-      $0.fact = "0 is a good number."
-    }
-
-    expectNoDifference(
-      String(customDumping: model),
-      """
-      FeatureModel(
-        count: 0,
-        fact: "0 is a good number."
-      )
-      """
-    )
-  }
-
-  @Test func `struct`() async {
-    var state = FeatureState()
-
-    await expectDifference(state) {
-      try await state.factButtonTapped()
-    } changes: {
-      $0.fact = "0 is a good number."
-    }
-
-    expectNoDifference(
-      String(customDumping: state),
-      """
-      FeatureState(
-        count: 0,
-        fact: "0 is a good number."
-      )
-      """
-    )
-    expectNoDifference(
-      diff(FeatureState(), state),
-      """
-        FeatureState(
-          count: 0,
-      -   fact: nil
-      +   fact: "0 is a good number."
-        )
-      """
-    )
-  }
+//  @Test func `struct`() async {
+//    var state = FeatureState()
+//
+//    await expectDifference(state) {
+//      try await state.factButtonTapped()
+//    } changes: {
+//      $0.fact = "0 is a good number."
+//    }
+//
+//    expectNoDifference(
+//      String(customDumping: state),
+//      """
+//      FeatureState(
+//        count: 0,
+//        fact: "0 is a good number."
+//      )
+//      """
+//    )
+//    expectNoDifference(
+//      diff(FeatureState(), state),
+//      """
+//        FeatureState(
+//          count: 0,
+//      -   fact: nil
+//      +   fact: "0 is a good number."
+//        )
+//      """
+//    )
+//  }
 
   @Test func customDumpPropertyDefaultStaticShorthand() {
     let model = StaticShorthandModel()

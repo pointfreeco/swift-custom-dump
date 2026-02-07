@@ -48,7 +48,6 @@ private func memberDeclarations(
   declaration: some DeclGroupSyntax
 ) -> [DeclSyntax] {
   let properties = modelDecl.properties
-  let declarationAccessModifier = modelDecl.access.extensionMemberModifier
   let customDumpValueConformances = customDumpValueConformances(
     for: declaration,
     properties: properties
@@ -56,10 +55,9 @@ private func memberDeclarations(
 
   let propertyLines = properties.map { property in
     let customDumpValueSuffix = property.isCustomDumpRepresentable ? ".CustomDumpValue" : ""
-    let propertyAccessModifier = property.access.modifier
     switch property.kind {
     case .type(let type):
-      return "\(propertyAccessModifier)var \(property.name): \(type)\(customDumpValueSuffix)"
+      return "public var \(property.name): \(type)\(customDumpValueSuffix)"
     case .initializer(let defaultValue):
       let defaultValue = rewriteDefaultValue(
         defaultValue,
@@ -68,9 +66,9 @@ private func memberDeclarations(
       )
       .trimmedDescription
       if property.isCustomDumpRepresentable {
-        return "\(propertyAccessModifier)var \(property.name) = (\(defaultValue)).customDumpValue"
+        return "public var \(property.name) = (\(defaultValue)).customDumpValue"
       } else {
-        return "\(propertyAccessModifier)var \(property.name) = \(defaultValue)"
+        return "public var \(property.name) = \(defaultValue)"
       }
     case .pair(let type, initializer: let defaultValue):
       let defaultValue = rewriteDefaultValue(
@@ -81,11 +79,11 @@ private func memberDeclarations(
       .trimmedDescription
       if property.isCustomDumpRepresentable {
         return """
-          \(propertyAccessModifier)var \(property.name): \(type)\(customDumpValueSuffix) = \
+          public var \(property.name): \(type)\(customDumpValueSuffix) = \
           (\(defaultValue)).customDumpValue
           """
       } else {
-        return "\(propertyAccessModifier)var \(property.name): \(type) = \(defaultValue)"
+        return "public var \(property.name): \(type) = \(defaultValue)"
       }
     }
   }
@@ -103,7 +101,7 @@ private func memberDeclarations(
   let representation =
     DeclSyntax(
       """
-      \(raw: declarationAccessModifier)struct CustomDumpValue\(raw: conformancesDescription) {
+      public struct CustomDumpValue\(raw: conformancesDescription) {
       \(raw: propertyLines.joined(separator: "\n"))
       }
       """
@@ -112,7 +110,7 @@ private func memberDeclarations(
   let customDumpValue =
     DeclSyntax(
       """
-      \(raw: declarationAccessModifier)var customDumpValue: CustomDumpValue {
+      public var customDumpValue: CustomDumpValue {
       CustomDumpValue(\(raw: initArguments))
       }
       """
@@ -120,7 +118,7 @@ private func memberDeclarations(
   let customDumpSubjectType =
     DeclSyntax(
       """
-      \(raw: declarationAccessModifier)var customDumpSubjectType: Any.Type {
+      public var customDumpSubjectType: Any.Type {
       Self.self
       }
       """
@@ -153,7 +151,6 @@ private struct ModelDecl {
   struct Property {
     var name: String
     var kind: Kind
-    var access: AccessLevel?
     var isCustomDumpRepresentable: Bool
 
     enum Kind {
@@ -163,8 +160,6 @@ private struct ModelDecl {
     }
   }
 
-  var access: AccessLevel?
-  var requiredAccess: AccessLevel
   var name: String
   var properties: [Property]
 
@@ -187,14 +182,12 @@ private struct ModelDecl {
       return nil
     }
 
-    let effectiveAccess = effectiveAccessLevel(for: declaration, in: context)
-    self.access = generatedAccessLevel(for: declaration, effectiveAccess: effectiveAccess)
-    self.requiredAccess = effectiveAccess
+    let requiredAccess = effectiveAccessLevel(for: declaration, in: context)
     self.name = name.text
     self.properties = Self.storedProperties(
       from: declaration,
       context: context,
-      requiredAccess: self.requiredAccess
+      requiredAccess: requiredAccess
     )
   }
 
@@ -211,14 +204,11 @@ private struct ModelDecl {
           $0.name.tokenKind == .keyword(.static) || $0.name.tokenKind == .keyword(.class)
         }) != true
       else { return nil }
-      let varDeclAccess = accessControl(for: varDecl)
-      guard varDeclAccess.effectiveAccessLevel >= requiredAccess
+      guard accessControl(for: varDecl).effectiveAccessLevel >= requiredAccess
       else { return nil }
       guard !hasCustomDumpIgnored(varDecl)
       else { return nil }
       let isCustomDumpRepresentable = hasCustomDump(varDecl)
-      let effectivePropertyAccess =
-        varDeclAccess.map { _ in min(varDeclAccess.effectiveAccessLevel, requiredAccess) }
 
       return varDecl.bindings.compactMap { binding in
         guard let identifier = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text
@@ -258,7 +248,6 @@ private struct ModelDecl {
           return ModelDecl.Property(
             name: identifier,
             kind: .initializer(defaultValue),
-            access: effectivePropertyAccess,
             isCustomDumpRepresentable: isCustomDumpRepresentable
           )
         case (let typeAnnotation?, nil):
@@ -268,7 +257,6 @@ private struct ModelDecl {
           return ModelDecl.Property(
             name: identifier,
             kind: .type(typeAnnotation.trimmedDescription),
-            access: effectivePropertyAccess,
             isCustomDumpRepresentable: isCustomDumpRepresentable
           )
         case (let typeAnnotation?, let defaultValue?):
@@ -283,7 +271,6 @@ private struct ModelDecl {
               type: typeAnnotation.trimmedDescription,
               initializer: defaultValue
             ),
-            access: effectivePropertyAccess,
             isCustomDumpRepresentable: isCustomDumpRepresentable
           )
         }
@@ -358,39 +345,9 @@ private enum AccessLevel: Int, Comparable {
   }
 }
 
-private extension AccessLevel {
-  var keyword: String {
-    switch self {
-    case .private:
-      return "private"
-    case .fileprivate:
-      return "fileprivate"
-    case .internal:
-      return "internal"
-    case .package:
-      return "package"
-    case .public:
-      return "public"
-    }
-  }
-}
-
 private extension AccessLevel? {
   var effectiveAccessLevel: AccessLevel {
     self ?? .internal
-  }
-
-  var modifier: String {
-    self.map { "\($0.keyword) " } ?? ""
-  }
-
-  var extensionMemberModifier: String {
-    switch self {
-    case .private:
-      return "fileprivate "
-    default:
-      return self.modifier
-    }
   }
 }
 
@@ -411,22 +368,20 @@ private func accessControl(from modifiers: DeclModifierListSyntax) -> AccessLeve
     .keyword(.fileprivate),
     .keyword(.private),
   ]
-  for modifier in modifiers {
-    if accessLevels.contains(modifier.name.tokenKind) {
-      switch modifier.name.tokenKind {
-      case .keyword(.open), .keyword(.public):
-        return .public
-      case .keyword(.package):
-        return .package
-      case .keyword(.internal):
-        return .internal
-      case .keyword(.fileprivate):
-        return .fileprivate
-      case .keyword(.private):
-        return .private
-      default:
-        break
-      }
+  for modifier in modifiers where accessLevels.contains(modifier.name.tokenKind) {
+    switch modifier.name.tokenKind {
+    case .keyword(.open), .keyword(.public):
+      return .public
+    case .keyword(.package):
+      return .package
+    case .keyword(.internal):
+      return .internal
+    case .keyword(.fileprivate):
+      return .fileprivate
+    case .keyword(.private):
+      return .private
+    default:
+      break
     }
   }
   return nil
@@ -436,25 +391,14 @@ private func effectiveAccessLevel(
   for declaration: some DeclGroupSyntax,
   in context: some MacroExpansionContext
 ) -> AccessLevel {
-  let declarationAccess = accessControl(for: declaration).effectiveAccessLevel
-  let enclosingAccess = enclosingAccessLevel(in: context)
-  return min(declarationAccess, enclosingAccess)
-}
-
-private func generatedAccessLevel(
-  for declaration: some DeclGroupSyntax,
-  effectiveAccess: AccessLevel
-) -> AccessLevel? {
-  let declarationAccess = accessControl(for: declaration)
-  if declarationAccess != nil {
-    return effectiveAccess
-  }
-  return effectiveAccess < .internal ? effectiveAccess : nil
+  min(
+    accessControl(for: declaration).effectiveAccessLevel,
+    enclosingAccessLevel(in: context)
+  )
 }
 
 private func enclosingAccessLevel(in context: some MacroExpansionContext) -> AccessLevel {
   var access: AccessLevel = .internal
-
   for node in context.lexicalContext {
     if let decl = node.as(ClassDeclSyntax.self) {
       access = min(access, accessControl(for: decl).effectiveAccessLevel)
@@ -466,7 +410,6 @@ private func enclosingAccessLevel(in context: some MacroExpansionContext) -> Acc
       access = min(access, accessControl(for: decl).effectiveAccessLevel)
     }
   }
-
   return access
 }
 
@@ -548,19 +491,19 @@ private func hasUncheckedSpecifier(in type: TypeSyntax) -> Bool {
   return hasUnchecked || hasUncheckedSpecifier(in: type.baseType)
 }
 
-private func modifiers(of declaration: some DeclGroupSyntax) -> DeclModifierListSyntax {
-  #if compiler(>=6.0)
-    return declaration.modifiers
-  #else
-    return declaration.modifiers ?? []
-  #endif
-}
-
 private func attributes(of declaration: some DeclGroupSyntax) -> AttributeListSyntax {
   #if compiler(>=6.0)
     return declaration.attributes
   #else
     return declaration.attributes ?? []
+  #endif
+}
+
+private func modifiers(of declaration: some DeclGroupSyntax) -> DeclModifierListSyntax {
+  #if compiler(>=6.0)
+    return declaration.modifiers
+  #else
+    return declaration.modifiers ?? []
   #endif
 }
 

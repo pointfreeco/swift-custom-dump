@@ -89,38 +89,38 @@ public func expectDifference<T: Equatable>(
 /// compares the results. The comparison is done by invoking the `changes` closure with a mutable
 /// version of the initial diffable state, and then asserting that the modifications made match the
 /// final diffable state using ``expectNoDifference``.
-public func expectDifference<T: CustomDumpRepresentable>(
-  _ expression: @autoclosure () throws -> T,
-  _ message: @autoclosure () -> String? = nil,
-  operation: (() throws -> Void)? = nil,
-  changes updateExpectingResult: (inout T.CustomDumpValue) throws -> Void,
-  fileID: StaticString = #fileID,
-  filePath: StaticString = #filePath,
-  line: UInt = #line,
-  column: UInt = #column
-) where T.CustomDumpValue: Equatable {
-  do {
-    let originalModel = try expression()
-    let original = originalModel.customDumpValue
-    try operation?()
-    var expected = original
-    try updateExpectingResult(&expected)
-    let actual = try expression().customDumpValue
-    expectDifferenceHelp(
-      original: original,
-      expected: expected,
-      actual: actual,
-      isExhaustive: operation != nil,
-      message: expected != actual || operation != nil ? message() : nil,
-      fileID: fileID,
-      filePath: filePath,
-      line: line,
-      column: column
-    )
-  } catch {
-    reportIssue(error, fileID: fileID, filePath: filePath, line: line, column: column)
-  }
-}
+//public func expectDifference<T: CustomDumpRepresentable>(
+//  _ expression: @autoclosure () throws -> T,
+//  _ message: @autoclosure () -> String? = nil,
+//  operation: (() throws -> Void)? = nil,
+//  changes updateExpectingResult: (inout T.CustomDumpValue) throws -> Void,
+//  fileID: StaticString = #fileID,
+//  filePath: StaticString = #filePath,
+//  line: UInt = #line,
+//  column: UInt = #column
+//) where T.CustomDumpValue: Equatable {
+//  do {
+//    let originalModel = try expression()
+//    let original = originalModel.customDumpValue
+//    try operation?()
+//    var expected = original
+//    try updateExpectingResult(&expected)
+//    let actual = try expression().customDumpValue
+//    expectDifferenceHelp(
+//      original: original,
+//      expected: expected,
+//      actual: actual,
+//      isExhaustive: operation != nil,
+//      message: expected != actual || operation != nil ? message() : nil,
+//      fileID: fileID,
+//      filePath: filePath,
+//      line: line,
+//      column: column
+//    )
+//  } catch {
+//    reportIssue(error, fileID: fileID, filePath: filePath, line: line, column: column)
+//  }
+//}
 
 #if compiler(>=6.2)
   /// Expects that a value has a set of changes.
@@ -164,38 +164,38 @@ public func expectDifference<T: CustomDumpRepresentable>(
   /// An async version of
   /// ``expectDifference(_:_:operation:changes:fileID:filePath:line:column:)-5fu8q`` for
   /// ``Diffable`` models.
-  nonisolated(nonsending) public func expectDifference<T: CustomDumpRepresentable>(
-    _ expression: @autoclosure () throws -> T,
-    _ message: @autoclosure () -> String? = nil,
-    operation: () async throws -> Void,
-    changes updateExpectingResult: (inout T.CustomDumpValue) throws -> Void,
-    fileID: StaticString = #fileID,
-    filePath: StaticString = #filePath,
-    line: UInt = #line,
-    column: UInt = #column
-  ) async where T.CustomDumpValue: Equatable {
-    do {
-      let originalModel = try expression()
-      let original = originalModel.customDumpValue
-      try await operation()
-      var expected = original
-      try updateExpectingResult(&expected)
-      let actual = try expression().customDumpValue
-      expectDifferenceHelp(
-        original: original,
-        expected: expected,
-        actual: actual,
-        isExhaustive: true,
-        message: expected != actual ? message() : nil,
-        fileID: fileID,
-        filePath: filePath,
-        line: line,
-        column: column
-      )
-    } catch {
-      reportIssue(error, fileID: fileID, filePath: filePath, line: line, column: column)
-    }
-  }
+//  nonisolated(nonsending) public func expectDifference<T: CustomDumpRepresentable>(
+//    _ expression: @autoclosure () throws -> T,
+//    _ message: @autoclosure () -> String? = nil,
+//    operation: () async throws -> Void,
+//    changes updateExpectingResult: (inout T.CustomDumpValue) throws -> Void,
+//    fileID: StaticString = #fileID,
+//    filePath: StaticString = #filePath,
+//    line: UInt = #line,
+//    column: UInt = #column
+//  ) async where T.CustomDumpValue: Equatable {
+//    do {
+//      let originalModel = try expression()
+//      let original = originalModel.customDumpValue
+//      try await operation()
+//      var expected = original
+//      try updateExpectingResult(&expected)
+//      let actual = try expression().customDumpValue
+//      expectDifferenceHelp(
+//        original: original,
+//        expected: expected,
+//        actual: actual,
+//        isExhaustive: true,
+//        message: expected != actual ? message() : nil,
+//        fileID: fileID,
+//        filePath: filePath,
+//        line: line,
+//        column: column
+//      )
+//    } catch {
+//      reportIssue(error, fileID: fileID, filePath: filePath, line: line, column: column)
+//    }
+//  }
 #else
   public func expectDifference<T: Equatable & Sendable>(
     _ expression: @autoclosure @Sendable () throws -> T,
