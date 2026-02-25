@@ -1,14 +1,15 @@
 {
+  "originHash" : "832e1b830d11bf383f8ce2e59d8ea92fdcad371f02f06ebd76ffff88934e03dd",
   "pins" : [
     {
-      "identity" : "swift-issue-reporting",
+      "identity" : "xctest-dynamic-overlay",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/pointfreeco/swift-issue-reporting",
+      "location" : "https://github.com/pointfreeco/xctest-dynamic-overlay",
       "state" : {
-        "revision" : "926f43898706eaa127db79ac42138e1ad7e85a3f",
-        "version" : "1.2.0"
+        "revision" : "dfd70507def84cb5fb821278448a262c6ff2bbad",
+        "version" : "1.9.0"
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }
