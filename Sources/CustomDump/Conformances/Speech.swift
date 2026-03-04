@@ -2,6 +2,7 @@
   import Speech
 
   @available(iOS 10, macOS 10.15, *)
+  @available(tvOS, unavailable)
   extension SFSpeechRecognizerAuthorizationStatus: CustomDumpStringConvertible {
     public var customDumpDescription: String {
       switch self {
@@ -21,6 +22,7 @@
   }
 
   @available(iOS 10, macOS 10.15, *)
+  @available(tvOS, unavailable)
   extension SFSpeechRecognitionTaskHint: CustomDumpStringConvertible {
     public var customDumpDescription: String {
       switch self {
@@ -39,6 +41,7 @@
   }
 
   @available(iOS 10, macOS 10.15, *)
+  @available(tvOS, unavailable)
   extension SFSpeechRecognitionTaskState: CustomDumpStringConvertible {
     public var customDumpDescription: String {
       switch self {
