@@ -33,10 +33,7 @@ jobs:
         with:
           timeout_minutes: 15
           max_attempts: 3
-          command: |
-            xcodebuild -downloadPlatform iOS
-            xcodebuild -downloadPlatform tvOS
-            xcodebuild -downloadPlatform visionOS
+          command: xcodebuild -downloadAllPlatforms
       - name: Run tests (platforms)
         run: make test-platforms
 
