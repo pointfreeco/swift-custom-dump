@@ -36,6 +36,7 @@ jobs:
           command: |
             xcodebuild -downloadPlatform iOS
             xcodebuild -downloadPlatform tvOS
+            xcodebuild -downloadPlatform visionOS
       - name: Run tests (platforms)
         run: make test-platforms
 
