@@ -353,8 +353,9 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
       let lhsItem = lhs._objectIdentifier
       let rhsItem = rhs._objectIdentifier
       if lhsItem == rhsItem {
+        let customType = lhs._customDiffType
         let (lhs, rhs) = lhs._customDiffValues
-        let subjectType = typeName(type(of: lhs))
+        let subjectType = customType.map { typeName($0) } ?? typeName(type(of: lhs))
         var occurrence = tracker.occurrencePerType[subjectType, default: 1] {
           didSet { tracker.occurrencePerType[subjectType] = occurrence }
         }
@@ -807,7 +808,12 @@ private struct Line: CustomDumpStringConvertible, Identifiable {
 
 public protocol _CustomDiffObject {
   var _customDiffValues: (Any, Any) { get }
+  var _customDiffType: Any.Type? { get }
   var _objectIdentifier: ObjectIdentifier { get }
+}
+
+extension _CustomDiffObject {
+  public var _customDiffType: Any.Type? { nil }
 }
 
 extension _CustomDiffObject where Self: AnyObject {
