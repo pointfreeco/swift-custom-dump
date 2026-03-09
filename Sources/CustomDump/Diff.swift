@@ -378,6 +378,9 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
             to: &out
           )
         } else {
+          let id = id
+          tracker.visitedItems.insert(lhsItem)
+          occurrence += 1
           diffChildren(
             lhs: lhs,
             rhs: rhs,
@@ -393,8 +396,6 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
             collapseUnchanged: false,
             filter: macroPropertyFilter(for: lhs)
           )
-          tracker.visitedItems.insert(lhsItem)
-          occurrence += 1
         }
       } else {
         diffEverything()

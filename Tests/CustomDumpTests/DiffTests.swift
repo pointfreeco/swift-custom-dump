@@ -1299,6 +1299,55 @@ final class DiffTests: XCTestCase {
     object.child = object
     XCTAssertNil(diff(object, object))
   }
+
+  func testDiffableObjectNestedIdentity() {
+    let root = SharedNode(
+      before: SharedNodeValue(name: "Root", child: nil),
+      after: SharedNodeValue(name: "Root!", child: nil)
+    )
+    let child = SharedNode(
+      before: SharedNodeValue(name: "Child", child: root),
+      after: SharedNodeValue(name: "Child!", child: root)
+    )
+    root.beforeValue.child = child
+    root.afterValue.child = child
+
+    expectNoDifference(
+      diff(root, root),
+      """
+        #1 SharedNodeValue(
+      -   name: "Root",
+      +   name: "Root!",
+          child: #2 SharedNodeValue(
+      -     name: "Child",
+      +     name: "Child!",
+      -     child: #1 SharedNodeValue(↩︎)
+      +     child: #1 SharedNodeValue(↩︎)
+          )
+        )
+      """
+    )
+  }
+}
+
+private struct SharedNodeValue: Equatable {
+  var name: String
+  var child: SharedNode?
+}
+
+private class SharedNode: _CustomDiffObject, Equatable {
+  var beforeValue: SharedNodeValue
+  var afterValue: SharedNodeValue
+  init(before: SharedNodeValue, after: SharedNodeValue) {
+    self.beforeValue = before
+    self.afterValue = after
+  }
+  var _customDiffValues: (Any, Any) {
+    (self.beforeValue, self.afterValue)
+  }
+  static func == (lhs: SharedNode, rhs: SharedNode) -> Bool {
+    false
+  }
 }
 
 private class Shared: _CustomDiffObject, Equatable {
