@@ -111,6 +111,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
       elementIndent: Int,
       elementSeparator: String,
       collapseUnchanged: Bool,
+      hideUnchanged: Bool = false,
       filter isIncluded: (Mirror.Child) -> Bool = { _ in true },
       areEquivalent: (Mirror.Child, Mirror.Child) -> Bool = { $0.label == $1.label },
       areInIncreasingOrder: ((Mirror.Child, Mirror.Child) -> Bool)? = nil,
@@ -220,6 +221,11 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
 
       func flushUnchanged() {
         guard collapseUnchanged else { return }
+        // When the caller opted into silent-discard mode, drop without printing.
+        if hideUnchanged {
+          unchangedBuffer.removeAll()
+          return
+        }
         if areInIncreasingOrder == nil && unchangedBuffer.count == 1 {
           let child = unchangedBuffer[0]
           print(
@@ -390,7 +396,8 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
             suffix: ")",
             elementIndent: 2,
             elementSeparator: ",",
-            collapseUnchanged: false,
+            collapseUnchanged: format.hideUnchangedChildren,
+            hideUnchanged: format.hideUnchangedChildren,
             filter: macroPropertyFilter(for: lhs)
           )
           tracker.visitedItems.insert(lhsItem)
@@ -426,7 +433,8 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
             suffix: ")",
             elementIndent: 2,
             elementSeparator: ",",
-            collapseUnchanged: false,
+            collapseUnchanged: format.hideUnchangedChildren,
+            hideUnchanged: format.hideUnchangedChildren,
             filter: macroPropertyFilter(for: lhs)
           )
         } else {
@@ -599,7 +607,8 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         suffix: ")",
         elementIndent: 2,
         elementSeparator: ",",
-        collapseUnchanged: false,
+        collapseUnchanged: format.hideUnchangedChildren,
+        hideUnchanged: format.hideUnchangedChildren,
         map: { child, _ in
           if child.label?.first == "." {
             child.label = nil
@@ -671,7 +680,8 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         suffix: ")",
         elementIndent: 2,
         elementSeparator: ",",
-        collapseUnchanged: false,
+        collapseUnchanged: format.hideUnchangedChildren,
+        hideUnchanged: format.hideUnchangedChildren,
         filter: macroPropertyFilter(for: lhs)
       )
 
@@ -683,7 +693,8 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         suffix: ")",
         elementIndent: 2,
         elementSeparator: ",",
-        collapseUnchanged: false,
+        collapseUnchanged: format.hideUnchangedChildren,
+        hideUnchanged: format.hideUnchangedChildren,
         map: { child, _ in
           if child.label?.first == "." {
             child.label = nil
@@ -766,14 +777,21 @@ public struct DiffFormat: Sendable {
   /// something "unchanged."
   public var both: String
 
+  /// When `true`, unchanged children of struct, class, tuple, enum, and `_CustomDiffObject` types
+  /// are silently omitted from the diff output, while the parent container name is still shown.
+  /// Collection, dictionary, set, and multi-line string diffs are unaffected.
+  public var hideUnchangedChildren: Bool
+
   public init(
     first: String,
     second: String,
-    both: String
+    both: String,
+    hideUnchangedChildren: Bool = false
   ) {
     self.first = first
     self.second = second
     self.both = both
+    self.hideUnchangedChildren = hideUnchangedChildren
   }
 
   /// The default format for ``diff(_:_:format:)`` output, appropriate for where monospaced fonts
@@ -790,6 +808,10 @@ public struct DiffFormat: Sendable {
   /// figure space (" ") for unchanged. These three characters are more likely to render with equal
   /// widths in proportional fonts.
   public static let proportional = Self(first: "\u{2212}", second: "+", both: "\u{2007}")
+
+  /// A compact diff format that hides unchanged properties, showing only changed ones with parent
+  /// context. Useful for deep or wide types to reduce noise when only a few fields change.
+  public static let compact = Self(first: "-", second: "+", both: " ", hideUnchangedChildren: true)
 }
 
 private struct Line: CustomDumpStringConvertible, Identifiable {
