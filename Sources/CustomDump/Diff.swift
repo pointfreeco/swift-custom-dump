@@ -355,7 +355,11 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
       if lhsItem == rhsItem {
         let customType = lhs._customDiffType
         let (lhs, rhs) = lhs._customDiffValues
-        let subjectType = customType.map { typeName($0) } ?? typeName(type(of: lhs))
+        let lhsMirror = Mirror(customDumpReflecting: lhs)
+        let rhsMirror = Mirror(customDumpReflecting: rhs)
+        let subjectType =
+          customType.map { typeName($0) }
+          ?? typeName(lhsMirror.subjectType)
         var occurrence = tracker.occurrencePerType[subjectType, default: 1] {
           didSet { tracker.occurrencePerType[subjectType] = occurrence }
         }
@@ -385,8 +389,8 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
           diffChildren(
             lhs: lhs,
             rhs: rhs,
-            Mirror(customDumpReflecting: lhs),
-            Mirror(customDumpReflecting: rhs),
+            lhsMirror,
+            rhsMirror,
             lhsName: "\(lhsName.map { "\($0): " } ?? "")#\(id)",
             rhsName: "\(rhsName.map { "\($0): " } ?? "")#\(id)",
             nameSuffix: "",

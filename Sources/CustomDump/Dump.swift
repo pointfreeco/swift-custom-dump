@@ -190,7 +190,10 @@ func _customDump<T, TargetStream>(
       let item = value._objectIdentifier
       let customType = value._customDiffType
       let (_, value) = value._customDiffValues
-      let subjectType = customType.map { typeName($0) } ?? typeName(type(of: value))
+      let valueMirror = Mirror(customDumpReflecting: value)
+      let subjectType =
+        customType.map { typeName($0) }
+        ?? typeName(valueMirror.subjectType)
       var occurrence = tracker.occurrencePerType[subjectType, default: 1] {
         didSet { tracker.occurrencePerType[subjectType] = occurrence }
       }
@@ -211,7 +214,7 @@ func _customDump<T, TargetStream>(
         occurrence += 1
         if customType != nil {
           dumpChildren(
-            of: Mirror(customDumpReflecting: value),
+            of: valueMirror,
             prefix: "\(subjectType)(",
             suffix: ")",
             shouldSort: false,
