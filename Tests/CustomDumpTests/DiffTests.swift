@@ -1262,8 +1262,7 @@ final class DiffTests: XCTestCase {
       -     name: "Blob"
       +     name: "Blob, Jr"
           ),
-      -   [1]: #1 User(↩︎),
-      +   [1]: #1 User(↩︎),
+          [1]: #1 User(↩︎),
       -   [2]: #1 User(↩︎)
       +   [2]: #2 User(
       +     id: 1,
@@ -1299,6 +1298,107 @@ final class DiffTests: XCTestCase {
     object.child = object
     XCTAssertNil(diff(object, object))
   }
+
+  func testDiffableObjectNestedIdentity() {
+    let root = SharedNode(
+      before: SharedNodeValue(name: "Root", child: nil),
+      after: SharedNodeValue(name: "Root!", child: nil)
+    )
+    let child = SharedNode(
+      before: SharedNodeValue(name: "Child", child: root),
+      after: SharedNodeValue(name: "Child!", child: root)
+    )
+    root.beforeValue.child = child
+    root.afterValue.child = child
+
+    expectNoDifference(
+      diff(root, root),
+      """
+        #1 SharedNodeValue(
+      -   name: "Root",
+      +   name: "Root!",
+          child: #2 SharedNodeValue(
+      -     name: "Child",
+      +     name: "Child!",
+            child: #1 SharedNodeValue(↩︎)
+          )
+        )
+      """
+    )
+  }
+
+  func testDiffableObjectNestedIdentityAcrossGraphs() {
+    let rootOrigin = Origin()
+    let childOrigin = Origin()
+
+    let lhsRoot = SnapshotNode(origin: rootOrigin, name: "Root")
+    let lhsChild = SnapshotNode(origin: childOrigin, name: "Child")
+    lhsRoot.child = lhsChild
+    lhsChild.child = lhsRoot
+
+    let rhsRoot = SnapshotNode(origin: rootOrigin, name: "Root!")
+    let rhsChild = SnapshotNode(origin: childOrigin, name: "Child!")
+    rhsRoot.child = rhsChild
+    rhsChild.child = rhsRoot
+
+    lhsRoot.target = rhsRoot
+    lhsChild.target = rhsChild
+    rhsRoot.target = rhsRoot
+    rhsChild.target = rhsChild
+
+    let difference = diff(lhsRoot, rhsRoot)
+
+    XCTAssertNotNil(difference)
+    XCTAssertTrue(difference?.contains(#"#1 SnapshotNode(↩︎)"#) == true)
+    XCTAssertTrue(difference?.contains(#"#2 SnapshotNode("#) == true)
+  }
+
+  func testDiffableObjectCollectionIdentityAcrossGraphs() {
+    let sharedOrigin = Origin()
+    let firstOrigin = Origin()
+    let secondOrigin = Origin()
+
+    let lhsShared = SnapshotNode(origin: sharedOrigin, name: "Shared")
+    let lhsFirst = SnapshotNode(origin: firstOrigin, name: "First")
+    let lhsSecond = SnapshotNode(origin: secondOrigin, name: "Second")
+    lhsFirst.child = lhsShared
+    lhsSecond.child = lhsShared
+
+    let rhsShared = SnapshotNode(origin: sharedOrigin, name: "Shared")
+    let rhsFirst = SnapshotNode(origin: firstOrigin, name: "First")
+    let rhsSecond = SnapshotNode(origin: secondOrigin, name: "Second")
+    rhsFirst.child = rhsShared
+    rhsSecond.child = rhsShared
+
+    lhsShared.target = rhsShared
+    lhsFirst.target = rhsFirst
+    lhsSecond.target = rhsSecond
+    rhsShared.target = rhsShared
+    rhsFirst.target = rhsFirst
+    rhsSecond.target = rhsSecond
+
+    XCTAssertNil(diff([lhsFirst, lhsSecond], [rhsFirst, rhsSecond]))
+  }
+}
+
+private struct SharedNodeValue: Equatable {
+  var name: String
+  var child: SharedNode?
+}
+
+private class SharedNode: _CustomDiffObject, Equatable {
+  var beforeValue: SharedNodeValue
+  var afterValue: SharedNodeValue
+  init(before: SharedNodeValue, after: SharedNodeValue) {
+    self.beforeValue = before
+    self.afterValue = after
+  }
+  var _customDiffValues: (Any, Any) {
+    (self.beforeValue, self.afterValue)
+  }
+  static func == (lhs: SharedNode, rhs: SharedNode) -> Bool {
+    false
+  }
 }
 
 private class Shared: _CustomDiffObject, Equatable {
@@ -1313,6 +1413,39 @@ private class Shared: _CustomDiffObject, Equatable {
   }
   static func == (lhs: Shared, rhs: Shared) -> Bool {
     false
+  }
+}
+
+private final class Origin {}
+
+private final class SnapshotNode: _CustomDiffObject, CustomDumpReflectable {
+  let origin: Origin
+  let name: String
+  var child: SnapshotNode?
+  var target: SnapshotNode?
+
+  init(origin: Origin, name: String) {
+    self.origin = origin
+    self.name = name
+  }
+
+  var _customDiffValues: (Any, Any) {
+    (self, target ?? self)
+  }
+
+  var _objectIdentifier: ObjectIdentifier {
+    ObjectIdentifier(origin)
+  }
+
+  var customDumpMirror: Mirror {
+    Mirror(
+      self,
+      children: [
+        "name": name,
+        "child": child as Any
+      ],
+      displayStyle: .class
+    )
   }
 }
 
