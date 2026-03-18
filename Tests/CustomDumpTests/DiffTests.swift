@@ -1442,7 +1442,7 @@ private final class SnapshotNode: _CustomDiffObject, CustomDumpReflectable {
       self,
       children: [
         "name": name,
-        "child": child as Any
+        "child": child as Any,
       ],
       displayStyle: .class
     )
