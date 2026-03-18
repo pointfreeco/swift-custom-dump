@@ -372,13 +372,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
           print(
             "\(lhsName.map { "\($0): " } ?? "")#\(id) \(subjectType)(↩︎)\(separator)"
               .indenting(by: indent)
-              .indenting(with: format.first + " "),
-            to: &out
-          )
-          print(
-            "\(rhsName.map { "\($0): " } ?? "")#\(id) \(subjectType)(↩︎)\(separator)"
-              .indenting(by: indent)
-              .indenting(with: format.second + " "),
+              .indenting(with: format.both + " "),
             terminator: "",
             to: &out
           )

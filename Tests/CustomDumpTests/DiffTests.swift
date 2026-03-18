@@ -1262,8 +1262,7 @@ final class DiffTests: XCTestCase {
       -     name: "Blob"
       +     name: "Blob, Jr"
           ),
-      -   [1]: #1 User(↩︎),
-      +   [1]: #1 User(↩︎),
+          [1]: #1 User(↩︎),
       -   [2]: #1 User(↩︎)
       +   [2]: #2 User(
       +     id: 1,
@@ -1321,8 +1320,7 @@ final class DiffTests: XCTestCase {
           child: #2 SharedNodeValue(
       -     name: "Child",
       +     name: "Child!",
-      -     child: #1 SharedNodeValue(↩︎)
-      +     child: #1 SharedNodeValue(↩︎)
+            child: #1 SharedNodeValue(↩︎)
           )
         )
       """
