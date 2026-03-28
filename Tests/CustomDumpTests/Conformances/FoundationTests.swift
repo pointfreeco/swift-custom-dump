@@ -183,6 +183,20 @@ final class FoundationTests: XCTestCase {
         """
       )
     }
+
+    func testNSDataLargeByteCount() {
+      var dump = ""
+      customDump(
+        NSData(data: .init(repeating: 0, count: 16_811)),
+        to: &dump
+      )
+      expectNoDifference(
+        dump,
+        """
+        Data(16,811 bytes)
+        """
+      )
+    }
   #endif
 
   #if !os(WASI)
