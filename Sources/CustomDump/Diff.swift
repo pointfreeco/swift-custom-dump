@@ -353,8 +353,13 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
       let lhsItem = lhs._objectIdentifier
       let rhsItem = rhs._objectIdentifier
       if lhsItem == rhsItem {
+        let customType = lhs._customDiffType
         let (lhs, rhs) = lhs._customDiffValues
-        let subjectType = typeName(type(of: lhs))
+        let lhsMirror = Mirror(customDumpReflecting: lhs)
+        let rhsMirror = Mirror(customDumpReflecting: rhs)
+        let subjectType =
+          customType.map { typeName($0) }
+          ?? typeName(lhsMirror.subjectType)
         var occurrence = tracker.occurrencePerType[subjectType, default: 1] {
           didSet { tracker.occurrencePerType[subjectType] = occurrence }
         }
@@ -367,22 +372,19 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
           print(
             "\(lhsName.map { "\($0): " } ?? "")#\(id) \(subjectType)(↩︎)\(separator)"
               .indenting(by: indent)
-              .indenting(with: format.first + " "),
-            to: &out
-          )
-          print(
-            "\(rhsName.map { "\($0): " } ?? "")#\(id) \(subjectType)(↩︎)\(separator)"
-              .indenting(by: indent)
-              .indenting(with: format.second + " "),
+              .indenting(with: format.both + " "),
             terminator: "",
             to: &out
           )
         } else {
+          let id = id
+          tracker.visitedItems.insert(lhsItem)
+          occurrence += 1
           diffChildren(
             lhs: lhs,
             rhs: rhs,
-            Mirror(customDumpReflecting: lhs),
-            Mirror(customDumpReflecting: rhs),
+            lhsMirror,
+            rhsMirror,
             lhsName: "\(lhsName.map { "\($0): " } ?? "")#\(id)",
             rhsName: "\(rhsName.map { "\($0): " } ?? "")#\(id)",
             nameSuffix: "",
@@ -393,8 +395,6 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
             collapseUnchanged: false,
             filter: macroPropertyFilter(for: lhs)
           )
-          tracker.visitedItems.insert(lhsItem)
-          occurrence += 1
         }
       } else {
         diffEverything()
@@ -806,7 +806,12 @@ private struct Line: CustomDumpStringConvertible, Identifiable {
 
 public protocol _CustomDiffObject {
   var _customDiffValues: (Any, Any) { get }
+  var _customDiffType: Any.Type? { get }
   var _objectIdentifier: ObjectIdentifier { get }
+}
+
+extension _CustomDiffObject {
+  public var _customDiffType: Any.Type? { nil }
 }
 
 extension _CustomDiffObject where Self: AnyObject {

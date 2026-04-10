@@ -1,6 +1,8 @@
 import CustomDump
 import Testing
+import IssueReportingTestSupport
 
+#if !os(Android)
 struct ExpectDifferenceTests {
   @Test func basics() {
     var user = User(id: 42, name: "Blob")
@@ -53,3 +55,4 @@ struct ExpectDifferenceTests {
     }
   }
 }
+#endif

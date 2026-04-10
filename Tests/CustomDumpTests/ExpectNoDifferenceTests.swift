@@ -1,7 +1,9 @@
 import CustomDump
 import Foundation
 import Testing
+import IssueReportingTestSupport
 
+#if !os(Android)
 struct ExpectNoDifferenceTests {
   @Test func basics() {
     struct User: Equatable {
@@ -37,3 +39,4 @@ struct ExpectNoDifferenceTests {
     }
   }
 }
+#endif
