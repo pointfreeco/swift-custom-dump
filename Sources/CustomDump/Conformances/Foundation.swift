@@ -1,7 +1,15 @@
 import Foundation
 
-#if canImport(FoundationNetworking)
-  import FoundationNetworking
+// `FoundationNetworking` only exists as a separate module on swift-corelibs-Foundation
+// platforms (Linux, Android, WASI). It hosts `URLRequest`, `URLSession`, etc. — types
+// that are inside Foundation itself on Apple platforms. The only conformance in this
+// file that uses one of those types is `NSURLRequest: CustomDumpRepresentable` (below),
+// gated on the `Networking` package trait so Android cross-compile consumers can opt
+// out and drop `libFoundationNetworking.so` from their bridge's DT_NEEDED.
+#if Networking
+  #if canImport(FoundationNetworking)
+    import FoundationNetworking
+  #endif
 #endif
 
 // NB: Xcode 13 does not include macOS 12 SDK
@@ -232,7 +240,10 @@ extension NSURLQueryItem: CustomDumpRepresentable {
   }
 }
 
-#if !os(WASI)
+// `NSURLRequest` lives in `FoundationNetworking` on swift-corelibs-Foundation
+// platforms, so this conformance is gated by the `Networking` package trait
+// in addition to the existing WASI exclusion.
+#if !os(WASI) && Networking
   extension NSURLRequest: CustomDumpRepresentable {
     public var customDumpValue: Any {
       self as URLRequest
@@ -273,7 +284,10 @@ extension URL: CustomDumpStringConvertible {
   }
 }
 
-#if !os(WASI)
+// `URLRequest.NetworkServiceType` lives in `FoundationNetworking` on
+// swift-corelibs-Foundation platforms — same trait gate as the `NSURLRequest`
+// conformance above.
+#if !os(WASI) && Networking
   extension URLRequest.NetworkServiceType: CustomDumpStringConvertible {
     public var customDumpDescription: String {
       switch self { #if canImport(FoundationNetworking)
