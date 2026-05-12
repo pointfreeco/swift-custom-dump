@@ -242,9 +242,6 @@ extension NSURLQueryItem: CustomDumpRepresentable {
   }
 }
 
-// `NSURLRequest` lives in `FoundationNetworking` on swift-corelibs-Foundation
-// platforms, so this conformance is gated by the `FoundationNetworking` package
-// trait in addition to the existing WASI exclusion.
 #if !os(WASI) && FoundationNetworking
   extension NSURLRequest: CustomDumpRepresentable {
     public var customDumpValue: Any {
@@ -286,9 +283,6 @@ extension URL: CustomDumpStringConvertible {
   }
 }
 
-// `URLRequest.NetworkServiceType` lives in `FoundationNetworking` on
-// swift-corelibs-Foundation platforms — same trait gate as the `NSURLRequest`
-// conformance above.
 #if !os(WASI) && FoundationNetworking
   extension URLRequest.NetworkServiceType: CustomDumpStringConvertible {
     public var customDumpDescription: String {

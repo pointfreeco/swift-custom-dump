@@ -1,12 +1,4 @@
 // swift-tools-version: 6.1
-// Bumped from 6.0 to 6.1 to use SwiftPM package traits (added in 6.1).
-// The `FoundationNetworking` trait gates the `FoundationNetworking` import +
-// the `NSURLRequest: CustomDumpRepresentable` and
-// `URLRequest.NetworkServiceType: CustomDumpStringConvertible` conformances.
-// Default is on, so existing consumers see no behavior change. Consumers
-// cross-compiling for the Swift Android SDK (or any other split-Foundation
-// target where `libFoundationNetworking.so` is unwanted in DT_NEEDED) can
-// disable it via `traits: []` on their `.package(...)` declaration.
 
 import PackageDescription
 
