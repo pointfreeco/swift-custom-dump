@@ -1,13 +1,5 @@
 import Foundation
 
-// `FoundationNetworking` only exists as a separate module on swift-corelibs-Foundation
-// platforms (Linux, Android, WASI). It hosts `URLRequest`, `URLSession`, etc. — types
-// that are inside Foundation itself on Apple platforms. The conformances in this file
-// that use one of those types — `NSURLRequest: CustomDumpRepresentable` and
-// `URLRequest.NetworkServiceType: CustomDumpStringConvertible` (below) — are gated on
-// the `FoundationNetworking` package trait so cross-compile consumers (Android,
-// static-Linux, WASI bridges) can opt out and drop `libFoundationNetworking.so` from
-// their DT_NEEDED.
 #if FoundationNetworking
   #if canImport(FoundationNetworking)
     import FoundationNetworking
