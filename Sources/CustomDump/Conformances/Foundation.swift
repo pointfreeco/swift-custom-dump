@@ -1,9 +1,7 @@
 import Foundation
 
-#if FoundationNetworking
-  #if canImport(FoundationNetworking)
-    import FoundationNetworking
-  #endif
+#if FoundationNetworking && canImport(FoundationNetworking)
+  import FoundationNetworking
 #endif
 
 // NB: Xcode 13 does not include macOS 12 SDK
