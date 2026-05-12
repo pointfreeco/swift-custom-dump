@@ -2,11 +2,13 @@ import Foundation
 
 // `FoundationNetworking` only exists as a separate module on swift-corelibs-Foundation
 // platforms (Linux, Android, WASI). It hosts `URLRequest`, `URLSession`, etc. — types
-// that are inside Foundation itself on Apple platforms. The only conformance in this
-// file that uses one of those types is `NSURLRequest: CustomDumpRepresentable` (below),
-// gated on the `Networking` package trait so Android cross-compile consumers can opt
-// out and drop `libFoundationNetworking.so` from their bridge's DT_NEEDED.
-#if Networking
+// that are inside Foundation itself on Apple platforms. The conformances in this file
+// that use one of those types — `NSURLRequest: CustomDumpRepresentable` and
+// `URLRequest.NetworkServiceType: CustomDumpStringConvertible` (below) — are gated on
+// the `FoundationNetworking` package trait so cross-compile consumers (Android,
+// static-Linux, WASI bridges) can opt out and drop `libFoundationNetworking.so` from
+// their DT_NEEDED.
+#if FoundationNetworking
   #if canImport(FoundationNetworking)
     import FoundationNetworking
   #endif
@@ -241,9 +243,9 @@ extension NSURLQueryItem: CustomDumpRepresentable {
 }
 
 // `NSURLRequest` lives in `FoundationNetworking` on swift-corelibs-Foundation
-// platforms, so this conformance is gated by the `Networking` package trait
-// in addition to the existing WASI exclusion.
-#if !os(WASI) && Networking
+// platforms, so this conformance is gated by the `FoundationNetworking` package
+// trait in addition to the existing WASI exclusion.
+#if !os(WASI) && FoundationNetworking
   extension NSURLRequest: CustomDumpRepresentable {
     public var customDumpValue: Any {
       self as URLRequest
@@ -287,7 +289,7 @@ extension URL: CustomDumpStringConvertible {
 // `URLRequest.NetworkServiceType` lives in `FoundationNetworking` on
 // swift-corelibs-Foundation platforms — same trait gate as the `NSURLRequest`
 // conformance above.
-#if !os(WASI) && Networking
+#if !os(WASI) && FoundationNetworking
   extension URLRequest.NetworkServiceType: CustomDumpStringConvertible {
     public var customDumpDescription: String {
       switch self { #if canImport(FoundationNetworking)
