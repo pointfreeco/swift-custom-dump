@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.1
 
 import PackageDescription
 
@@ -15,6 +15,10 @@ let package = Package(
       name: "CustomDump",
       targets: ["CustomDump"]
     )
+  ],
+  traits: [
+    "FoundationNetworking",
+    .default(enabledTraits: ["FoundationNetworking"]),
   ],
   dependencies: [
     .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "1.2.2")

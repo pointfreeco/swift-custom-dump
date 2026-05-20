@@ -1,6 +1,6 @@
 import Foundation
 
-#if canImport(FoundationNetworking)
+#if FoundationNetworking && canImport(FoundationNetworking)
   import FoundationNetworking
 #endif
 
@@ -232,7 +232,7 @@ extension NSURLQueryItem: CustomDumpRepresentable {
   }
 }
 
-#if !os(WASI)
+#if FoundationNetworking && canImport(FoundationNetworking)
   extension NSURLRequest: CustomDumpRepresentable {
     public var customDumpValue: Any {
       self as URLRequest
@@ -273,7 +273,7 @@ extension URL: CustomDumpStringConvertible {
   }
 }
 
-#if !os(WASI)
+#if FoundationNetworking && canImport(FoundationNetworking)
   extension URLRequest.NetworkServiceType: CustomDumpStringConvertible {
     public var customDumpDescription: String {
       switch self { #if canImport(FoundationNetworking)
