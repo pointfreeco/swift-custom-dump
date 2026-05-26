@@ -1,4 +1,4 @@
-func typeName(
+@_spi(TypeName) public func typeName(
   _ type: Any.Type,
   qualified: Bool = true,
   genericsAbbreviated: Bool = true
