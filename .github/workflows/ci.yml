@@ -37,24 +37,6 @@ jobs:
       - name: Run tests (platforms)
         run: make test-platforms
 
-  # linux:
-  #   name: Ubuntu
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix:
-  #       swift:
-  #         - '6.2.3'
-  #   steps:
-  #     - uses: actions/checkout@v5
-  #     - name: Install Swift ${{ matrix.swift }}
-  #       uses: swift-actions/setup-swift@v3
-  #       with:
-  #         swift-version: ${{ matrix.swift }}
-  #     - name: Print Swift version
-  #       run: swift --version
-  #     - name: Run tests
-  #       run: make test-swift
-
   # wasm:
   #   name: Wasm
   #   runs-on: ubuntu-latest
@@ -72,3 +54,15 @@ jobs:
 
   #     - name: Build
   #       run: swift build --swift-sdk swift-6.2.3-RELEASE_wasm --target CustomDump -Xlinker -z -Xlinker stack-size=$((1024 * 1024))
+
+  linux-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: "Test Swift Package on Linux"
+        run: swift test
+      - name: "Test Swift Package on Android"
+        uses: skiptools/swift-android-action@v2
+        with:
+          # Ubuntu runners low on space causes the emulator to fail to install
+          free-disk-space: true
