@@ -16,6 +16,8 @@ concurrency:
 jobs:
   macos-26:
     runs-on: macos-26
+    env:
+      ENABLE_ALL_TRAITS: 1
     strategy:
       matrix:
         xcode:

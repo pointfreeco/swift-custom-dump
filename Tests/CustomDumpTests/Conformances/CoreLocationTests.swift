@@ -1,4 +1,4 @@
-#if canImport(CoreLocation)
+#if canImport(CoreLocation) && (CoreLocation && !OmitCoreLocation)
   import CoreLocation
   import CustomDump
   import XCTest

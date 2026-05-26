@@ -1,4 +1,4 @@
-#if canImport(CoreLocation)
+#if canImport(CoreLocation) && (CoreLocation && !OmitCoreLocation)
   import CoreLocation
 
   @available(iOS 13.4, macOS 10.15.4, tvOS 13.4, watchOS 6.2, *)
