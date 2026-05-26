@@ -34,9 +34,16 @@ extension Calendar: CustomDumpReflectable {
 #if !os(WASI)
   extension Data: CustomDumpStringConvertible {
     public var customDumpDescription: String {
-      let formatter = ByteCountFormatter()
-      formatter.allowedUnits = .useBytes
-      return "Data(\(formatter.string(fromByteCount: .init(self.count))))"
+      let bytes = Self.numberFormatter.string(from: self.count as NSNumber) ?? "\(self.count)"
+      return "Data(\(bytes) \(self.count == 1 ? "byte" : "bytes"))"
+    }
+
+    private static var numberFormatter: NumberFormatter {
+      let formatter = NumberFormatter()
+      formatter.locale = Locale(identifier: "en_US_POSIX")
+      formatter.numberStyle = .decimal
+      formatter.usesGroupingSeparator = true
+      return formatter
     }
   }
 #endif
