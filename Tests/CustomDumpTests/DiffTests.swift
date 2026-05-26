@@ -1,5 +1,8 @@
 import CustomDump
 import XCTest
+#if canImport(SwiftUI)
+import SwiftUI
+#endif
 
 @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
 final class DiffTests: XCTestCase {
@@ -1126,6 +1129,46 @@ final class DiffTests: XCTestCase {
       """
     )
   }
+
+#if canImport(SwiftUI)
+  @available(macOS 13, iOS 16, tvOS 16, watchOS 9, *)
+  func testLocalizedStringKey() {
+    XCTAssertNoDifference(
+      diff(
+        "My name is Jack" as LocalizedStringKey,
+        "My name is Jill" as LocalizedStringKey
+      ),
+      """
+      - "My name is Jack"
+      + "My name is Jill"
+      """
+    )
+
+    let name1 = "Jack"
+    let name2 = "Jill"
+    XCTAssertNoDifference(
+      diff(
+        "My name is \(name1)" as LocalizedStringKey,
+        "My name is \(name2)" as LocalizedStringKey
+      ),
+      """
+      - "My name is Jack"
+      + "My name is Jill"
+      """
+    )
+
+    XCTAssertNoDifference(
+      diff(
+        "Time remaining: \(Duration.seconds(10), format: .time(pattern: .minuteSecond))" as LocalizedStringKey,
+        "Time remaining: \(Duration.seconds(9), format: .time(pattern: .minuteSecond))" as LocalizedStringKey
+      ),
+      """
+      - "Time remaining: 0:10"
+      + "Time remaining: 0:09"
+      """
+    )
+  }
+#endif
 
   func testCustomDictionary() {
     XCTAssertEqual(
