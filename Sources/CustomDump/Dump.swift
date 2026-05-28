@@ -1,3 +1,5 @@
+internal import Foundation
+
 /// Dumps the given value's contents using its mirror to standard output.
 ///
 /// This function aims to dump the contents of a value into a nicely formatted, tree-like
@@ -183,10 +185,10 @@ func _customDump<T, TargetStream>(
     case (let value as Any.Type, _):
       out.write("\(typeName(value)).self")
 
-    case (let value as CustomDumpStringConvertible, _):
+    case (let value as any CustomDumpStringConvertible, _):
       out.write(value.customDumpDescription)
 
-    case (let value as _CustomDiffObject, _):
+    case (let value as any _CustomDiffObject, _):
       let item = value._objectIdentifier
       let customType = value._customDiffType
       let (_, value) = value._customDiffValues
@@ -233,7 +235,7 @@ func _customDump<T, TargetStream>(
         }
       }
 
-    case (let value as CustomDumpRepresentable, _):
+    case (let value as any CustomDumpRepresentable, _):
       customDumpHelp(
         value.customDumpValue,
         to: &out,
@@ -298,7 +300,7 @@ func _customDump<T, TargetStream>(
         dumpChildren(
           of: mirror,
           prefix: "[", suffix: "]",
-          shouldSort: mirror.subjectType is _UnorderedCollection.Type,
+          shouldSort: mirror.subjectType is (any _UnorderedCollection.Type),
           by: {
             guard
               let (lhsKey, _) = $0.value as? (key: AnyHashable, value: Any),
@@ -380,7 +382,7 @@ func _customDump<T, TargetStream>(
       dumpChildren(
         of: mirror,
         prefix: "Set([", suffix: "])",
-        shouldSort: mirror.subjectType is _UnorderedCollection.Type,
+        shouldSort: mirror.subjectType is (any _UnorderedCollection.Type),
         by: {
           let lhs = _customDump(
             $0.value,
@@ -488,7 +490,7 @@ func _customDump(
 }
 
 func macroPropertyFilter(for value: Any) -> (Mirror.Child) -> Bool {
-  value is CustomDumpReflectable
+  value is (any CustomDumpReflectable)
     ? { _ in true }
     : { $0.label.map { !$0.hasPrefix("_$") } ?? true }
 }

@@ -1,3 +1,5 @@
+import Foundation
+
 /// Detects differences between two given values by comparing their mirrors and optionally returns
 /// a formatted string describing it.
 ///
@@ -120,8 +122,8 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
       var rhsChildren = Array(rhsMirror.children)
 
       if isMirrorEqual(lhsChildren, rhsChildren),
-        !(lhs is _CustomDiffObject),
-        !(rhs is _CustomDiffObject)
+         !(lhs is (any _CustomDiffObject)),
+         !(rhs is (any _CustomDiffObject))
       {
         let lhsDump =
           _customDump(
@@ -346,10 +348,10 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
     }
 
     switch (lhs, lhsMirror.displayStyle, rhs, rhsMirror.displayStyle) {
-    case (is CustomDumpStringConvertible, _, is CustomDumpStringConvertible, _):
+    case (is any CustomDumpStringConvertible, _, is any CustomDumpStringConvertible, _):
       diffEverything()
 
-    case (let lhs as _CustomDiffObject, _, let rhs as _CustomDiffObject, _):
+    case (let lhs as any _CustomDiffObject, _, let rhs as any _CustomDiffObject, _):
       let lhsItem = lhs._objectIdentifier
       let rhsItem = rhs._objectIdentifier
       if lhsItem == rhsItem {
@@ -400,7 +402,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         diffEverything()
       }
 
-    case (let lhs as CustomDumpRepresentable, _, let rhs as CustomDumpRepresentable, _):
+    case (let lhs as any CustomDumpRepresentable, _, let rhs as any CustomDumpRepresentable, _):
       out.write(
         diffHelp(
           lhs.customDumpValue,
@@ -524,7 +526,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
           }
           return lhs.key == rhs.key
         },
-        areInIncreasingOrder: lhsMirror.subjectType is _UnorderedCollection.Type
+        areInIncreasingOrder: lhsMirror.subjectType is (any _UnorderedCollection.Type)
           ? {
             let (lhsValue, rhsValue): (Any, Any)
             if let lhs = $0.value as? (key: AnyHashable, value: Any),
@@ -640,7 +642,7 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         areEquivalent: {
           isIdentityEqual($0.value, $1.value) || isMirrorEqual($0.value, $1.value)
         },
-        areInIncreasingOrder: lhsMirror.subjectType is _UnorderedCollection.Type
+        areInIncreasingOrder: lhsMirror.subjectType is (any _UnorderedCollection.Type)
           ? {
             let lhsDump = _customDump(
               $0.value,

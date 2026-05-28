@@ -1,5 +1,5 @@
 #if canImport(StoreKit)
-  import StoreKit
+  public import StoreKit
 
   @available(iOS 3, macCatalyst 13, macOS 10.7, tvOS 9, watchOS 6.2, *)
   extension SKPaymentTransactionState: CustomDumpStringConvertible {

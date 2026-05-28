@@ -1,7 +1,7 @@
-import Foundation
+public import Foundation
 
 #if FoundationNetworking && canImport(FoundationNetworking)
-  import FoundationNetworking
+  public import FoundationNetworking
 #endif
 
 // NB: Xcode 13 does not include macOS 12 SDK
@@ -94,7 +94,7 @@ extension NSDate: CustomDumpRepresentable {
 
 extension NSError: CustomDumpReflectable {
   public var customDumpMirror: Mirror {
-    let swiftError = self as Error
+    let swiftError = self as any Error
     guard type(of: swiftError) is NSError.Type else {
       return Mirror(reflecting: swiftError)
     }

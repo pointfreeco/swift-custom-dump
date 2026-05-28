@@ -1,5 +1,5 @@
 #if canImport(CoreMotion)
-  import CoreMotion
+  public import CoreMotion
 
   @available(iOS 11, watchOS 4, *)
   extension CMAuthorizationStatus: CustomDumpStringConvertible {
