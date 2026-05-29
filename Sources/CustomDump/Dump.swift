@@ -300,7 +300,7 @@ func _customDump<T, TargetStream>(
         dumpChildren(
           of: mirror,
           prefix: "[", suffix: "]",
-          shouldSort: mirror.subjectType is (any _UnorderedCollection.Type),
+          shouldSort: mirror.subjectType is any _UnorderedCollection.Type,
           by: {
             guard
               let (lhsKey, _) = $0.value as? (key: AnyHashable, value: Any),
@@ -382,7 +382,7 @@ func _customDump<T, TargetStream>(
       dumpChildren(
         of: mirror,
         prefix: "Set([", suffix: "])",
-        shouldSort: mirror.subjectType is (any _UnorderedCollection.Type),
+        shouldSort: mirror.subjectType is any _UnorderedCollection.Type,
         by: {
           let lhs = _customDump(
             $0.value,
@@ -490,7 +490,7 @@ func _customDump(
 }
 
 func macroPropertyFilter(for value: Any) -> (Mirror.Child) -> Bool {
-  value is (any CustomDumpReflectable)
+  value is any CustomDumpReflectable
     ? { _ in true }
     : { $0.label.map { !$0.hasPrefix("_$") } ?? true }
 }
