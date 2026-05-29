@@ -122,8 +122,8 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
       var rhsChildren = Array(rhsMirror.children)
 
       if isMirrorEqual(lhsChildren, rhsChildren),
-         !(lhs is any _CustomDiffObject),
-         !(rhs is any _CustomDiffObject)
+        !(lhs is any _CustomDiffObject),
+        !(rhs is any _CustomDiffObject)
       {
         let lhsDump =
           _customDump(
