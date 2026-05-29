@@ -1,3 +1,5 @@
+import Foundation
+
 func typeName(
   _ type: Any.Type,
   qualified: Bool = true,

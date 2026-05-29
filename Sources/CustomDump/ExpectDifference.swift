@@ -1,3 +1,4 @@
+import Foundation
 import IssueReporting
 
 /// Expects that a value has a set of changes.

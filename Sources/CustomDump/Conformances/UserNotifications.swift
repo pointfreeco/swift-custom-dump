@@ -1,5 +1,5 @@
 #if canImport(UserNotifications)
-  import UserNotifications
+  public import UserNotifications
 
   @available(iOS 10, macOS 10.14, *)
   @available(tvOS, unavailable)

@@ -1,3 +1,4 @@
+import Foundation
 import IssueReporting
 
 /// Asserts that two values have no difference.

@@ -126,6 +126,6 @@ public protocol CustomDumpReflectable {
 
 extension Mirror {
   init(customDumpReflecting subject: Any) {
-    self = (subject as? CustomDumpReflectable)?.customDumpMirror ?? Mirror(reflecting: subject)
+    self = (subject as? any CustomDumpReflectable)?.customDumpMirror ?? Mirror(reflecting: subject)
   }
 }

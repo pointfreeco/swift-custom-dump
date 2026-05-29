@@ -1,5 +1,5 @@
 #if canImport(UserNotificationsUI)
-  import UserNotificationsUI
+  public import UserNotificationsUI
 
   @available(iOS 10, macCatalyst 14, macOS 11, *)
   @available(tvOS, unavailable)

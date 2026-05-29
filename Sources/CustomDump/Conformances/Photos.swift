@@ -1,5 +1,5 @@
 #if canImport(Photos)
-  import Photos
+  public import Photos
 
   @available(iOS 14, macCatalyst 14, macOS 11, tvOS 14, *)
   extension PHAccessLevel: CustomDumpStringConvertible {

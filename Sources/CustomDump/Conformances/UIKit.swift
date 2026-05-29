@@ -1,5 +1,5 @@
 #if canImport(UIKit)
-  import UIKit
+  public import UIKit
 
   #if !os(watchOS)
     @available(iOS 3.2, macCatalyst 13, tvOS 9, *)

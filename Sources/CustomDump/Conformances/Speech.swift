@@ -1,5 +1,5 @@
 #if canImport(Speech)
-  import Speech
+  public import Speech
 
   @available(iOS 10, macOS 10.15, *)
   @available(tvOS, unavailable)

@@ -1,5 +1,5 @@
 #if canImport(CoreImage)
-  import CoreImage
+  public import CoreImage
 
   @available(watchOS, unavailable)
   extension CIQRCodeDescriptor.ErrorCorrectionLevel: CustomDumpStringConvertible {
