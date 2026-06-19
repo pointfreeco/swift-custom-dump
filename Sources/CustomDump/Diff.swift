@@ -165,7 +165,10 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         return
       }
 
-      guard !lhsMirror.isSingleValueContainer && !rhsMirror.isSingleValueContainer
+      guard
+        (!lhsMirror.isSingleValueContainer && !rhsMirror.isSingleValueContainer)
+          || lhs is any _CustomDiffObject
+          || rhs is any _CustomDiffObject
       else {
         print(
           _customDump(
