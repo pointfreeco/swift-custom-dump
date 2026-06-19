@@ -1379,6 +1379,25 @@ final class DiffTests: XCTestCase {
 
     XCTAssertNil(diff([lhsFirst, lhsSecond], [rhsFirst, rhsSecond]))
   }
+
+  func testDiffableObjectSingleValueContainer() {
+    let origin = Origin()
+    let lhs = SingleValueNode(origin: origin, numbers: [])
+    let rhs = SingleValueNode(origin: origin, numbers: [4])
+    lhs.target = rhs
+    rhs.target = rhs
+
+    expectNoDifference(
+      diff(lhs, rhs),
+      """
+        #1 SingleValueNode(
+          numbers: [
+      +     [0]: 4
+          ]
+        )
+      """
+    )
+  }
 }
 
 private struct SharedNodeValue: Equatable {
@@ -1445,6 +1464,33 @@ private final class SnapshotNode: _CustomDiffObject, CustomDumpReflectable {
         "child": child as Any,
       ],
       displayStyle: .class
+    )
+  }
+}
+
+private final class SingleValueNode: _CustomDiffObject, CustomDumpReflectable {
+  let origin: Origin
+  var numbers: [Int]
+  var target: SingleValueNode?
+
+  init(origin: Origin, numbers: [Int]) {
+    self.origin = origin
+    self.numbers = numbers
+  }
+
+  var _customDiffValues: (Any, Any) {
+    (self, target ?? self)
+  }
+
+  var _objectIdentifier: ObjectIdentifier {
+    ObjectIdentifier(origin)
+  }
+
+  var customDumpMirror: Mirror {
+    Mirror(
+      self,
+      children: ["numbers": numbers],
+      displayStyle: .struct
     )
   }
 }
