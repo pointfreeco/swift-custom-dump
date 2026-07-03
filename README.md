@@ -1,6 +1,6 @@
 # Custom Dump
 
-[![](https://img.shields.io/badge/SPI-documentation-blue)](https://swiftpackageindex.com/pointfreeco/swift-custom-dump/main/documentation/customdump)
+[![](https://img.shields.io/badge/documentation-gray?logo=swift&logoColor=white)](https://swiftpackageindex.com/pointfreeco/swift-custom-dump/main/documentation/customdump)
 [![CI](https://github.com/pointfreeco/swift-custom-dump/actions/workflows/ci.yml/badge.svg)](https://github.com/pointfreeco/swift-custom-dump/actions/workflows/ci.yml)
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fpointfreeco%2Fswift-custom-dump%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/pointfreeco/swift-custom-dump)
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fpointfreeco%2Fswift-custom-dump%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/pointfreeco/swift-custom-dump)
