@@ -54,8 +54,3 @@ extension SIMD {
 extension SIMD2: CustomDumpReflectable {}
 extension SIMD3: CustomDumpReflectable {}
 extension SIMD4: CustomDumpReflectable {}
-extension SIMD8: CustomDumpReflectable {}
-extension SIMD16: CustomDumpReflectable {}
-extension SIMD32: CustomDumpReflectable {}
-extension SIMD64: CustomDumpReflectable {}
-extension SIMDMask: CustomDumpReflectable {}
