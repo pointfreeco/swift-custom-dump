@@ -196,7 +196,7 @@ func _customDump<T, TargetStream>(
       let subjectType =
         customType.map { typeName($0) }
         ?? typeName(valueMirror.subjectType)
-      var occurrence = tracker.occurrencePerType[subjectType, default: 1] {
+      var occurrence = tracker.occurrencePerType[subjectType, default: 0] {
         didSet { tracker.occurrencePerType[subjectType] = occurrence }
       }
 

@@ -1335,12 +1335,12 @@ final class DumpTests: XCTestCase {
       """
       DumpTests.DiffableObjectsParent(
         objs1: DumpTests.DiffableObjects(
-          obj1: #1 DumpTests.Login(email: "admin@pointfree.co"),
-          obj2: #1 DumpTests.Login(↩︎)
+          obj1: DumpTests.Login(email: "admin@pointfree.co"),
+          obj2: DumpTests.Login(↩︎)
         ),
         objs2: DumpTests.DiffableObjects(
-          obj1: #2 DumpTests.Login(email: "admin@pointfree.co"),
-          obj2: #2 DumpTests.Login(↩︎)
+          obj1: #1 DumpTests.Login(email: "admin@pointfree.co"),
+          obj2: #1 DumpTests.Login(↩︎)
         )
       )
       """
@@ -1356,12 +1356,12 @@ final class DumpTests: XCTestCase {
       """
       DumpTests.DiffableObjectsParent(
         objs1: DumpTests.DiffableObjects(
-          obj1: #1 DumpTests.Login(email: "admin@pointfree.co"),
-          obj2: #2 DumpTests.Login(email: "admin@pointfree.co")
+          obj1: DumpTests.Login(email: "admin@pointfree.co"),
+          obj2: #1 DumpTests.Login(email: "admin@pointfree.co")
         ),
         objs2: DumpTests.DiffableObjects(
-          obj1: #2 DumpTests.Login(↩︎),
-          obj2: #1 DumpTests.Login(↩︎)
+          obj1: #1 DumpTests.Login(↩︎),
+          obj2: DumpTests.Login(↩︎)
         )
       )
       """
@@ -1399,12 +1399,12 @@ final class DumpTests: XCTestCase {
       """
       DumpTests.DiffableObjectsParent(
         objs1: DumpTests.DiffableObjects(
-          obj1: #1 "after",
-          obj2: #1 String(↩︎)
+          obj1: "after",
+          obj2: String(↩︎)
         ),
         objs2: DumpTests.DiffableObjects(
-          obj1: #2 "after",
-          obj2: #2 String(↩︎)
+          obj1: #1 "after",
+          obj2: #1 String(↩︎)
         )
       )
       """

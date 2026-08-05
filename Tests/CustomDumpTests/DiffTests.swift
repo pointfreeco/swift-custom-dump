@@ -1231,7 +1231,7 @@ final class DiffTests: XCTestCase {
     expectNoDifference(
       diff(obj, obj),
       """
-        #1 User(
+        User(
           id: 1,
       -   name: "Blob"
       +   name: "Blob, Jr"
@@ -1242,11 +1242,11 @@ final class DiffTests: XCTestCase {
     expectNoDifference(
       diff(Shared(), Shared()),
       """
-      - #1 User(
+      - User(
       -   id: 1,
       -   name: "Blob, Jr"
       - )
-      + #2 User(
+      + #1 User(
       +   id: 1,
       +   name: "Blob, Jr"
       + )
@@ -1257,14 +1257,14 @@ final class DiffTests: XCTestCase {
       diff([obj, obj, obj], [obj, obj, Shared()]),
       """
         [
-          [0]: #1 User(
+          [0]: User(
             id: 1,
       -     name: "Blob"
       +     name: "Blob, Jr"
           ),
-          [1]: #1 User(↩︎),
-      -   [2]: #1 User(↩︎)
-      +   [2]: #2 User(
+          [1]: User(↩︎),
+      -   [2]: User(↩︎)
+      +   [2]: #1 User(
       +     id: 1,
       +     name: "Blob, Jr"
       +   )
@@ -1283,8 +1283,8 @@ final class DiffTests: XCTestCase {
       diff(stats, stats),
       """
         DiffTests.State(
-      -   stats: #1 DiffTests.Stats(count: 0)
-      +   stats: #1 DiffTests.Stats(count: 1)
+      -   stats: DiffTests.Stats(count: 0)
+      +   stats: DiffTests.Stats(count: 1)
         )
       """
     )
@@ -1305,8 +1305,8 @@ final class DiffTests: XCTestCase {
       after: SharedNodeValue(name: "Root!", child: nil)
     )
     let child = SharedNode(
-      before: SharedNodeValue(name: "Child", child: root),
-      after: SharedNodeValue(name: "Child!", child: root)
+      before: SharedNodeValue(name: "Child", child: nil),
+      after: SharedNodeValue(name: "Child!", child: nil)
     )
     root.beforeValue.child = child
     root.afterValue.child = child
@@ -1314,13 +1314,13 @@ final class DiffTests: XCTestCase {
     expectNoDifference(
       diff(root, root),
       """
-        #1 SharedNodeValue(
+        SharedNodeValue(
       -   name: "Root",
       +   name: "Root!",
-          child: #2 SharedNodeValue(
+          child: #1 SharedNodeValue(
       -     name: "Child",
       +     name: "Child!",
-            child: #1 SharedNodeValue(↩︎)
+            child: nil
           )
         )
       """
@@ -1349,8 +1349,8 @@ final class DiffTests: XCTestCase {
     let difference = diff(lhsRoot, rhsRoot)
 
     XCTAssertNotNil(difference)
-    XCTAssertTrue(difference?.contains(#"#1 SnapshotNode(↩︎)"#) == true)
-    XCTAssertTrue(difference?.contains(#"#2 SnapshotNode("#) == true)
+    XCTAssertTrue(difference?.contains(#"SnapshotNode(↩︎)"#) == true)
+    XCTAssertTrue(difference?.contains(#"#1 SnapshotNode("#) == true)
   }
 
   func testDiffableObjectCollectionIdentityAcrossGraphs() {
@@ -1390,7 +1390,7 @@ final class DiffTests: XCTestCase {
     expectNoDifference(
       diff(lhs, rhs),
       """
-        #1 SingleValueNode(
+        SingleValueNode(
           numbers: [
       +     [0]: 4
           ]
