@@ -37,6 +37,74 @@
   }
 
   @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
+  extension Color: CustomDumpStringConvertible {
+    public var customDumpDescription: String {
+      if #available(macOS 12, iOS 15, tvOS 15, watchOS 8, *) {
+        switch self {
+        case .brown:
+          return "Color.brown"
+        case .cyan:
+          return "Color.cyan"
+        case .indigo:
+          return "Color.indigo"
+        case .mint:
+          return "Color.mint"
+        case .teal:
+          return "Color.teal"
+        default:
+          break
+        }
+      }
+      if #available(macOS 11, iOS 14, tvOS 14, watchOS 7, *), self == .accentColor {
+        return "Color.accentColor"
+      }
+      switch self {
+      case .black:
+        return "Color.black"
+      case .blue:
+        return "Color.blue"
+      case .clear:
+        return "Color.clear"
+      case .gray:
+        return "Color.gray"
+      case .green:
+        return "Color.green"
+      case .orange:
+        return "Color.orange"
+      case .pink:
+        return "Color.pink"
+      case .primary:
+        return "Color.primary"
+      case .purple:
+        return "Color.purple"
+      case .red:
+        return "Color.red"
+      case .secondary:
+        return "Color.secondary"
+      case .white:
+        return "Color.white"
+      case .yellow:
+        return "Color.yellow"
+      default:
+        var tracker = ObjectTracker()
+        let base = _customDump(
+          Mirror(reflecting: self).children.first?.value as Any,
+          name: nil,
+          indent: 2,
+          isRoot: false,
+          maxDepth: .max,
+          tracker: &tracker
+        )
+        return """
+          Color(
+          \(base)
+          )
+          """
+      }
+    }
+  }
+
+  @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
   extension LocalizedStringKey: CustomDumpRepresentable {
     public var customDumpValue: Any {
       self.formatted()
