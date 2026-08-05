@@ -1245,6 +1245,44 @@ final class DumpTests: XCTestCase {
         Animation.easeInOut
         """
       )
+
+      dump = ""
+      customDump(
+        Color.red,
+        to: &dump
+      )
+      expectNoDifference(
+        dump,
+        """
+        Color.red
+        """
+      )
+
+      dump = ""
+      customDump(
+        Color(white: 0.5),
+        to: &dump
+      )
+      expectNoDifference(
+        dump,
+        """
+        Color(
+          ColorBox(
+            base: ResolvedColorProvider(
+              color: (extension in SwiftUI):Color.ResolvedHDR(
+                base: Color.Resolved(
+                  linearRed: 0.21404114,
+                  linearGreen: 0.21404114,
+                  linearBlue: 0.21404114,
+                  opacity: 1.0
+                ),
+                _headroom: nan
+              )
+            )
+          )
+        )
+        """
+      )
     }
   #endif
 
