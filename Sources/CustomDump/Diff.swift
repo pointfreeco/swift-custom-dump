@@ -365,24 +365,33 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         let subjectType =
           customType.map { typeName($0) }
           ?? typeName(lhsMirror.subjectType)
-        var occurrence = tracker.occurrencePerType[subjectType, default: 1] {
+        var occurrence = tracker.occurrencePerType[subjectType, default: 0] {
           didSet { tracker.occurrencePerType[subjectType] = occurrence }
         }
-        var id: UInt {
+        var id: String {
           let id = tracker.idPerItem[lhsItem, default: occurrence]
           tracker.idPerItem[lhsItem] = id
-          return id
+          return id > 0 ? "#\(id)" : ""
+        }
+        func label(_ name: String?) -> String? {
+          switch (name, id.isEmpty) {
+          case let (name?, false): return "\(name): \(id)"
+          case let (name?, true): return "\(name):"
+          case (nil, false): return id
+          case (nil, true): return nil
+          }
         }
         if tracker.visitedItems.contains(lhsItem) {
           print(
-            "\(lhsName.map { "\($0): " } ?? "")#\(id) \(subjectType)(↩︎)\(separator)"
+            "\(lhsName.map { "\($0): " } ?? "")\(id.isEmpty ? "" : "\(id) ")\(subjectType)(↩︎)\(separator)"
               .indenting(by: indent)
               .indenting(with: format.both + " "),
             terminator: "",
             to: &out
           )
         } else {
-          let id = id
+          let lhsLabel = label(lhsName)
+          let rhsLabel = label(rhsName)
           tracker.visitedItems.insert(lhsItem)
           occurrence += 1
           diffChildren(
@@ -390,8 +399,8 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
             rhs: rhs,
             lhsMirror,
             rhsMirror,
-            lhsName: "\(lhsName.map { "\($0): " } ?? "")#\(id)",
-            rhsName: "\(rhsName.map { "\($0): " } ?? "")#\(id)",
+            lhsName: lhsLabel,
+            rhsName: rhsLabel,
             nameSuffix: "",
             prefix: "\(subjectType)(",
             suffix: ")",
