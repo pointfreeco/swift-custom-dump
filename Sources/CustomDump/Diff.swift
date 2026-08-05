@@ -375,8 +375,8 @@ public func diff<T>(_ lhs: T, _ rhs: T, format: DiffFormat = .default) -> String
         }
         func label(_ name: String?) -> String? {
           switch (name, id.isEmpty) {
-          case let (name?, false): return "\(name): \(id)"
-          case let (name?, true): return "\(name):"
+          case (let name?, false): return "\(name): \(id)"
+          case (let name?, true): return "\(name):"
           case (nil, false): return id
           case (nil, true): return nil
           }
