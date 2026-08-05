@@ -44,3 +44,13 @@ extension AnyHashable: CustomDumpRepresentable {
     base
   }
 }
+
+extension SIMD {
+  public var customDumpMirror: Mirror {
+    Mirror(self, unlabeledChildren: indices.map { self[$0] })
+  }
+}
+
+extension SIMD2: CustomDumpReflectable {}
+extension SIMD3: CustomDumpReflectable {}
+extension SIMD4: CustomDumpReflectable {}

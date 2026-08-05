@@ -82,4 +82,14 @@ final class SwiftTests: XCTestCase {
       """
     )
   }
+
+  func testSIMD() {
+    let simd: SIMD4<Float> = [1, 2, 4, 8]
+    var dump = ""
+    customDump(simd, to: &dump)
+    expectNoDifference(
+      dump,
+      "SIMD4<Float>(1.0, 2.0, 4.0, 8.0)"
+    )
+  }
 }
