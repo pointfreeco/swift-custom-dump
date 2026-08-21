@@ -1,13 +1,13 @@
 {
-  "originHash" : "b8074a296a58bd0e3a7e2a4bec81624e2dfa3114663fceb0c68d7abb02c67c32",
+  "originHash" : "d232c85b5a3407a15049fedcc4685772d0cc74496d09143fe9bc202e53075c49",
   "pins" : [
     {
-      "identity" : "xctest-dynamic-overlay",
+      "identity" : "swift-issue-reporting",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/pointfreeco/xctest-dynamic-overlay",
+      "location" : "https://github.com/pointfreeco/swift-issue-reporting",
       "state" : {
-        "branch" : "xcode-26-fix",
-        "revision" : "8f50fd37682807c9fa193340dc477f3b8c76291b"
+        "revision" : "71c7c9a761d1ca6ed4ccb6ced040fe1c1a39e8e7",
+        "version" : "2.1.0"
       }
     }
   ],
