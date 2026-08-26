@@ -21,21 +21,20 @@ let package = Package(
     .default(enabledTraits: ["FoundationNetworking"]),
   ],
   dependencies: [
-    .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "1.2.2")
+    .package(url: "https://github.com/pointfreeco/swift-issue-reporting", from: "2.0.0")
   ],
   targets: [
     .target(
       name: "CustomDump",
       dependencies: [
-        .product(name: "IssueReporting", package: "xctest-dynamic-overlay"),
-        .product(name: "XCTestDynamicOverlay", package: "xctest-dynamic-overlay"),
+        .product(name: "IssueReporting", package: "swift-issue-reporting"),
       ]
     ),
     .testTarget(
       name: "CustomDumpTests",
       dependencies: [
         "CustomDump",
-        .product(name: "IssueReportingTestSupport", package: "xctest-dynamic-overlay"),
+        .product(name: "IssueReportingTestSupport", package: "swift-issue-reporting"),
       ]
     ),
   ]

@@ -556,7 +556,7 @@ final class FoundationTests: XCTestCase {
       NSURL(fileURLWithPath: "/tmp"),
       to: &dump
     )
-    #if os(Windows) || os(WASI)
+    #if os(Android) || os(WASI) || os(Windows)
       expectNoDifference(
         dump,
         """

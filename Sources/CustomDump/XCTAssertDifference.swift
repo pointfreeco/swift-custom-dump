@@ -1,4 +1,4 @@
-import XCTestDynamicOverlay
+import IssueReporting
 
 @available(*, deprecated, renamed: "expectDifference")
 public func XCTAssertDifference<T>(
@@ -6,8 +6,10 @@ public func XCTAssertDifference<T>(
   _ message: @autoclosure () -> String = "",
   operation: () throws -> Void = {},
   changes updateExpectingResult: (inout T) throws -> Void,
-  file: StaticString = #filePath,
-  line: UInt = #line
+  fileID: StaticString = #fileID,
+  file filePath: StaticString = #filePath,
+  line: UInt = #line,
+  column: UInt = #column
 ) where T: Equatable {
   do {
     var expression1 = try expression()
@@ -19,13 +21,15 @@ public func XCTAssertDifference<T>(
     let format = DiffFormat.proportional
     guard let difference = diff(expression1, expression2, format: format)
     else {
-      XCTFail(
+      reportIssue(
         """
         XCTAssertDifference failed: ("\(expression1)" is not equal to ("\(expression2)"), but no \
         difference was detected.
         """,
-        file: file,
-        line: line
+        fileID: fileID,
+        filePath: filePath,
+        line: line,
+        column: column
       )
       return
     }
@@ -36,18 +40,22 @@ public func XCTAssertDifference<T>(
 
       (Expected: \(format.first), Actual: \(format.second))
       """
-    XCTFail(
+    reportIssue(
       "\(failure)\(message.isEmpty ? "" : " - \(message)")",
-      file: file,
-      line: line
+      fileID: fileID,
+      filePath: filePath,
+      line: line,
+      column: column
     )
   } catch {
-    XCTFail(
+    reportIssue(
       """
       XCTAssertDifference failed: threw error "\(error)"
       """,
-      file: file,
-      line: line
+      fileID: fileID,
+      filePath: filePath,
+      line: line,
+      column: column
     )
   }
 }
@@ -58,8 +66,10 @@ public func XCTAssertDifference<T: Sendable>(
   _ message: @autoclosure @Sendable () -> String = "",
   operation: @Sendable () async throws -> Void = {},
   changes updateExpectingResult: @Sendable (inout T) throws -> Void,
-  file: StaticString = #filePath,
-  line: UInt = #line
+  fileID: StaticString = #fileID,
+  file filePath: StaticString = #filePath,
+  line: UInt = #line,
+  column: UInt = #column
 ) async where T: Equatable {
   do {
     var expression1 = try expression()
@@ -71,13 +81,15 @@ public func XCTAssertDifference<T: Sendable>(
     let format = DiffFormat.proportional
     guard let difference = diff(expression1, expression2, format: format)
     else {
-      XCTFail(
+      reportIssue(
         """
         XCTAssertDifference failed: ("\(expression1)" is not equal to ("\(expression2)"), but no \
         difference was detected.
         """,
-        file: file,
-        line: line
+        fileID: fileID,
+        filePath: filePath,
+        line: line,
+        column: column
       )
       return
     }
@@ -88,18 +100,22 @@ public func XCTAssertDifference<T: Sendable>(
 
       (Expected: \(format.first), Actual: \(format.second))
       """
-    XCTFail(
+    reportIssue(
       "\(failure)\(message.isEmpty ? "" : " - \(message)")",
-      file: file,
-      line: line
+      fileID: fileID,
+      filePath: filePath,
+      line: line,
+      column: column
     )
   } catch {
-    XCTFail(
+    reportIssue(
       """
       XCTAssertDifference failed: threw error "\(error)"
       """,
-      file: file,
-      line: line
+      fileID: fileID,
+      filePath: filePath,
+      line: line,
+      column: column
     )
   }
 }
