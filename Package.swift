@@ -27,7 +27,7 @@ let package = Package(
     .target(
       name: "CustomDump",
       dependencies: [
-        .product(name: "IssueReporting", package: "swift-issue-reporting"),
+        .product(name: "IssueReporting", package: "swift-issue-reporting")
       ]
     ),
     .testTarget(

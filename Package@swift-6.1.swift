@@ -27,7 +27,7 @@ let package = Package(
     .target(
       name: "CustomDump",
       dependencies: [
-        .product(name: "IssueReporting", package: "xctest-dynamic-overlay"),
+        .product(name: "IssueReporting", package: "xctest-dynamic-overlay")
       ]
     ),
     .testTarget(
