@@ -1,13 +1,13 @@
 {
-  "originHash" : "6f68f2fe1f6c6b8186c49a7e0648a92258927fa22b926440c59a5bd7ee1a76be",
+  "originHash" : "d232c85b5a3407a15049fedcc4685772d0cc74496d09143fe9bc202e53075c49",
   "pins" : [
     {
       "identity" : "swift-issue-reporting",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-issue-reporting",
       "state" : {
-        "revision" : "d6adc8bc81e8ba37d3ecd094b78450853738a89f",
-        "version" : "2.0.0"
+        "revision" : "71c7c9a761d1ca6ed4ccb6ced040fe1c1a39e8e7",
+        "version" : "2.1.0"
       }
     }
   ],

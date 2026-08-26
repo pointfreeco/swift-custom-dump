@@ -1,4 +1,4 @@
-// swift-tools-version: 6.4
+// swift-tools-version: 6.1
 
 import PackageDescription
 
@@ -21,20 +21,20 @@ let package = Package(
     .default(enabledTraits: ["FoundationNetworking"]),
   ],
   dependencies: [
-    .package(url: "https://github.com/pointfreeco/swift-issue-reporting", from: "2.1.0")
+    .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", branch: "xcode-26-fix")
   ],
   targets: [
     .target(
       name: "CustomDump",
       dependencies: [
-        .product(name: "IssueReporting", package: "swift-issue-reporting"),
+        .product(name: "IssueReporting", package: "xctest-dynamic-overlay"),
       ]
     ),
     .testTarget(
       name: "CustomDumpTests",
       dependencies: [
         "CustomDump",
-        .product(name: "IssueReportingTestSupport", package: "swift-issue-reporting"),
+        .product(name: "IssueReportingTestSupport", package: "xctest-dynamic-overlay"),
       ]
     ),
   ]
