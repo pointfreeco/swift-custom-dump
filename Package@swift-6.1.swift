@@ -21,7 +21,7 @@ let package = Package(
     .default(enabledTraits: ["FoundationNetworking"]),
   ],
   dependencies: [
-    .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "1.13.0"),
+    .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "1.13.0")
   ],
   targets: [
     .target(
