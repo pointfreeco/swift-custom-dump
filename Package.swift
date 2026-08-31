@@ -28,7 +28,8 @@ let package = Package(
       name: "CustomDump",
       dependencies: [
         .product(name: "IssueReporting", package: "swift-issue-reporting")
-      ]
+      ],
+      resources: [.process("PrivacyInfo.xcprivacy")]
     ),
     .testTarget(
       name: "CustomDumpTests",
