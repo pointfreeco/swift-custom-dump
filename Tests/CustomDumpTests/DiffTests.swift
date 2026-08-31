@@ -728,6 +728,106 @@ final class DiffTests: XCTestCase {
     )
   }
 
+  func testHideUnchangedChildren() {
+    // Test 1: Struct — unchanged property hidden (last element changes)
+    expectNoDifference(
+      diff(User(id: 42, name: "Blob"), User(id: 42, name: "Blob, Jr."), format: .compact),
+      """
+        User(
+      -   name: "Blob"
+      +   name: "Blob, Jr."
+        )
+      """
+    )
+
+    // Test 2: Struct — changed property in the middle (trailing comma expected)
+    struct Info: Equatable {
+      var age: Int
+      var name: String
+      var email: String
+    }
+    expectNoDifference(
+      diff(
+        Info(age: 30, name: "Blob", email: "blob@example.com"),
+        Info(age: 30, name: "Blob, Jr.", email: "blob@example.com"),
+        format: .compact
+      ),
+      """
+        DiffTests.Info(
+      -   name: "Blob",
+      +   name: "Blob, Jr.",
+        )
+      """
+    )
+
+    // Test 3: Enum — unchanged associated value hidden
+    expectNoDifference(
+      diff(Enum.fizz(42, buzz: "Blob"), Enum.fizz(42, buzz: "Glob"), format: .compact),
+      """
+        Enum.fizz(
+      -   buzz: "Blob"
+      +   buzz: "Glob"
+        )
+      """
+    )
+
+    // Test 4: Tuple — unchanged elements hidden
+    expectNoDifference(
+      diff((42, "Blob"), (42, "Blob, Jr."), format: .compact),
+      """
+        (
+      -   "Blob"
+      +   "Blob, Jr."
+        )
+      """
+    )
+
+    // Test 5: Nested struct — unchanged at both levels hidden
+    expectNoDifference(
+      diff(
+        Pair(driver: User(id: 1, name: "Blob"), passenger: User(id: 2, name: "Blob, Jr.")),
+        Pair(driver: User(id: 1, name: "Blob"), passenger: User(id: 2, name: "Blob, Sr.")),
+        format: .compact
+      ),
+      """
+        Pair(
+          passenger: User(
+      -     name: "Blob, Jr."
+      +     name: "Blob, Sr."
+          )
+        )
+      """
+    )
+
+    // Test 6: Collection is NOT silently dropped — still shows `… (N unchanged)`
+    expectNoDifference(
+      diff([1, 2, 3, 4, 5], [1, 2, 99, 4, 5], format: .compact),
+      """
+        [
+          … (2 unchanged),
+      -   [2]: 3,
+      +   [2]: 99,
+          … (2 unchanged)
+        ]
+      """
+    )
+
+    // Test 7: Default format still shows all unchanged properties (regression)
+    expectNoDifference(
+      diff(User(id: 42, name: "Blob"), User(id: 42, name: "Blob, Jr.")),
+      """
+        User(
+          id: 42,
+      -   name: "Blob"
+      +   name: "Blob, Jr."
+        )
+      """
+    )
+
+    // Test 8: Equal values return `nil` with `.compact`
+    XCTAssertEqual(diff(User(id: 1, name: "Blob"), User(id: 1, name: "Blob"), format: .compact), nil)
+  }
+
   #if !os(WASI)
     func testNestedCustomMirror() {
       #if compiler(>=5.4)
